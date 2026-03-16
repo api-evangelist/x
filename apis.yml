@@ -8,7 +8,7 @@ image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
 tags:
   - API
 created: '2025-08-14'
-modified: '2025-08-14'
+modified: '2026-03-16'
 url: https://raw.githubusercontent.com/api-evangelist/x/refs/heads/main/apis.yml
 specificationVersion: '0.19'
 apis:
@@ -23,4 +23,4 @@ apis:
         url: ' https://developer.x.com/en'
 maintainers:
   - FN: Kin Lane
-    email: info@apievangelist.com
+    email: kin@apievangelist.com
