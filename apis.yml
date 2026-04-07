@@ -1,6 +1,7 @@
 aid: x
 name: X
-description: 'Get immediate access to the X API and unlock the potential of X data '
+description: >-
+  Get immediate access to the X API and unlock the potential of X data.
 type: Index
 position: Consumer
 access: 3rd-Party
@@ -14,7 +15,8 @@ specificationVersion: '0.19'
 apis:
   - aid: x:x
     name: X
-    description: 'Get immediate access to the X API and unlock the potential of X data '
+    description: >-
+      Get immediate access to the X API and unlock the potential of X data.
     humanURL: ' https://developer.x.com/en'
     tags:
       - API
