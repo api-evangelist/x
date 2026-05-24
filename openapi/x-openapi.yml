@@ -1,0 +1,118 @@
+openapi: 3.1.0
+info:
+  title: X API v2
+  version: "2.0"
+  description: |
+    The X (formerly Twitter) API v2 provides programmatic access to posts, users,
+    spaces, direct messages, lists, and trends. Endpoints derived from the public
+    X API v2 introduction documentation at docs.x.com.
+  contact:
+    name: X Developer Platform
+    url: https://docs.x.com/x-api/introduction
+servers:
+  - url: https://api.x.com/2
+    description: X API v2 production server
+security:
+  - BearerAuth: []
+tags:
+  - name: Posts
+  - name: Users
+  - name: Trends
+paths:
+  /tweets:
+    post:
+      tags: [Posts]
+      summary: Create a new post
+      operationId: createTweet
+      responses:
+        '201':
+          description: Created post
+  /tweets/search/all:
+    get:
+      tags: [Posts]
+      summary: Full-archive search of posts
+      operationId: searchAllTweets
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search query in X query language
+      responses:
+        '200':
+          description: Matching posts
+  /tweets/search/stream:
+    get:
+      tags: [Posts]
+      summary: Near real-time filtered stream of posts
+      operationId: getFilteredStream
+      responses:
+        '200':
+          description: Streamed posts matching the configured rules
+  /tweets/search/stream/rules:
+    post:
+      tags: [Posts]
+      summary: Add or delete rules for the filtered stream
+      operationId: updateFilteredStreamRules
+      responses:
+        '201':
+          description: Rules updated
+    get:
+      tags: [Posts]
+      summary: List the active rules for the filtered stream
+      operationId: getFilteredStreamRules
+      responses:
+        '200':
+          description: Current filtered stream rules
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Look up a user by ID
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A user
+  /users/by/username/{username}:
+    get:
+      tags: [Users]
+      summary: Look up a user by username
+      operationId: getUserByUsername
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A user
+  /trends/by/woeid/{woeid}:
+    get:
+      tags: [Trends]
+      summary: Retrieve trending topics for a Where On Earth ID
+      operationId: getTrendsByWoeid
+      parameters:
+        - name: woeid
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Trends for the location
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        App-only authentication using an OAuth 2.0 Bearer Token issued by the
+        X Developer Platform, passed via the Authorization header.
