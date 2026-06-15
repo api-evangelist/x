@@ -1,0 +1,157 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "X API v2",
+    "version": "2.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Posts",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create a new post",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.x.com/2/tweets"
+          },
+          "docs": "Create a new post"
+        },
+        {
+          "info": {
+            "name": "Full-archive search of posts",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.x.com/2/tweets/search/all",
+            "params": [
+              {
+                "name": "query",
+                "value": "",
+                "type": "query",
+                "description": "Search query in X query language"
+              }
+            ]
+          },
+          "docs": "Full-archive search of posts"
+        },
+        {
+          "info": {
+            "name": "Near real-time filtered stream of posts",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.x.com/2/tweets/search/stream"
+          },
+          "docs": "Near real-time filtered stream of posts"
+        },
+        {
+          "info": {
+            "name": "List the active rules for the filtered stream",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.x.com/2/tweets/search/stream/rules"
+          },
+          "docs": "List the active rules for the filtered stream"
+        },
+        {
+          "info": {
+            "name": "Add or delete rules for the filtered stream",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://api.x.com/2/tweets/search/stream/rules"
+          },
+          "docs": "Add or delete rules for the filtered stream"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Look up a user by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.x.com/2/users/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Look up a user by ID"
+        },
+        {
+          "info": {
+            "name": "Look up a user by username",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.x.com/2/users/by/username/:username",
+            "params": [
+              {
+                "name": "username",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Look up a user by username"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Trends",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve trending topics for a Where On Earth ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://api.x.com/2/trends/by/woeid/:woeid",
+            "params": [
+              {
+                "name": "woeid",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Retrieve trending topics for a Where On Earth ID"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
