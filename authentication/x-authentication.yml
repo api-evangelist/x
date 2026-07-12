@@ -1,0 +1,16 @@
+generated: '2026-07-11'
+method: derived
+source: openapi/x-openapi.yml
+summary:
+  types:
+  - http
+schemes:
+- name: BearerAuth
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+  description: |-
+    App-only authentication using an OAuth 2.0 Bearer Token issued by the
+    X Developer Platform, passed via the Authorization header.
+  sources:
+  - openapi/x-openapi.yml
