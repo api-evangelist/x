@@ -1,0 +1,63 @@
+openapi: 3.1.0
+info:
+  title: X API v2 Posts Users API
+  version: '2.0'
+  description: 'The X (formerly Twitter) API v2 provides programmatic access to posts, users,
+
+    spaces, direct messages, lists, and trends. Endpoints derived from the public
+
+    X API v2 introduction documentation at docs.x.com.
+
+    '
+  contact:
+    name: X Developer Platform
+    url: https://docs.x.com/x-api/introduction
+servers:
+- url: https://api.x.com/2
+  description: X API v2 production server
+security:
+- BearerAuth: []
+tags:
+- name: Users
+paths:
+  /users/{id}:
+    get:
+      tags:
+      - Users
+      summary: Look up a user by ID
+      operationId: getUserById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A user
+  /users/by/username/{username}:
+    get:
+      tags:
+      - Users
+      summary: Look up a user by username
+      operationId: getUserByUsername
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A user
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'App-only authentication using an OAuth 2.0 Bearer Token issued by the
+
+        X Developer Platform, passed via the Authorization header.
+
+        '
