@@ -3,9 +3,22 @@ name: X
 description: >-
   Get immediate access to the X API and unlock the potential of X data.
 type: Index
+accessModel:
+  pricing: freemium
+  onboarding: self-serve
+  trial: false
+  try_now: true
+  public: false
+  label: Freemium · Self-serve signup
+  confidence: high
+  source:
+  - plans
+  - authentication
+  generated: '2026-07-22'
+  method: derived
 position: Consumer
 access: 3rd-Party
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/x.png
 tags: []
 created: '2025-08-14'
 modified: '2026-03-16'
@@ -19,15 +32,41 @@ common:
   - type: GitHubOrganization
     url: https://github.com/twitter
 apis:
-  - aid: x:x
-    name: X
-    description: >-
-      Get immediate access to the X API and unlock the potential of X data.
-    humanURL: ' https://developer.x.com/en'
-    tags: []
-    properties:
-      - type: Documentation
-        url: ' https://developer.x.com/en'
+- aid: x:x
+  name: X
+  description: Get immediate access to the X API and unlock the potential of X data.
+  humanURL: ' https://developer.x.com/en'
+  tags: []
+  properties:
+  - type: Documentation
+    url: ' https://developer.x.com/en'
+- aid: x:x-posts-api
+  name: X Posts API
+  description: The Posts API from X — 4 operation(s) for posts.
+  humanURL: ' https://developer.x.com/en'
+  tags:
+  - Posts
+  properties:
+  - type: OpenAPI
+    url: openapi/x-posts-api-openapi.yml
+- aid: x:x-trends-api
+  name: X Trends API
+  description: The Trends API from X — 1 operation(s) for trends.
+  humanURL: ' https://developer.x.com/en'
+  tags:
+  - Trends
+  properties:
+  - type: OpenAPI
+    url: openapi/x-trends-api-openapi.yml
+- aid: x:x-users-api
+  name: X Users API
+  description: The Users API from X — 2 operation(s) for users.
+  humanURL: ' https://developer.x.com/en'
+  tags:
+  - Users
+  properties:
+  - type: OpenAPI
+    url: openapi/x-users-api-openapi.yml
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
