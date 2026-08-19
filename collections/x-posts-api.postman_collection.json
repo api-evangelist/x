@@ -1,0 +1,398 @@
+{
+  "item": [
+    {
+      "id": "d51a9c6d-ee4b-4866-b106-8866b1f18e1a",
+      "name": "Posts",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "f43cf4ae-d350-4fe0-af63-ccaf041b1e89",
+          "name": "Create a new post",
+          "request": {
+            "name": "Create a new post",
+            "description": {},
+            "url": {
+              "path": [
+                "tweets"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "b7055240-4257-45dc-aa42-69b36da0e595",
+              "name": "Created post",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "tweets"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "1959cdd6-fc10-4a9f-bd50-7003583fe16d",
+          "name": "Full-archive search of posts",
+          "request": {
+            "name": "Full-archive search of posts",
+            "description": {},
+            "url": {
+              "path": [
+                "tweets",
+                "search",
+                "all"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "query",
+                  "value": "<string>",
+                  "description": "(Required) Search query in X query language"
+                }
+              ],
+              "variable": []
+            },
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "49032351-edfb-4d0f-a422-e6e11ab20733",
+              "name": "Matching posts",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "tweets",
+                    "search",
+                    "all"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "query",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "4bc3fd11-837d-4dbf-b9c3-66b2adc8ac41",
+          "name": "Near real-time filtered stream of posts",
+          "request": {
+            "name": "Near real-time filtered stream of posts",
+            "description": {},
+            "url": {
+              "path": [
+                "tweets",
+                "search",
+                "stream"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "0f9d9d6d-9fb7-440a-b491-7778af25d3ea",
+              "name": "Streamed posts matching the configured rules",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "tweets",
+                    "search",
+                    "stream"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "b49b45bd-b4fc-48be-afe4-537d00fd4886",
+          "name": "Add or delete rules for the filtered stream",
+          "request": {
+            "name": "Add or delete rules for the filtered stream",
+            "description": {},
+            "url": {
+              "path": [
+                "tweets",
+                "search",
+                "stream",
+                "rules"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "POST",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "c73ca4d3-ded9-46fb-bf1b-4b7d40d0293a",
+              "name": "Rules updated",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "tweets",
+                    "search",
+                    "stream",
+                    "rules"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {}
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "956be3b5-c3de-436c-bf14-af53f2fc9a3c",
+          "name": "List the active rules for the filtered stream",
+          "request": {
+            "name": "List the active rules for the filtered stream",
+            "description": {},
+            "url": {
+              "path": [
+                "tweets",
+                "search",
+                "stream",
+                "rules"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "d9f06e6f-05a3-458f-a702-6ed9df26045b",
+              "name": "Current filtered stream rules",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "tweets",
+                    "search",
+                    "stream",
+                    "rules"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://api.x.com/2",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "9ab9929c-38e9-4aae-9e46-6213250ea813",
+    "name": "X API v2 Posts API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The X (formerly Twitter) API v2 provides programmatic access to posts, users,\nspaces, direct messages, lists, and trends. Endpoints derived from the public\nX API v2 introduction documentation at docs.x.com.\n\n\nContact Support:\n Name: X Developer Platform",
+      "type": "text/plain"
+    }
+  }
+}
