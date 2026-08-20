@@ -63,6 +63,8 @@ apis:
   description: The Users API from X — 2 operation(s) for users.
   humanURL: ' https://developer.x.com/en'
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI
