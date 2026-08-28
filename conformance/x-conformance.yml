@@ -1,0 +1,131 @@
+generated: '2026-08-28'
+method: searched
+source: >-
+  openapi/_original/x-api-v2-openapi.json,
+  https://api.x.com/.well-known/oauth-authorization-server,
+  https://docs.x.com/x-api/fundamentals/response-codes-and-errors.md,
+  https://docs.x.com/fundamentals/authentication/overview
+description: >-
+  Cross-cutting standards the X API v2 contract and documentation actually assert.
+  Reward-only: standards X's market has no convention for are recorded as conforms:false
+  with the reason, not as a penalty.
+standards:
+- id: oauth2
+  name: OAuth 2.0 Authorization Code with PKCE
+  conforms: true
+  evidence:
+    spec: components.securitySchemes.OAuth2UserToken (flows.authorizationCode)
+    authorizationUrl: https://api.x.com/2/oauth2/authorize
+    tokenUrl: https://api.x.com/2/oauth2/token
+    scopes: 26
+    docs: https://docs.x.com/fundamentals/authentication/oauth-2-0/overview
+- id: rfc8414
+  name: OAuth 2.0 Authorization Server Metadata
+  conforms: true
+  evidence:
+    url: https://api.x.com/.well-known/oauth-authorization-server
+    http_status: 200
+    fields: [issuer, authorization_endpoint, token_endpoint, scopes_supported, code_challenge_methods_supported, grant_types_supported]
+    file: ../well-known/x-oauth-authorization-server.json
+- id: rfc9728
+  name: OAuth 2.0 Protected Resource Metadata
+  conforms: true
+  evidence:
+    url: https://api.x.com/.well-known/oauth-protected-resource
+    http_status: 200
+    resource: https://api.x.com/mcp
+    file: ../well-known/x-oauth-protected-resource.json
+- id: rfc7636
+  name: PKCE (S256)
+  conforms: true
+  evidence:
+    field: code_challenge_methods_supported
+    value: [S256]
+    source: https://api.x.com/.well-known/oauth-authorization-server
+- id: oauth1a
+  name: OAuth 1.0a user context
+  conforms: true
+  evidence:
+    spec: components.securitySchemes.UserToken (type http, scheme OAuth)
+    docs: https://docs.x.com/fundamentals/authentication/oauth-1-0a/api-key-and-secret
+    note: Still a supported first-class auth method alongside OAuth 2.0.
+- id: rfc9457
+  name: 'RFC 9457 / RFC 7807 Problem Details for HTTP APIs'
+  conforms: true
+  evidence:
+    media_type: application/problem+json
+    schemas: [Problem, InvalidRequestProblem, ResourceNotFoundProblem, NotAuthorizedForResourceProblem, DisallowedResourceProblem, ResourceUnavailableProblem, FieldUnauthorizedProblem, NotAuthorizedForFieldProblem, FieldHydrationFailureProblem, InternalErrorProblem]
+    type_uri_prefix: https://api.x.com/2/problems/
+    docs: https://docs.x.com/x-api/fundamentals/response-codes-and-errors
+    note: >-
+      Every one of the 190 operations declares a `default` response, and the problem
+      documents are served as application/problem+json with type/title/detail. X also
+      returns problem documents from non-API surfaces — the MCP 401 is one.
+- id: pagination
+  name: Token-based pagination
+  conforms: true
+  evidence:
+    request_param: pagination_token
+    response_field: meta.next_token
+    occurrences: 48 request parameters, 50 response fields
+    docs: https://docs.x.com/x-api/fundamentals/pagination
+- id: idempotency
+  name: Idempotent retry semantics
+  conforms: partial
+  evidence:
+    operations: [ensureAccount, createBot]
+    quote: >-
+      "Idempotent: when the user already has an account it is returned unchanged with
+      `created` false." / "Idempotent on handle ... safe to retry when a response was lost"
+    source: openapi/_original/x-api-v2-openapi.json (operation descriptions)
+    note: >-
+      X documents idempotency at the OPERATION level on two operations. There is no
+      client-supplied Idempotency-Key header anywhere in the contract, so an agent cannot
+      make an arbitrary write safely retryable. See conventions/x-conventions.yml.
+- id: sparse-fieldsets
+  name: Sparse fieldsets and expansions
+  conforms: true
+  evidence:
+    parameters: ['tweet.fields', 'user.fields', 'media.fields', 'place.fields', 'poll.fields', expansions]
+    docs: https://docs.x.com/x-api/fundamentals/fields
+- id: rfc9116
+  name: 'RFC 9116 security.txt'
+  conforms: partial
+  evidence:
+    url: https://x.com/.well-known/security.txt
+    http_status: 200
+    note: >-
+      Served and PGP-signed, but its own Expires field is 2024-01-01T06:00:00.000Z — the
+      published document is past expiry — and Canonical still names twitter.com.
+- id: rfc8594
+  name: 'RFC 8594 Sunset / Deprecation headers'
+  conforms: false
+  evidence:
+    note: >-
+      No Sunset or Deprecation header is declared anywhere in the published contract, and no
+      operation carries `deprecated: true`. X operates a prose deprecation policy instead
+      (https://docs.x.com/x-api/fundamentals/versioning) and announces retirements in the
+      changelog and developer forum.
+- id: json-api
+  name: 'JSON:API'
+  conforms: false
+  evidence:
+    note: Plain JSON with a data/includes/meta/errors envelope; not JSON:API.
+- id: asyncapi
+  name: AsyncAPI
+  conforms: false
+  evidence:
+    probe: https://docs.x.com/asyncapi.yaml
+    http_status: 404
+    note: >-
+      X ships a large real-time surface (filtered stream, firehose, sample streams, Account
+      Activity and X Activity webhooks) but publishes no AsyncAPI document for it. The
+      webhook/event catalog is captured in asyncapi/x-webhooks.yml.
+domain_standard:
+  applicable: false
+  note: >-
+    Social/conversation APIs have no adopted interoperability standard for their own market —
+    there is no OpenRTB, FHIR, FDX or SCIM equivalent for public social conversation data, and
+    X does not implement ActivityPub (its federation-adjacent surfaces are proprietary).
+    Recorded as not applicable rather than as a failure. The nearest cross-cutting standards
+    X does implement — OAuth 2.0/PKCE, RFC 8414, RFC 9728 and RFC 9457 — are listed above.

@@ -4,84 +4,171 @@ schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main
 provider: X
 providerId: x
 created: '2026-05-04'
-# Provenance stamped 2026-08-11: this artifact was written by the API Evangelist
-# bulk sweep dated 2026-05-04, not harvested from the provider. See roadmap#35.
-method: generated
-modified: '2026-05-04'
+modified: '2026-08-28'
+generated: '2026-08-28'
+method: searched
+source: https://docs.x.com/x-api/fundamentals/rate-limits.md
+docs: https://docs.x.com/x-api/fundamentals/rate-limits
 tags:
   - Rate Limiting
   - Quotas
   - Throttling
-description: Machine-readable rate limit definitions for the X API surface. Captures per-tier quotas,
-  burst behavior, response signaling, and recovery semantics. Defaults are scaffold values to be replaced
-  with published provider limits.
+description: >-
+  Published X API v2 rate limits, transcribed from X's own per-endpoint tables on
+  2026-08-28. This file REPLACES a 2026-05-04 scaffold that carried invented tier numbers
+  (10 rpm free / 100 rpm pro / 1000 rpm enterprise); X does not rate-limit by tier at all —
+  limits are per-endpoint, per-app and per-user, on 15-minute or 24-hour windows.
+model:
+  dimension: per-endpoint
+  scopes:
+    - name: per-app
+      description: Applies when calling with an app-only Bearer token.
+    - name: per-user
+      description: Applies when calling with an OAuth 1.0a or OAuth 2.0 user token.
+  windows: ['15 minutes', '24 hours', '1 second']
+  tiered: false
+  note: >-
+    Rate limits are independent of spend. Pay-per-usage adds a separate volume ceiling —
+    3,000,000 Post reads per monthly billing cycle — which is a usage cap, not a rate limit.
+  console: https://console.x.com
 headers:
-  limit: X-RateLimit-Limit
-  remaining: X-RateLimit-Remaining
-  reset: X-RateLimit-Reset
-  retryAfter: Retry-After
-  policy: RateLimit-Policy
+  limit: x-rate-limit-limit
+  remaining: x-rate-limit-remaining
+  reset: x-rate-limit-reset
+  retryAfter: null
+  policy: null
+  reset_format: unix timestamp in seconds
+  note: >-
+    X does NOT send Retry-After and does NOT implement the IETF RateLimit-* draft headers.
+    A client must read the absolute x-rate-limit-reset timestamp and compute its own wait.
 responseCodes:
   throttled: 429
   quotaExceeded: 429
   serviceUnavailable: 503
+  error_body:
+    v2: '{"type":"https://api.x.com/2/problems/rate-limit-exceeded", ...}'
+    legacy: '{"errors":[{"code":88,"message":"Rate limit exceeded"}]}'
 limits:
-  - tier: free
-    name: Free Tier Default
-    scope: api-key
-    metric: requests_per_minute
-    limit: 10
-    burst: 20
-    timeFrame: minute
-    applies:
-      - X
-  - tier: free
-    name: Free Tier Monthly Quota
-    scope: api-key
-    metric: requests_per_month
-    limit: 1000
-    timeFrame: month
-    applies:
-      - X
-  - tier: professional
-    name: Professional Tier Default
-    scope: api-key
-    metric: requests_per_minute
-    limit: 100
-    burst: 200
-    timeFrame: minute
-    applies:
-      - X
-  - tier: professional
-    name: Professional Tier Monthly Quota
-    scope: api-key
-    metric: requests_per_month
-    limit: 100000
-    timeFrame: month
-    applies:
-      - X
-  - tier: enterprise
-    name: Enterprise Negotiated Limit
-    scope: contract
-    metric: requests_per_minute
-    limit: 1000
-    burst: 5000
-    timeFrame: minute
-    applies:
-      - X
+  - name: Posts lookup by ids
+    endpoint: GET /2/tweets
+    perApp: 3500
+    perUser: 5000
+    timeFrame: 15 minutes
+  - name: Post lookup by id
+    endpoint: GET /2/tweets/:id
+    perApp: 450
+    perUser: 900
+    timeFrame: 15 minutes
+  - name: Recent search
+    endpoint: GET /2/tweets/search/recent
+    perApp: 450
+    perUser: 300
+    timeFrame: 15 minutes
+    notes: 10 default / 100 max results; 512-character query length
+  - name: Full-archive search
+    endpoint: GET /2/tweets/search/all
+    perApp: 300
+    perUser: null
+    timeFrame: 15 minutes
+    burst: 1 request per second
+    notes: 10 default / 500 max results; 1024-character query length; 1/sec per app and per user
+  - name: Recent post counts
+    endpoint: GET /2/tweets/counts/recent
+    perApp: 300
+    perUser: null
+    timeFrame: 15 minutes
+    notes: 512-character query length
+  - name: Full-archive post counts
+    endpoint: GET /2/tweets/counts/all
+    perApp: 300
+    perUser: null
+    timeFrame: 15 minutes
+    notes: 1024-character query length
+  - name: Filtered stream connect
+    endpoint: GET /2/tweets/search/stream
+    perApp: 50
+    perUser: null
+    timeFrame: 15 minutes
+    notes: 1 connection; 1000 rules; 1024-character rule length; 250 posts/sec delivery
+  - name: Filtered stream rules lookup
+    endpoint: GET /2/tweets/search/stream/rules
+    perApp: 450
+    perUser: null
+    timeFrame: 15 minutes
+  - name: Filtered stream rules update
+    endpoint: POST /2/tweets/search/stream/rules
+    perApp: 100
+    perUser: null
+    timeFrame: 15 minutes
+  - name: Create Post
+    endpoint: POST /2/tweets
+    perApp: 10000
+    perAppTimeFrame: 24 hours
+    perUser: 100
+    timeFrame: 15 minutes
+  - name: Delete Post
+    endpoint: DELETE /2/tweets/:id
+    perApp: null
+    perUser: 50
+    timeFrame: 15 minutes
+  - name: User timeline
+    endpoint: GET /2/users/:id/tweets
+    perApp: 10000
+    perUser: 900
+    timeFrame: 15 minutes
+  - name: User mentions
+    endpoint: GET /2/users/:id/mentions
+    perApp: 450
+    perUser: 300
+    timeFrame: 15 minutes
+  - name: Reverse chronological timeline
+    endpoint: GET /2/users/:id/timelines/reverse_chronological
+    perApp: null
+    perUser: 180
+    timeFrame: 15 minutes
+  - name: Liking users lookup
+    endpoint: GET /2/tweets/:id/liking_users
+    perApp: 75
+    perUser: 75
+    timeFrame: 15 minutes
+  - name: Liked posts lookup
+    endpoint: GET /2/users/:id/liked_tweets
+    perApp: 75
+    perUser: 75
+    timeFrame: 15 minutes
+  - name: Like a Post
+    endpoint: POST /2/users/:id/likes
+    perApp: null
+    perUser: 50
+    timeFrame: 15 minutes
+    dailyCap: 1000
+    dailyTimeFrame: 24 hours
+limit_count: 17
+coverage_note: >-
+  X publishes per-endpoint limits for roughly 25 Posts endpoints plus Users, Lists, Spaces,
+  DMs, Media, Compliance and stream endpoints. The 17 rows above are the published Posts and
+  timeline block, transcribed verbatim; the remainder are on the same page and in the
+  Developer Console. Rows were not extrapolated to endpoints X did not publish a number for.
 policies:
   - name: Backoff Strategy
-    description: Clients should implement exponential backoff with jitter, honoring the Retry-After header
-      when present.
-  - name: Burst Handling
-    description: Short bursts above the steady-state limit are tolerated up to the documented burst ceiling
-      before throttling engages.
-  - name: Quota Reset
-    description: Monthly quotas reset at the start of each calendar month in UTC. Per-minute and per-second
-      windows reset on a sliding-window basis.
-  - name: Fair Use
-    description: Even on uncapped enterprise tiers, sustained usage that materially impacts shared infrastructure
-      may be subject to fair-use throttling.
+    description: >-
+      X's own guidance: on 429 read x-rate-limit-reset, implement exponential backoff, cache
+      responses, and spread requests across the window.
+    source: https://docs.x.com/x-api/fundamentals/rate-limits
+  - name: Prefer streaming over polling
+    description: >-
+      X recommends the filtered stream rather than polling search endpoints for real-time data,
+      explicitly as a rate-limit strategy.
+  - name: Usage cap
+    description: >-
+      Pay-per-usage accounts are capped at 3,000,000 Post reads per monthly billing cycle.
+      Exceeding it returns 429 with problem type usage-capped. Higher volume requires an
+      Enterprise agreement.
+    source: https://docs.x.com/x-api/getting-started/pricing
+  - name: Separate limits per product
+    description: >-
+      X API v2, the Enterprise APIs and the Ads API each have their own rate-limit regimes;
+      Enterprise limits are set by contract.
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com

@@ -1,0 +1,162 @@
+generated: '2026-08-28'
+method: searched
+source: >-
+  openapi/_original/x-api-v2-openapi.json (components.schemas.Problem discriminator),
+  https://docs.x.com/x-api/fundamentals/response-codes-and-errors.md
+docs: https://docs.x.com/x-api/fundamentals/response-codes-and-errors
+format: rfc9457
+media_type: application/problem+json
+description: >-
+  X API v2 error catalog. The nine machine-declared problem types come from the
+  discriminator mapping on components.schemas.Problem in X's published OpenAPI; the two
+  extra types and all remediation text come from X's own error reference page. Every one
+  of the 190 published operations declares a `default` response bound to Problem.
+envelope:
+  fields: [type, title, detail]
+  optional_fields: [status, parameter, value, resource_id, resource_type]
+  required: [type, title, detail]
+  discriminator: type
+  example:
+    title: Invalid Request
+    detail: The 'query' parameter is required.
+    type: https://api.x.com/2/problems/invalid-request
+partial_errors:
+  supported: true
+  description: >-
+    A 200 response may contain BOTH `data` and an `errors` array — e.g. a multi-id lookup
+    where some ids are unavailable. Each entry in `errors` is a full problem document with
+    resource_id and resource_type. Agents MUST inspect `errors` on success responses.
+  docs: https://docs.x.com/x-api/fundamentals/response-codes-and-errors
+status_codes:
+- code: 200
+  meaning: OK
+- code: 201
+  meaning: Created (POST)
+- code: 204
+  meaning: No Content (DELETE)
+- code: 400
+  meaning: Bad Request
+  causes: Invalid JSON, malformed query, missing required parameters
+- code: 401
+  meaning: Unauthorized
+  causes: Invalid or missing authentication credentials
+- code: 403
+  meaning: Forbidden
+  causes: Valid auth but no permission for this resource or action
+- code: 404
+  meaning: Not Found
+  causes: Resource does not exist or has been deleted
+- code: 409
+  meaning: Conflict
+  causes: Stream has no rules (filtered stream only)
+- code: 429
+  meaning: Too Many Requests
+  causes: Rate limit or usage cap exceeded
+  remediation: Read x-rate-limit-reset and back off exponentially.
+- code: 500
+  meaning: Internal Server Error
+  remediation: Wait and retry; check https://developer.x.com/status
+- code: 502
+  meaning: Bad Gateway
+  remediation: Wait and retry
+- code: 503
+  meaning: Service Unavailable
+  remediation: Wait and retry
+- code: 504
+  meaning: Gateway Timeout
+  remediation: Wait and retry
+problem_types:
+- type: https://api.x.com/2/problems/invalid-request
+  schema: InvalidRequestProblem
+  title: Invalid Request
+  meaning: Malformed request or invalid parameters.
+  extra_fields: [parameter, value, status]
+  remediation: Validate JSON syntax, required parameters, parameter types, and escape special characters in queries.
+  declared_in: spec
+- type: https://api.x.com/2/problems/resource-not-found
+  schema: ResourceNotFoundProblem
+  title: Not Found Error
+  meaning: The Post, user, or other resource does not exist or was deleted.
+  extra_fields: [resource_id, resource_type, parameter, value, status]
+  remediation: Confirm the id; deleted Posts return 404. Also appears inside partial-error arrays on 200 responses.
+  declared_in: spec
+- type: https://api.x.com/2/problems/not-authorized-for-resource
+  schema: NotAuthorizedForResourceProblem
+  title: Authorization Error
+  meaning: The caller has no access to this private or protected content.
+  remediation: Protected accounts' Posts require user-context authorization with the right scope.
+  declared_in: spec
+- type: https://api.x.com/2/problems/not-authorized-for-field
+  schema: NotAuthorizedForFieldProblem
+  title: Field Authorization Error
+  meaning: The caller may see the resource but not the specific requested field.
+  remediation: Drop the field from the *.fields parameter, or authenticate with the scope that grants it.
+  declared_in: spec
+- type: https://api.x.com/2/problems/field-unauthorized
+  schema: FieldUnauthorizedProblem
+  title: Field Unauthorized
+  meaning: The requested field is not authorized for this app or token.
+  declared_in: spec
+- type: https://api.x.com/2/problems/field-hydration-failure
+  schema: FieldHydrationFailureProblem
+  title: Field Hydration Failure
+  meaning: A requested expansion or field could not be resolved for this resource.
+  remediation: Treat as partial data; the rest of the response is still valid.
+  declared_in: spec
+- type: https://api.x.com/2/problems/resource-unavailable
+  schema: ResourceUnavailableProblem
+  title: Resource Unavailable
+  meaning: The resource exists but cannot currently be served (e.g. withheld in a region).
+  declared_in: spec
+- type: https://api.x.com/2/problems/disallowed-resource
+  schema: DisallowedResourceProblem
+  title: Disallowed Resource
+  meaning: The resource is not permitted to be returned to this caller.
+  declared_in: spec
+- type: https://api.x.com/2/problems/internal-error
+  schema: InternalErrorProblem
+  title: Internal Error
+  meaning: Server-side failure.
+  remediation: Retry with backoff; check the status page.
+  declared_in: spec
+- type: https://api.x.com/2/problems/client-forbidden
+  title: Client Forbidden
+  meaning: App is not enrolled or lacks the required access level for the endpoint.
+  declared_in: docs
+  source: https://docs.x.com/x-api/fundamentals/response-codes-and-errors
+- type: https://api.x.com/2/problems/usage-capped
+  title: Usage Capped
+  meaning: The usage cap for the billing period has been exceeded.
+  declared_in: docs
+- type: https://api.x.com/2/problems/rate-limit-exceeded
+  title: Rate Limit Exceeded
+  meaning: The per-app or per-user rate limit for this endpoint has been exceeded.
+  remediation: Honour x-rate-limit-reset; back off exponentially.
+  declared_in: docs
+- type: https://api.x.com/2/problems/streaming-connection
+  title: Streaming Connection Problem
+  meaning: The stream connection failed or was dropped (including full-buffer disconnects).
+  remediation: Reconnect with backoff; use recovery/redundant connections for missed data.
+  declared_in: docs
+- type: https://api.x.com/2/problems/rule-cap
+  title: Rule Cap
+  meaning: Too many filtered-stream rules for the access level.
+  declared_in: docs
+- type: https://api.x.com/2/problems/invalid-rules
+  title: Invalid Rules
+  meaning: Filtered-stream rule syntax error.
+  declared_in: docs
+- type: https://api.x.com/2/problems/duplicate-rules
+  title: Duplicate Rules
+  meaning: The filtered-stream rule already exists.
+  declared_in: docs
+- type: 'about:blank'
+  title: Generic
+  meaning: Generic problem document with no specific type; read the HTTP status code.
+  declared_in: docs
+  note: Returned by https://api.x.com/mcp on an unauthenticated tools/list.
+legacy_v11_codes:
+  note: >-
+    The v1.1 surface and some gateway responses still return the legacy
+    {"errors":[{"code":<int>,"message":"..."}]} envelope — e.g. code 88 "Rate limit exceeded",
+    code 34 "Sorry, that page does not exist". Agents talking to v2 should not depend on it.

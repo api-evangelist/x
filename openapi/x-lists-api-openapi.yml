@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: X API v2 Posts API
+  title: X API v2 Lists API
   version: '2.168'
-  description: The Posts surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  description: The Lists surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
   termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
   contact:
     name: X Developers
@@ -14,74 +14,30 @@ servers:
 - description: X API
   url: https://api.x.com
 tags:
-- name: Posts
-  description: Endpoints related to retrieving, searching, and modifying Posts
+- name: Lists
+  description: Endpoints related to retrieving, managing Lists
   externalDocs:
     description: Find out more
-    url: https://docs.x.com/x-api/posts/introduction
+    url: https://docs.x.com/x-api/lists/introduction
 paths:
-  /2/tweets:
-    get:
-      security:
-      - OAuth2UserToken:
-        - tweet.read
-        - users.read
-      - UserToken: []
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Get Posts by IDs
-      operationId: getPostsByIds
-      parameters:
-      - name: ids
-        in: query
-        required: true
-        schema:
-          type: array
-          minItems: 1
-          maxItems: 100
-          items:
-            $ref: '#/components/schemas/PostId'
-        explode: false
-        style: form
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      - $ref: '#/components/parameters/PostExpansionsParameter'
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/MediaFieldsParameter'
-      - $ref: '#/components/parameters/PollFieldsParameter'
-      - $ref: '#/components/parameters/PlaceFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsByIdsResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+  /2/lists:
     post:
       security:
       - OAuth2UserToken:
+        - list.write
         - tweet.read
         - users.read
-        - tweet.write
+        - list.read
       - UserToken: []
       tags:
-      - Posts
-      summary: Create Posts
-      operationId: createPosts
+      - Lists
+      summary: Create Lists
+      operationId: createLists
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatePostsRequest'
+              $ref: '#/components/schemas/CreateListsRequest'
         required: true
       responses:
         '201':
@@ -89,7 +45,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreatePostsResponse'
+                $ref: '#/components/schemas/CreateListsResponse'
         default:
           description: The request has failed.
           content:
@@ -99,513 +55,79 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-  /2/tweets/analytics:
-    get:
-      security:
-      - OAuth2UserToken:
-        - tweet.read
-        - users.read
-      - UserToken: []
-      tags:
-      - Posts
-      summary: Get Posts Analytics
-      operationId: getPostsAnalytics
-      parameters:
-      - name: ids
-        in: query
-        required: true
-        schema:
-          type: array
-          minItems: 1
-          maxItems: 100
-          items:
-            $ref: '#/components/schemas/AnalyticsId'
-        explode: false
-        style: form
-      - name: start_time
-        in: query
-        required: true
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: end_time
-        in: query
-        required: true
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: granularity
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - hourly
-          - weekly
-          - daily
-          - total
-          default: total
-        style: form
-      - $ref: '#/components/parameters/AnalyticsFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsAnalyticsResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/counts/all:
-    get:
-      security:
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Get Posts Counts All
-      description: At most one of `pagination_token`, `next_token` may be provided.
-      operationId: getPostsCountsAll
-      parameters:
-      - name: query
-        in: query
-        required: true
-        schema:
-          type: string
-          minLength: 1
-          maxLength: 4096
-        style: form
-      - name: start_time
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: end_time
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: since_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: until_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: next_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: granularity
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - minute
-          - hour
-          - day
-          default: hour
-        style: form
-      - name: search_count.fields
-        in: query
-        required: false
-        schema:
-          type: string
-        style: form
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsCountsAllResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/counts/recent:
-    get:
-      security:
-      - OAuth2UserToken: []
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Get Posts Counts Recent
-      description: At most one of `pagination_token`, `next_token` may be provided.
-      operationId: getPostsCountsRecent
-      parameters:
-      - name: query
-        in: query
-        required: true
-        schema:
-          type: string
-          minLength: 1
-          maxLength: 4096
-        style: form
-      - name: start_time
-        in: query
-        description: Must be within the last 7 days.
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: end_time
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: since_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: until_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: next_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: granularity
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - minute
-          - hour
-          - day
-          default: hour
-        style: form
-      - name: search_count.fields
-        in: query
-        required: false
-        schema:
-          type: string
-        style: form
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsCountsRecentResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/search/all:
+  /2/lists/{id}:
     get:
       security:
       - OAuth2UserToken:
         - users.read
         - tweet.read
+        - list.read
       - UserToken: []
       - BearerToken: []
       tags:
-      - Posts
-      summary: Search Posts All
-      description: At most one of `start_time`, `since_id` may be provided. At most one of `end_time`,
-        `until_id` may be provided. At most one of `pagination_token`, `next_token` may be provided.
-      operationId: searchPostsAll
-      parameters:
-      - name: query
-        in: query
-        required: true
-        schema:
-          type: string
-          minLength: 1
-          maxLength: 4096
-        style: form
-      - name: start_time
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: end_time
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: since_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: until_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: max_results
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 10
-          maximum: 500
-          format: int32
-          default: 10
-        style: form
-      - name: next_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: sort_order
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - recency
-          - relevancy
-        style: form
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      - $ref: '#/components/parameters/PostExpansionsParameter'
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/MediaFieldsParameter'
-      - $ref: '#/components/parameters/PollFieldsParameter'
-      - $ref: '#/components/parameters/PlaceFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SearchPostsAllResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/search/recent:
-    get:
-      security:
-      - OAuth2UserToken:
-        - users.read
-        - tweet.read
-      - UserToken: []
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Search Posts Recent
-      description: At most one of `start_time`, `since_id` may be provided. At most one of `end_time`,
-        `until_id` may be provided. At most one of `pagination_token`, `next_token` may be provided.
-      operationId: searchPostsRecent
-      parameters:
-      - name: query
-        in: query
-        required: true
-        schema:
-          type: string
-          minLength: 1
-          maxLength: 4096
-        style: form
-      - name: max_results
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 10
-          maximum: 100
-          format: int32
-          default: 10
-        style: form
-      - name: next_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: start_time
-        in: query
-        description: Must be within the last 7 days.
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: end_time
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: since_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: until_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: sort_order
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - recency
-          - relevancy
-        style: form
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      - $ref: '#/components/parameters/PostExpansionsParameter'
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/MediaFieldsParameter'
-      - $ref: '#/components/parameters/PollFieldsParameter'
-      - $ref: '#/components/parameters/PlaceFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SearchPostsRecentResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/{id}:
-    get:
-      security:
-      - OAuth2UserToken:
-        - tweet.read
-        - users.read
-      - UserToken: []
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Get Posts by ID
-      operationId: getPostsById
+      - Lists
+      summary: Get Lists by ID
+      operationId: getListsById
       parameters:
       - name: id
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/PostId'
+          $ref: '#/components/schemas/ListId'
         style: simple
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      - $ref: '#/components/parameters/PostExpansionsParameter'
+      - $ref: '#/components/parameters/ListFieldsParameter'
+      - $ref: '#/components/parameters/ListExpansionsParameter'
       - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/MediaFieldsParameter'
-      - $ref: '#/components/parameters/PollFieldsParameter'
-      - $ref: '#/components/parameters/PlaceFieldsParameter'
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetPostsByIdResponse'
+                $ref: '#/components/schemas/GetListsByIdResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      security:
+      - OAuth2UserToken:
+        - list.write
+        - users.read
+        - tweet.read
+      - UserToken: []
+      tags:
+      - Lists
+      summary: Update List
+      description: Updates the details of a specific List owned by the authenticated user by its ID.
+      externalDocs:
+        url: https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/put-lists-id
+      operationId: updateLists
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ListId'
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateListsRequest'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateListsResponse'
         default:
           description: The request has failed.
           content:
@@ -619,307 +141,174 @@ paths:
       security:
       - OAuth2UserToken:
         - users.read
-        - tweet.read
-        - tweet.write
-      - UserToken: []
-      tags:
-      - Posts
-      summary: Delete Posts
-      operationId: deletePosts
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/PostId'
-        style: simple
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeletePostsResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/{id}/liking_users:
-    get:
-      security:
-      - OAuth2UserToken:
-        - like.read
-        - tweet.read
-        - users.read
-      - UserToken: []
-      tags:
-      - Posts
-      summary: Get Posts Liking Users
-      operationId: getPostsLikingUsers
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/PostId'
-        style: simple
-      - name: max_results
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          format: int32
-          default: 100
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/UserExpansionsParameter'
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsLikingUsersResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/{id}/quote_tweets:
-    get:
-      security:
-      - OAuth2UserToken:
-        - users.read
+        - list.write
         - tweet.read
       - UserToken: []
-      - BearerToken: []
       tags:
-      - Posts
-      summary: Get Posts Quoted Posts
-      operationId: getPostsQuotedPosts
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/PostId'
-        style: simple
-      - name: max_results
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 10
-          maximum: 100
-          format: int32
-          default: 10
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: exclude
-        in: query
-        required: false
-        schema:
-          type: array
-          minItems: 1
-          uniqueItems: true
-          items:
-            type: string
-            enum:
-            - replies
-            - retweets
-        explode: false
-        style: form
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      - $ref: '#/components/parameters/PostExpansionsParameter'
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/MediaFieldsParameter'
-      - $ref: '#/components/parameters/PollFieldsParameter'
-      - $ref: '#/components/parameters/PlaceFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsQuotedPostsResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/{id}/retweeted_by:
-    get:
-      security:
-      - OAuth2UserToken:
-        - tweet.read
-        - users.read
-      - UserToken: []
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Get Posts Reposted by
-      operationId: getPostsRepostedBy
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/PostId'
-        style: simple
-      - name: max_results
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          format: int32
-          default: 100
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/UserExpansionsParameter'
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsRepostedByResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/{id}/retweets:
-    get:
-      security:
-      - OAuth2UserToken:
-        - users.read
-        - tweet.read
-      - UserToken: []
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Get Posts Reposts
-      operationId: getPostsReposts
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/PostId'
-        style: simple
-      - name: max_results
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          format: int32
-          default: 100
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      - $ref: '#/components/parameters/PostExpansionsParameter'
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/MediaFieldsParameter'
-      - $ref: '#/components/parameters/PollFieldsParameter'
-      - $ref: '#/components/parameters/PlaceFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsRepostsResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/{tweet_id}/hidden:
-    put:
-      security:
-      - OAuth2UserToken:
-        - users.read
-        - tweet.read
-        - tweet.moderate.write
-      - UserToken: []
-      tags:
-      - Posts
-      summary: Hide reply
-      description: Hides or unhides a reply to a conversation owned by the authenticated user.
+      - Lists
+      summary: Delete List
+      description: Deletes a specific List owned by the authenticated user by its ID.
       externalDocs:
-        url: https://developer.twitter.com/en/docs/twitter-api/tweets/hide-replies/api-reference/put-tweets-id-hidden
-      operationId: hidePostsReply
+        url: https://developer.twitter.com/en/docs/twitter-api/lists/manage-lists/api-reference/delete-lists-id
+      operationId: deleteLists
       parameters:
-      - name: tweet_id
+      - name: id
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/PostId'
+          $ref: '#/components/schemas/ListId'
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteListsResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/lists/{id}/followers:
+    get:
+      security:
+      - OAuth2UserToken:
+        - list.read
+        - users.read
+        - tweet.read
+      - UserToken: []
+      - BearerToken: []
+      tags:
+      - Lists
+      summary: Get Lists Followers
+      operationId: getListsFollowers
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ListId'
+        style: simple
+      - name: max_results
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          format: int32
+          default: 100
+        style: form
+      - name: pagination_token
+        in: query
+        description: A 64-bit signed integer.
+        required: false
+        schema:
+          type: string
+        style: form
+      - $ref: '#/components/parameters/UserFieldsParameter'
+      - $ref: '#/components/parameters/UserExpansionsParameter'
+      - $ref: '#/components/parameters/PostFieldsParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetListsFollowersResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/lists/{id}/members:
+    get:
+      security:
+      - OAuth2UserToken:
+        - tweet.read
+        - list.read
+        - users.read
+      - UserToken: []
+      - BearerToken: []
+      tags:
+      - Lists
+      summary: Get Lists Members
+      operationId: getListsMembers
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ListId'
+        style: simple
+      - name: max_results
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          format: int32
+          default: 100
+        style: form
+      - name: pagination_token
+        in: query
+        description: A 64-bit signed integer.
+        required: false
+        schema:
+          type: string
+        style: form
+      - $ref: '#/components/parameters/UserFieldsParameter'
+      - $ref: '#/components/parameters/UserExpansionsParameter'
+      - $ref: '#/components/parameters/PostFieldsParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetListsMembersResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      security:
+      - OAuth2UserToken:
+        - list.write
+        - users.read
+        - tweet.read
+      - UserToken: []
+      tags:
+      - Lists
+      summary: Add Lists Member
+      operationId: addListsMember
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ListId'
         style: simple
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/HidePostsReplyRequest'
+              $ref: '#/components/schemas/AddListsMemberRequest'
         required: true
       responses:
         '200':
@@ -927,7 +316,111 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HidePostsReplyResponse'
+                $ref: '#/components/schemas/AddListsMemberResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/lists/{id}/members/{user_id}:
+    delete:
+      security:
+      - OAuth2UserToken:
+        - list.write
+        - users.read
+        - tweet.read
+      - UserToken: []
+      tags:
+      - Lists
+      summary: Remove a List member
+      description: Removes a User from a List by their ID.
+      externalDocs:
+        url: https://developer.twitter.com/en/docs/twitter-api/lists/list-members/api-reference/delete-lists-id-members-user_id
+      operationId: removeListsMemberByUserId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ListId'
+        style: simple
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UserId'
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoveListsMemberByUserIdResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/lists/{id}/tweets:
+    get:
+      security:
+      - OAuth2UserToken:
+        - users.read
+        - tweet.read
+        - list.read
+      - UserToken: []
+      - BearerToken: []
+      tags:
+      - Lists
+      summary: Get Lists Posts
+      operationId: getListsPosts
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/ListId'
+        style: simple
+      - name: max_results
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          format: int32
+          default: 100
+        style: form
+      - name: pagination_token
+        in: query
+        description: A base32hex-encoded pagination token.
+        required: false
+        schema:
+          type: string
+          minLength: 1
+        style: form
+      - $ref: '#/components/parameters/PostFieldsParameter'
+      - $ref: '#/components/parameters/PostExpansionsParameter'
+      - $ref: '#/components/parameters/UserFieldsParameter'
+      - $ref: '#/components/parameters/MediaFieldsParameter'
+      - $ref: '#/components/parameters/PollFieldsParameter'
+      - $ref: '#/components/parameters/PlaceFieldsParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetListsPostsResponse'
         default:
           description: The request has failed.
           content:
@@ -960,78 +453,11 @@ components:
           - https://api.x.com/2/problems/invalid-request
         value:
           type: string
-    CreatePostsGeo:
-      type: object
-      required:
-      - place_id
-      properties:
-        place_id:
-          type: string
-          description: Place ID for geo tagging.
-      additionalProperties: false
-    CreatePostsRequest:
-      type: object
-      properties:
-        card_uri:
-          type: string
-          description: Card URI parameter.
-        community_id:
-          type: string
-          description: Community to post the tweet to.
-          pattern: ^[0-9]{1,19}$
-        direct_message_deep_link:
-          type: string
-          description: Direct message deep link.
-        edit_options:
-          description: Edit an existing tweet rather than creating a new one.
-          $ref: '#/components/schemas/CreatePostsEditOptions'
-        for_super_followers_only:
-          type: boolean
-          description: Restrict tweet to super followers.
-        geo:
-          description: Geo location for the tweet.
-          $ref: '#/components/schemas/CreatePostsGeo'
-        made_with_ai:
-          type: boolean
-          description: Disclose that the tweet contains AI-generated media.
-        media:
-          description: Media attachments.
-          $ref: '#/components/schemas/CreatePostsMedia'
-        nullcast:
-          type: boolean
-          description: If true, the tweet is not shown in the public timeline.
-        paid_partnership:
-          type: boolean
-          description: Disclose that the tweet is a paid partnership.
-        poll:
-          description: Poll configuration.
-          $ref: '#/components/schemas/CreatePostsPoll'
-        quote_tweet_id:
-          type: string
-          description: Tweet ID to quote.
-          pattern: ^[0-9]{1,19}$
-        reply:
-          description: Tweet reply configuration.
-          $ref: '#/components/schemas/CreatePostsReply'
-        reply_settings:
-          type: string
-          description: Who can reply to this tweet.
-          enum:
-          - following
-          - mentionedUsers
-          - subscribers
-          - verified
-        share_with_followers:
-          type: boolean
-          description: Share an exclusive (super-follower) tweet with all followers.
-        text:
-          type: string
-          description: 'Text of the tweet. Required unless media is provided.  Defaulted to an empty string
-            so it is always sent: the backend''s `tweet_text` variable is non-null and rejects an absent
-            value.'
-          default: ''
-      additionalProperties: false
-    SearchPostsRecentResponse:
+    ListFollowerCount:
+      type: integer
+      description: The number of users who follow this List.
+      format: int64
+    GetListsPostsResponse:
       type: object
       properties:
         data:
@@ -1047,15 +473,9 @@ components:
         meta:
           type: object
           properties:
-            newest_id:
-              type: string
-              description: Most recent ID in the data array.
             next_token:
               type: string
               description: Pagination token for the next page of results.
-            oldest_id:
-              type: string
-              description: Oldest ID in the data array.
             previous_token:
               type: string
               description: Pagination token for the previous page of results.
@@ -1063,17 +483,22 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
-    GetPostsByIdResponse:
+    UpdateListsRequest:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
+        description:
+          type: string
+          description: New description for the List (up to 100 characters).
+          maxLength: 100
+        name:
+          type: string
+          description: New name for the List (1-25 characters).
+          minLength: 1
+          maxLength: 25
+        private:
+          type: boolean
+          description: Whether the List is private.
+      additionalProperties: false
     PostNoteRequestSuggestions:
       type: array
       description: Community-Notes request suggestions for this Post.
@@ -1161,45 +586,18 @@ components:
           - post
           - user
           nullable: true
-    HidePostsReplyResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/HidePostsReplyResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    CreatePostsPoll:
+    CreateListsResponseData:
       type: object
       required:
-      - options
-      - duration_minutes
+      - id
+      - name
       properties:
-        duration_minutes:
-          type: integer
-          description: Duration of the poll in minutes.
-          minimum: 5
-          maximum: 10080
-        options:
-          type: array
-          description: Poll options (2-4 choices, 1-25 characters each).
-          minItems: 2
-          maxItems: 4
-          items:
-            type: string
-            minLength: 1
-            maxLength: 25
-        reply_settings:
+        id:
           type: string
-          description: Who can reply to the poll Tweet. Accepted for compatibility; it carries no backend
-            argument and is dropped before the mutation is issued (see `translate_body`).
-          enum:
-          - following
-          - mentionedUsers
-          - subscribers
-          - verified
-      additionalProperties: false
+          description: Unique identifier of the created List.
+        name:
+          type: string
+          description: The name of the created List.
     PostContextAnnotations:
       type: array
       description: Annotations inferred about the Post (domain and entity context).
@@ -1240,32 +638,24 @@ components:
                 name:
                   type: string
                   nullable: true
-    GetPostsRepostedByResponse:
+    AddListsMemberResponse:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
+          $ref: '#/components/schemas/AddListsMemberResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
+    AddListsMemberRequest:
+      type: object
+      required:
+      - user_id
+      properties:
+        user_id:
+          type: string
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
     Error:
       type: object
       required:
@@ -1277,15 +667,6 @@ components:
           format: int32
         message:
           type: string
-    HidePostsReplyRequest:
-      type: object
-      required:
-      - hidden
-      properties:
-        hidden:
-          type: boolean
-          description: Whether the reply should be hidden.
-      additionalProperties: false
     PostAttachments:
       type: object
       description: Specifies the type of attachments (if any) present in this Post.
@@ -1308,55 +689,6 @@ components:
           items:
             type: string
           nullable: true
-    AnalyticsId:
-      type: string
-      description: Unique identifier of a Analytics
-      pattern: ^[0-9]{1,19}$
-    CreatePostsMediaCallToActionsVisitSite:
-      type: object
-      required:
-      - url
-      properties:
-        url:
-          type: string
-          description: HTTPS URL the CTA links to.
-      additionalProperties: false
-    GetPostsCountsRecentResponseData:
-      type: object
-      required:
-      - start
-      - end
-      - post_count
-      properties:
-        end:
-          type: string
-          description: End of the count bucket (exclusive), RFC 3339.
-        post_count:
-          type: integer
-          description: Number of Posts in the bucket.
-        start:
-          type: string
-          description: Start of the count bucket (inclusive), RFC 3339.
-    GetPostsCountsRecentResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/GetPostsCountsRecentResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            total_post_count:
-              type: integer
-              format: int64
     User:
       type: object
       properties:
@@ -1472,6 +804,17 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
           type: string
+    GetListsByIdResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/List'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
     PostReferencedPosts:
       type: array
       description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes
@@ -1495,14 +838,40 @@ components:
               - retweeted
               - quoted
               - replied_to
-    DeletePostsResponseData:
+    AddListsMemberResponseData:
       type: object
       required:
-      - deleted
+      - is_member
       properties:
-        deleted:
+        is_member:
           type: boolean
-          description: Whether the Post was deleted.
+          description: Indicates whether the user is a member of the List.
+    GetListsMembersResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            previous_token:
+              type: string
+              description: Pagination token for the previous page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
     MediaVariants:
       type: array
       description: Each media object may have multiple display or playback variants, with different resolutions
@@ -1524,25 +893,6 @@ components:
             type: string
             description: The URL to this media variant.
             nullable: true
-    CreatePostsReply:
-      type: object
-      required:
-      - in_reply_to_tweet_id
-      properties:
-        auto_populate_reply_metadata:
-          type: boolean
-          description: If true, reply metadata is automatically populated. Accepted for compatibility;
-            it carries no backend argument and is dropped before the mutation is issued (see `translate_body`).
-        exclude_reply_user_ids:
-          type: array
-          description: User IDs to exclude from the reply thread.
-          items:
-            type: string
-        in_reply_to_tweet_id:
-          type: string
-          description: The ID of the tweet being replied to.
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
     PostMatchedMediaNotes:
       type: array
       description: Community-Notes media matches for this Post.
@@ -1768,38 +1118,6 @@ components:
                     description: The t.co shortened URL.
               nullable: true
           nullable: true
-    SearchPostsAllResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            newest_id:
-              type: string
-              description: Most recent ID in the data array.
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            oldest_id:
-              type: string
-              description: Oldest ID in the data array.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
     PostEntities:
       type: object
       description: A list of metadata entities (hashtags, mentions, URLs) found in the Post text.
@@ -2100,24 +1418,6 @@ components:
           type: integer
           description: Number of Posts (including Reposts) created by this User.
           format: int64
-    CreatePostsResponseData:
-      type: object
-      required:
-      - id
-      - text
-      properties:
-        edit_history_post_ids:
-          type: array
-          description: Post IDs in this Post's edit history chain.
-          items:
-            type: string
-        id:
-          type: string
-          description: Unique identifier of the created Post.
-          pattern: ^[0-9]{1,19}$
-        text:
-          type: string
-          description: The content of the created Post.
     Media:
       type: object
       properties:
@@ -2147,114 +1447,6 @@ components:
           $ref: '#/components/schemas/MediaVariants'
         width:
           type: integer
-    AnalyticsTimestampedMetrics:
-      type: array
-      description: Time-bucketed engagement metrics for the Post, one entry per granularity bucket.
-      items:
-        type: object
-        properties:
-          metrics:
-            type: object
-            description: Engagement metric counts for this bucket.
-            properties:
-              app_install_attempts:
-                type: integer
-                format: int64
-                nullable: true
-              app_opens:
-                type: integer
-                format: int64
-                nullable: true
-              bookmarks:
-                type: integer
-                format: int64
-                nullable: true
-              detail_expands:
-                type: integer
-                format: int64
-                nullable: true
-              email_tweet:
-                type: integer
-                format: int64
-                nullable: true
-              engagements:
-                type: integer
-                format: int64
-                nullable: true
-              follows:
-                type: integer
-                format: int64
-                nullable: true
-              hashtag_clicks:
-                type: integer
-                format: int64
-                nullable: true
-              impressions:
-                type: integer
-                format: int64
-                nullable: true
-              likes:
-                type: integer
-                format: int64
-                nullable: true
-              media_views:
-                type: integer
-                format: int64
-                nullable: true
-              permalink_clicks:
-                type: integer
-                format: int64
-                nullable: true
-              quote_tweets:
-                type: integer
-                format: int64
-                nullable: true
-              replies:
-                type: integer
-                format: int64
-                nullable: true
-              retweets:
-                type: integer
-                format: int64
-                nullable: true
-              shares:
-                type: integer
-                format: int64
-                nullable: true
-              unfollows:
-                type: integer
-                format: int64
-                nullable: true
-              unlikes:
-                type: integer
-                format: int64
-                nullable: true
-              url_clicks:
-                type: integer
-                format: int64
-                nullable: true
-              user_profile_clicks:
-                type: integer
-                format: int64
-                nullable: true
-            nullable: true
-          timestamp:
-            type: string
-            description: Start of the metrics bucket, as an ISO 8601 date-time.
-            nullable: true
-    CreatePostsMediaCallToActions:
-      type: object
-      properties:
-        app_install:
-          description: App Install CTA. At least one store id should be provided.
-          $ref: '#/components/schemas/CreatePostsMediaCallToActionsAppInstall'
-        visit_site:
-          description: Visit Site CTA.
-          $ref: '#/components/schemas/CreatePostsMediaCallToActionsVisitSite'
-        watch_now:
-          description: Watch Now CTA.
-          $ref: '#/components/schemas/CreatePostsMediaCallToActionsWatchNow'
-      additionalProperties: false
     MediaOrganicMetrics:
       type: object
       description: Organic nonpublic engagement metrics for the media at the time of the request.
@@ -2290,6 +1482,15 @@ components:
             data without a view count.
           format: int64
           nullable: true
+    DeleteListsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteListsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     Topic:
       type: object
       properties:
@@ -2348,16 +1549,14 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/disallowed-resource
-    CreatePostsEditOptions:
+    DeleteListsResponseData:
       type: object
       required:
-      - previous_post_id
+      - deleted
       properties:
-        previous_post_id:
-          type: string
-          description: The ID of the Post being edited.
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
+        deleted:
+          type: boolean
+          description: Indicates whether the List was deleted.
     ResourceNotFoundProblem:
       type: object
       required:
@@ -2389,48 +1588,15 @@ components:
       description: URLs suggested as sources for this Post.
       items:
         type: string
-    GetPostsCountsAllResponseData:
-      type: object
-      required:
-      - start
-      - end
-      - post_count
-      properties:
-        end:
-          type: string
-          description: End of the count bucket (exclusive), RFC 3339.
-        post_count:
-          type: integer
-          description: Number of Posts in the bucket.
-        start:
-          type: string
-          description: Start of the count bucket (inclusive), RFC 3339.
-    GetPostsLikingUsersResponse:
+    UpdateListsResponse:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
+          $ref: '#/components/schemas/UpdateListsResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
     MediaPromotedMetrics:
       type: object
       description: Promoted nonpublic engagement metrics for the media at the time of the request.
@@ -2466,35 +1632,6 @@ components:
             data without a view count.
           format: int64
           nullable: true
-    DeletePostsResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeletePostsResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    GetPostsByIdsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
     UserSubscription:
       type: object
       description: The subscription relationship between this User and you.
@@ -2600,6 +1737,14 @@ components:
           description: Number of users who watched at least 75% of this video.
           format: int64
           nullable: true
+    UpdateListsResponseData:
+      type: object
+      required:
+      - updated
+      properties:
+        updated:
+          type: boolean
+          description: Indicates whether the List was updated.
     PollOptions:
       type: array
       description: The list of options (choices) available in this poll.
@@ -2622,75 +1767,19 @@ components:
             type: integer
             description: The number of votes this option has received.
             format: int64
-    GetPostsCountsAllResponse:
+    RemoveListsMemberByUserIdResponseData:
       type: object
+      required:
+      - is_member
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/GetPostsCountsAllResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            total_post_count:
-              type: integer
-              format: int64
-    Analytics:
-      type: object
-      properties:
-        app_install_attempts:
-          type: integer
-        app_opens:
-          type: integer
-        bookmarks:
-          type: integer
-        detail_expands:
-          type: integer
-        email_tweet:
-          type: integer
-        engagements:
-          type: integer
-        follows:
-          type: integer
-        hashtag_clicks:
-          type: integer
-        id:
-          type: string
-        impressions:
-          type: integer
-        likes:
-          type: integer
-        media_views:
-          type: integer
-        permalink_clicks:
-          type: integer
-        quote_tweets:
-          type: integer
-        replies:
-          type: integer
-        retweets:
-          type: integer
-        shares:
-          type: integer
-        timestamp:
-          type: string
-        timestamped_metrics:
-          $ref: '#/components/schemas/AnalyticsTimestampedMetrics'
-        unfollows:
-          type: integer
-        unlikes:
-          type: integer
-        url_clicks:
-          type: integer
-        user_profile_clicks:
-          type: integer
+        is_member:
+          type: boolean
+          description: Indicates whether the user is a member of the List.
+    UserId:
+      type: string
+      description: Unique identifier of a User
+      pattern: ^[0-9]{1,19}$
+      example: '2244994945'
     PostPublicMetrics:
       type: object
       description: Engagement metrics for the Post at the time of the request.
@@ -2726,6 +1815,32 @@ components:
           type: integer
           description: Number of times this Post has been reposted.
           format: int64
+    GetListsFollowersResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            previous_token:
+              type: string
+              description: Pagination token for the previous page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
     ResourceUnavailableProblem:
       type: object
       required:
@@ -2748,19 +1863,6 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/resource-unavailable
-    CreatePostsMediaCallToActionsAppInstall:
-      type: object
-      properties:
-        app_store_id:
-          type: string
-          description: Apple App Store iPhone app id.
-        ipad_app_store_id:
-          type: string
-          description: Apple App Store iPad app id.
-        play_store_id:
-          type: string
-          description: Google Play Store app id.
-      additionalProperties: false
     Poll:
       type: object
       properties:
@@ -2773,34 +1875,6 @@ components:
         options:
           $ref: '#/components/schemas/PollOptions'
         voting_status:
-          type: string
-    NotAuthorizedForResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
           type: string
     PostNotePost:
       type: object
@@ -2905,6 +1979,34 @@ components:
         text:
           type: string
           description: The full note text of the Post.
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
     UserConnectionStatus:
       type: array
       description: Returns detailed information about the relationship between two users.
@@ -2918,38 +2020,20 @@ components:
         - followed_by
         - following
         - muting
-    GetPostsRepostsResponse:
+    RemoveListsMemberByUserIdResponse:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
+          $ref: '#/components/schemas/RemoveListsMemberByUserIdResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    HidePostsReplyResponseData:
-      type: object
-      properties:
-        hidden:
-          type: boolean
-          description: Whether the reply is hidden.
+    ListId:
+      type: string
+      description: Unique identifier of a List
+      pattern: ^[0-9]{1,19}$
+      example: '1146654567674912769'
     UserAffiliation:
       type: object
       description: Metadata about a user's affiliation.
@@ -2972,22 +2056,6 @@ components:
           items:
             type: string
           nullable: true
-    GetPostsAnalyticsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Analytics'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    PostId:
-      type: string
-      description: Unique identifier of a Post
-      pattern: ^[0-9]{1,19}$
-      example: '1346889436626259968'
     Expansions:
       type: object
       properties:
@@ -3015,29 +2083,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
-    GetPostsQuotedPostsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
+    ListMemberCount:
+      type: integer
+      description: The number of members in this List.
+      format: int64
     PostMediaMetadata:
       type: array
       description: Metadata for media attached to this Post.
@@ -3061,44 +2110,6 @@ components:
             type: string
             description: Title of the media.
             nullable: true
-    CreatePostsMedia:
-      type: object
-      required:
-      - media_ids
-      properties:
-        call_to_actions:
-          description: Call-to-action button rendered on the media entity.
-          $ref: '#/components/schemas/CreatePostsMediaCallToActions'
-        description:
-          type: string
-          description: Description for the media, rendered on the Post card for video and Amplify content.
-        embeddable:
-          type: boolean
-          description: When true, the media's asset URLs do not expire and external syndicated playback
-            is allowed.
-        media_ids:
-          type: array
-          description: Media IDs to attach to the tweet.
-          minItems: 1
-          maxItems: 4
-          items:
-            type: string
-            pattern: ^[0-9]{1,19}$
-        preview_media_id:
-          type: string
-          description: Media id whose asset is used as the preview image.
-          pattern: ^[0-9]{1,19}$
-        tagged_user_ids:
-          type: array
-          description: User IDs tagged in the media.
-          maxItems: 10
-          items:
-            type: string
-            pattern: ^[0-9]{1,19}$
-        title:
-          type: string
-          description: Title for the media, rendered on the Post card for video and Amplify content.
-      additionalProperties: false
     FieldHydrationFailureProblem:
       type: object
       required:
@@ -3133,24 +2144,34 @@ components:
           type: integer
           description: The number of times this video has been viewed.
           format: int64
-    CreatePostsMediaCallToActionsWatchNow:
-      type: object
-      required:
-      - url
-      properties:
-        url:
-          type: string
-          description: HTTPS URL the CTA links to.
-      additionalProperties: false
-    CreatePostsResponse:
+    CreateListsResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/CreatePostsResponseData'
+          $ref: '#/components/schemas/CreateListsResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
+    List:
+      type: object
+      properties:
+        created_at:
+          type: string
+        description:
+          type: string
+        follower_count:
+          $ref: '#/components/schemas/ListFollowerCount'
+        id:
+          type: string
+        member_count:
+          $ref: '#/components/schemas/ListMemberCount'
+        name:
+          type: string
+        owner_id:
+          type: string
+        private:
+          type: boolean
     PlaceContainedWithin:
       type: array
       description: A list of unique identifiers of the Places that contain this place.
@@ -3188,6 +2209,24 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
+    CreateListsRequest:
+      type: object
+      required:
+      - name
+      properties:
+        description:
+          type: string
+          description: Description of the List (up to 100 characters).
+          maxLength: 100
+        name:
+          type: string
+          description: Name of the List (1-25 characters).
+          minLength: 1
+          maxLength: 25
+        private:
+          type: boolean
+          description: Whether the List is private.
+      additionalProperties: false
   parameters:
     UserFieldsParameter:
       name: user.fields
@@ -3257,44 +2296,6 @@ components:
           - width
       explode: false
       style: form
-    AnalyticsFieldsParameter:
-      name: analytics.fields
-      in: query
-      description: A comma separated list of Analytics fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Analytics object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - app_install_attempts
-          - app_opens
-          - bookmarks
-          - detail_expands
-          - email_tweet
-          - engagements
-          - follows
-          - hashtag_clicks
-          - id
-          - impressions
-          - likes
-          - media_views
-          - permalink_clicks
-          - quote_tweets
-          - replies
-          - retweets
-          - shares
-          - timestamp
-          - timestamped_metrics
-          - unfollows
-          - unlikes
-          - url_clicks
-          - user_profile_clicks
-      explode: false
-      style: form
     PostExpansionsParameter:
       name: expansions
       in: query
@@ -3342,6 +2343,43 @@ components:
           - id
           - name
           - place_type
+      explode: false
+      style: form
+    ListFieldsParameter:
+      name: list.fields
+      in: query
+      description: A comma separated list of List fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a List object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - created_at
+          - description
+          - follower_count
+          - id
+          - member_count
+          - name
+          - private
+      explode: false
+      style: form
+    ListExpansionsParameter:
+      name: expansions
+      in: query
+      description: A comma separated list of fields to expand.
+      required: false
+      schema:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - owner_id
       explode: false
       style: form
     PollFieldsParameter:

@@ -1,0 +1,37 @@
+generated: '2026-08-28'
+method: searched
+source: https://docs.x.com/tools-and-libraries.md
+description: >-
+  Client-side embeddable surfaces X publishes, distinct from the SDKs in packages/.
+  X's embeddable layer is the long-standing publish/widgets platform rather than a modern
+  component library — there is no first-party web-component set, element library, or embedded
+  dashboard for the X API.
+families:
+- name: X Embeds
+  type: embeddable widgets
+  generator: https://publish.x.com/
+  description: >-
+    Build embeddable Posts, timelines and buttons for a website. X's Tools & Libraries page
+    lists the Embed Generator as the supported way to produce them.
+  official: true
+  loader: null
+  note: >-
+    The embed generator emits markup that loads X's widgets script; X does not publish a
+    versioned, pinned distribution for it, so a consumer cannot tell which build they are
+    served. Recorded as unpinned rather than guessed.
+- name: X Chat encryption SDK
+  type: client library
+  package: '@xdevplatform/chat-xdk'
+  version: 0.5.0
+  published: '2026-08-18'
+  description: >-
+    Client-side encryption library for X Direct Messages, required to read or write Chat
+    content. Listed here because it is a client-side runtime dependency rather than a plain
+    API wrapper; it is also catalogued in packages/.
+  official: true
+absent:
+  web_components: false
+  element_library: false
+  embedded_dashboard: false
+  hosted_checkout: false
+  note: X publishes none of these for the X API.

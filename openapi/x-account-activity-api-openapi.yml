@@ -1,8 +1,9 @@
 openapi: 3.1.0
 info:
-  title: X API v2 Trends API
+  title: X API v2 Account Activity API
   version: '2.168'
-  description: The Trends surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  description: The Account Activity surface of the X API v2, split by tag from the X-published OpenAPI
+    at https://api.x.com/2/openapi.json.
   termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
   contact:
     name: X Developers
@@ -14,47 +15,27 @@ servers:
 - description: X API
   url: https://api.x.com
 tags:
-- name: Trends
-  description: Endpoint for retrieving trends
+- name: Account Activity
+  description: Endpoints relating to retrieving, managing Account Activity subscriptions
   externalDocs:
     description: Find out more
-    url: https://docs.x.com/x-api/trends/introduction
+    url: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
 paths:
-  /2/trends/by/woeid/{woeid}:
+  /2/account_activity/subscriptions/count:
     get:
       security:
-      - OAuth2UserToken: []
       - BearerToken: []
       tags:
-      - Trends
-      summary: Get Trends by Woeid
-      operationId: getTrendsByWoeid
-      parameters:
-      - name: woeid
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-        style: simple
-      - name: max_trends
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 50
-          format: int32
-          default: 20
-        style: form
-      - $ref: '#/components/parameters/TrendFieldsParameter'
+      - Account Activity
+      summary: Get Account Activity Subscription Count
+      operationId: getAccountActivitySubscriptionCount
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetTrendsByWoeidResponse'
+                $ref: '#/components/schemas/GetAccountActivitySubscriptionCountResponse'
         default:
           description: The request has failed.
           content:
@@ -64,26 +45,148 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-  /2/users/personalized_trends:
+  /2/account_activity/webhooks/{webhook_id}/subscriptions/all:
     get:
       security:
       - OAuth2UserToken:
+        - dm.read
+        - dm.write
         - users.read
         - tweet.read
       - UserToken: []
       tags:
-      - Trends
-      summary: Get Trends Personalized Trends
-      operationId: getTrendsPersonalizedTrends
+      - Account Activity
+      summary: Validate Account Activity Subscription
+      operationId: validateAccountActivitySubscription
       parameters:
-      - $ref: '#/components/parameters/PersonalizedTrendFieldsParameter'
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/WebhookConfigId'
+        style: simple
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetTrendsPersonalizedTrendsResponse'
+                $ref: '#/components/schemas/ValidateAccountActivitySubscriptionResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      security:
+      - OAuth2UserToken:
+        - dm.read
+        - tweet.read
+        - users.read
+        - dm.write
+      - UserToken: []
+      tags:
+      - Account Activity
+      summary: Create subscription
+      description: Creates an Account Activity subscription for the user and the given webhook.
+      externalDocs:
+        url: https://docs.x.com/x-api/account-activity/introduction
+      operationId: createAccountActivitySubscription
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/WebhookConfigId'
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountActivitySubscriptionRequest'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAccountActivitySubscriptionResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/account_activity/webhooks/{webhook_id}/subscriptions/all/list:
+    get:
+      security:
+      - BearerToken: []
+      tags:
+      - Account Activity
+      summary: Get Account Activity Subscriptions
+      operationId: getAccountActivitySubscriptions
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/WebhookConfigId'
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAccountActivitySubscriptionsResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/account_activity/webhooks/{webhook_id}/subscriptions/{user_id}/all:
+    delete:
+      security:
+      - BearerToken: []
+      tags:
+      - Account Activity
+      summary: Delete subscription
+      description: Deletes an Account Activity subscription for the given webhook and user ID.
+      externalDocs:
+        url: https://docs.x.com/x-api/account-activity/introduction
+      operationId: deleteAccountActivitySubscription
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/WebhookConfigId'
+        style: simple
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UserId'
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteAccountActivitySubscriptionResponse'
         default:
           description: The request has failed.
           content:
@@ -94,43 +197,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
 components:
-  parameters:
-    TrendFieldsParameter:
-      name: trend.fields
-      in: query
-      description: A comma separated list of Trend fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Trend object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - trend_name
-          - tweet_count
-      explode: false
-      style: form
-    PersonalizedTrendFieldsParameter:
-      name: personalized_trend.fields
-      in: query
-      description: A comma separated list of PersonalizedTrend fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a PersonalizedTrend object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - category
-          - post_count
-          - trend_name
-          - trending_since
-      explode: false
-      style: form
   schemas:
     NotAuthorizedForFieldProblem:
       type: object
@@ -162,30 +228,6 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
           type: string
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
     InvalidRequestProblem:
       type: object
       required:
@@ -207,35 +249,24 @@ components:
           - https://api.x.com/2/problems/invalid-request
         value:
           type: string
-    Error:
+    GetAccountActivitySubscriptionCountResponseData:
       type: object
-      required:
-      - code
-      - message
       properties:
-        code:
-          type: integer
-          format: int32
-        message:
+        account_name:
           type: string
-    GetTrendsByWoeidResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Trend'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    Trend:
-      type: object
-      properties:
-        trend_name:
+          description: Name of the subscribing account.
+        provisioned_count:
           type: string
-        tweet_count:
-          type: integer
+          description: Number of subscriptions provisioned for the app.
+        subscriptions_count_all:
+          type: string
+          description: Number of active subscriptions across all event types.
+        subscriptions_count_direct_messages:
+          type: string
+          description: Number of active Direct Message subscriptions.
+    CreateAccountActivitySubscriptionRequest:
+      type: object
+      properties: {}
     ResourceNotFoundProblem:
       type: object
       required:
@@ -262,34 +293,76 @@ components:
           - https://api.x.com/2/problems/resource-not-found
         value:
           type: string
-    GetTrendsPersonalizedTrendsResponse:
+    ValidateAccountActivitySubscriptionResponseData:
+      type: object
+      required:
+      - subscribed
+      properties:
+        subscribed:
+          type: boolean
+          description: Whether the user has an active subscription.
+    GetAccountActivitySubscriptionsResponseDataSubscriptions:
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: Subscribed user.
+      additionalProperties: false
+    GetAccountActivitySubscriptionsResponseData:
+      type: object
+      properties:
+        application_id:
+          type: string
+          description: App the subscriptions belong to.
+        subscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetAccountActivitySubscriptionsResponseDataSubscriptions'
+        webhook_id:
+          type: string
+          description: Webhook receiving the subscription events.
+        webhook_url:
+          type: string
+          description: URL the webhook delivers events to.
+    GetAccountActivitySubscriptionCountResponse:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PersonalizedTrend'
+          $ref: '#/components/schemas/GetAccountActivitySubscriptionCountResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    InternalErrorProblem:
+    DeleteAccountActivitySubscriptionResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteAccountActivitySubscriptionResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    CreateAccountActivitySubscriptionResponseData:
       type: object
       required:
-      - type
-      - title
-      - detail
+      - subscribed
       properties:
-        detail:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
+        subscribed:
+          type: boolean
+          description: Whether the subscription is active.
+    GetAccountActivitySubscriptionsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GetAccountActivitySubscriptionsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    WebhookConfigId:
+      type: string
+      description: Unique identifier of a WebhookConfig
+      pattern: ^[0-9]{1,19}$
     Problem:
       oneOf:
       - $ref: '#/components/schemas/ResourceNotFoundProblem'
@@ -313,17 +386,80 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    PersonalizedTrend:
+    CreateAccountActivitySubscriptionResponse:
       type: object
       properties:
-        category:
+        data:
+          $ref: '#/components/schemas/CreateAccountActivitySubscriptionResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
           type: string
-        post_count:
+        field:
           type: string
-        trend_name:
+        resource_type:
           type: string
-        trending_since:
+        section:
           type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    DeleteAccountActivitySubscriptionResponseData:
+      type: object
+      required:
+      - subscribed
+      properties:
+        subscribed:
+          type: boolean
+          description: Whether the user has an active subscription.
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    UserId:
+      type: string
+      description: Unique identifier of a User
+      pattern: ^[0-9]{1,19}$
+      example: '2244994945'
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
     ResourceUnavailableProblem:
       type: object
       required:
@@ -393,6 +529,15 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/disallowed-resource
+    ValidateAccountActivitySubscriptionResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ValidateAccountActivitySubscriptionResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     NotAuthorizedForResourceProblem:
       type: object
       required:

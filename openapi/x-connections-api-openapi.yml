@@ -1,0 +1,649 @@
+openapi: 3.1.0
+info:
+  title: X API v2 Connections API
+  version: '2.168'
+  description: The Connections surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
+  contact:
+    name: X Developers
+    url: https://developer.x.com/
+  license:
+    name: X Developer Agreement and Policy
+    url: https://developer.x.com/en/developer-terms/agreement-and-policy.html
+servers:
+- description: X API
+  url: https://api.x.com
+tags:
+- name: Connections
+  description: Endpoints related to streaming connections
+  externalDocs:
+    description: Find out more
+    url: https://developer.x.com/en/docs/x-api/connections
+paths:
+  /2/connections:
+    get:
+      security:
+      - BearerToken: []
+      tags:
+      - Connections
+      summary: Get Connection History
+      description: Returns active and historical streaming connections with disconnect reasons for the
+        authenticated application.
+      operationId: getConnectionHistory
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - active
+          - inactive
+          - all
+          default: active
+        style: form
+      - name: endpoints
+        in: query
+        required: false
+        schema:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            enum:
+            - filtered_stream
+            - sample_stream
+            - sample10_stream
+            - firehose_stream
+            - tweets_compliance_stream
+            - users_compliance_stream
+            - tweet_label_stream
+            - firehose_stream_lang_en
+            - firehose_stream_lang_ja
+            - firehose_stream_lang_ko
+            - firehose_stream_lang_pt
+            - likes_firehose_stream
+            - likes_sample10_stream
+            - likes_compliance_stream
+        explode: false
+        style: form
+      - name: max_results
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          format: int32
+          default: 10
+        style: form
+      - name: pagination_token
+        in: query
+        required: false
+        schema:
+          type: string
+        style: form
+      - $ref: '#/components/parameters/ConnectionFieldsParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetConnectionHistoryResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      security:
+      - BearerToken: []
+      tags:
+      - Connections
+      summary: Terminate multiple connections
+      description: Terminates multiple streaming connections by their UUIDs for the authenticated application.
+      operationId: deleteConnectionsByUuids
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteConnectionsByUuidsRequest'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteConnectionsByUuidsResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/connections/all:
+    delete:
+      security:
+      - BearerToken: []
+      tags:
+      - Connections
+      summary: Terminate all connections
+      description: Terminates all active streaming connections for the authenticated application.
+      externalDocs:
+        url: https://docs.x.com/x-api/connections/terminate-all-connections
+      operationId: deleteAllConnections
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteAllConnectionsResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/connections/{endpoint_id}:
+    delete:
+      security:
+      - BearerToken: []
+      tags:
+      - Connections
+      summary: Terminate connections by endpoint
+      description: Terminates all streaming connections for a specific endpoint ID for the authenticated
+        application.
+      operationId: deleteConnectionsByEndpoint
+      parameters:
+      - name: endpoint_id
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - filtered_stream
+          - sample_stream
+          - sample10_stream
+          - firehose_stream
+          - tweets_compliance_stream
+          - users_compliance_stream
+          - tweet_label_stream
+          - firehose_stream_lang_en
+          - firehose_stream_lang_ja
+          - firehose_stream_lang_ko
+          - firehose_stream_lang_pt
+          - likes_firehose_stream
+          - likes_sample10_stream
+          - likes_compliance_stream
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteConnectionsByEndpointResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  schemas:
+    NotAuthorizedForFieldProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
+          type: string
+    InvalidRequestProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    DeleteConnectionsByUuidsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteConnectionsByUuidsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    ResourceNotFoundProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    DeleteConnectionsByUuidsRequest:
+      type: object
+      required:
+      - uuids
+      properties:
+        uuids:
+          type: array
+          description: Connection UUIDs to terminate (1-100).
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+      additionalProperties: false
+    GetConnectionHistoryResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Connection'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    DeleteConnectionsByUuidsResponseData:
+      type: object
+      required:
+      - successful_kills
+      - failed_kills
+      properties:
+        failed_kills:
+          type: integer
+          description: Number of connections that could not be terminated.
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteConnectionsByUuidsResponseDataResults'
+        successful_kills:
+          type: integer
+          description: Number of connections successfully terminated.
+    DeleteAllConnectionsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteAllConnectionsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    Problem:
+      oneOf:
+      - $ref: '#/components/schemas/ResourceNotFoundProblem'
+      - $ref: '#/components/schemas/InvalidRequestProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
+      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
+      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
+      - $ref: '#/components/schemas/ResourceUnavailableProblem'
+      - $ref: '#/components/schemas/DisallowedResourceProblem'
+      - $ref: '#/components/schemas/InternalErrorProblem'
+      discriminator:
+        propertyName: type
+        mapping:
+          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
+          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
+          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
+          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
+          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
+          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
+          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
+          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
+          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    DeleteConnectionsByEndpointResponseData:
+      type: object
+      required:
+      - successful_kills
+      - failed_kills
+      properties:
+        failed_kills:
+          type: integer
+          description: Number of connections that could not be terminated.
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteConnectionsByEndpointResponseDataResults'
+        successful_kills:
+          type: integer
+          description: Number of connections successfully terminated.
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+    DeleteAllConnectionsResponseDataResults:
+      type: object
+      required:
+      - uuid
+      - success
+      properties:
+        error_message:
+          type: string
+        success:
+          type: boolean
+        uuid:
+          type: string
+      additionalProperties: false
+    DeleteConnectionsByEndpointResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteConnectionsByEndpointResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    DeleteConnectionsByEndpointResponseDataResults:
+      type: object
+      required:
+      - uuid
+      - success
+      properties:
+        error_message:
+          type: string
+        success:
+          type: boolean
+        uuid:
+          type: string
+      additionalProperties: false
+    DeleteAllConnectionsResponseData:
+      type: object
+      required:
+      - successful_kills
+      - failed_kills
+      properties:
+        failed_kills:
+          type: integer
+          description: Number of connections that could not be terminated.
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteAllConnectionsResponseDataResults'
+        successful_kills:
+          type: integer
+          description: Number of connections successfully terminated.
+    DeleteConnectionsByUuidsResponseDataResults:
+      type: object
+      required:
+      - uuid
+      - success
+      properties:
+        error_message:
+          type: string
+        success:
+          type: boolean
+        uuid:
+          type: string
+      additionalProperties: false
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    FieldUnauthorizedProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-unauthorized
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    Connection:
+      type: object
+      properties:
+        client_ip:
+          type: string
+        connected_at:
+          type: string
+          format: date-time
+        disconnect_reason:
+          type: string
+        disconnected_at:
+          type: string
+          format: date-time
+        endpoint_name:
+          type: string
+        id:
+          type: string
+  parameters:
+    ConnectionFieldsParameter:
+      name: connection.fields
+      in: query
+      description: A comma separated list of Connection fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a Connection object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - client_ip
+          - connected_at
+          - disconnect_reason
+          - disconnected_at
+          - endpoint_name
+          - id
+      explode: false
+      style: form
+  securitySchemes:
+    BearerToken:
+      type: http
+      scheme: bearer

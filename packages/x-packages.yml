@@ -1,0 +1,79 @@
+generated: '2026-08-28'
+method: searched
+source: https://docs.x.com/tools-and-libraries.md
+docs: https://docs.x.com/tools-and-libraries
+description: >-
+  First-party X Developer Platform client libraries and CLIs ("XDKs"), with the
+  latest published version and release date read from each registry's metadata
+  endpoint on 2026-08-28. Community libraries that X links but does not maintain
+  are listed separately and are NOT marked official.
+packages:
+- name: '@xdevplatform/xdk'
+  language: TypeScript
+  registry: npm
+  official: true
+  url: https://www.npmjs.com/package/@xdevplatform/xdk
+  repository: https://github.com/xdevplatform/xdk-typescript
+  install: npm install @xdevplatform/xdk
+  version: 0.6.6
+  published: '2026-07-25'
+  description: A modern TypeScript/JavaScript SDK for the X API. Full type safety, ESM support, Node.js and modern bundlers.
+  source: https://registry.npmjs.org/@xdevplatform/xdk
+- name: xdk
+  language: Python
+  registry: pypi
+  official: true
+  url: https://pypi.org/project/xdk/
+  repository: https://github.com/xdevplatform/xdk-python
+  install: pip install xdk
+  version: 0.10.6
+  published: '2026-07-25'
+  description: Python SDK for the X API. Async support, type hints, automatic token refresh.
+  source: https://pypi.org/pypi/xdk/json
+- name: '@xdevplatform/chat-xdk'
+  language: TypeScript
+  registry: npm
+  official: true
+  url: https://www.npmjs.com/package/@xdevplatform/chat-xdk
+  install: npm install @xdevplatform/chat-xdk
+  version: 0.5.0
+  published: '2026-08-18'
+  description: X Chat SDK — end-to-end encryption for X Direct Messages, used with the X Chat API.
+  source: https://registry.npmjs.org/@xdevplatform/chat-xdk
+- name: '@xdevplatform/xurl'
+  language: TypeScript
+  registry: npm
+  official: true
+  kind: cli
+  url: https://www.npmjs.com/package/@xdevplatform/xurl
+  repository: https://github.com/xdevplatform/xurl
+  install: npm install -g @xdevplatform/xurl
+  version: 1.3.1
+  published: '2026-07-21'
+  description: Auth-enabled curl-like CLI for the X API; also the local MCP bridge (`xurl mcp`) for api.x.com/mcp.
+  source: https://registry.npmjs.org/@xdevplatform/xurl
+- name: xdevplatform/tap/xurl
+  language: Shell
+  registry: homebrew
+  official: true
+  kind: cli
+  url: https://github.com/xdevplatform/homebrew-tap
+  install: brew install --cask xdevplatform/tap/xurl
+  version: null
+  published: null
+  note: >-
+    Homebrew tap distribution of xurl. A tap has no public registry metadata endpoint
+    to query for a version; the authoritative version is the npm package
+    @xdevplatform/xurl (1.3.1, 2026-07-21) built from the same repository.
+  source: https://docs.x.com/tools/mcp
+community_libraries:
+  note: >-
+    X links these from its Tools & Libraries page but explicitly labels them
+    "community-maintained". They are recorded for discovery and are NOT first-party.
+  python: [tweepy, twarc, python-twitter, TwitterAPI]
+  javascript: [node-twitter-api-v2, twitter.js, twitter-v2]
+  go: [go-twitter, gotwi, twitter-stream]
+  other:
+  - name: twitter-text
+    url: https://github.com/twitter/twitter-text
+    note: X-owned repository under the legacy twitter GitHub org; parses and validates Post text.

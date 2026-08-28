@@ -1,0 +1,40 @@
+generated: '2026-08-28'
+method: searched
+source: https://docs.x.com/.well-known/agent-skills/x/skill.md
+description: >-
+  Agent Skills published by X itself, discovered through the agentskills.io 0.2.0
+  discovery index at https://docs.x.com/.well-known/agent-skills/index.json and saved
+  verbatim. No skill in this directory was authored by API Evangelist.
+discovery:
+  index: https://docs.x.com/.well-known/agent-skills/index.json
+  legacy_index: https://docs.x.com/.well-known/skills/index.json
+  spec: https://schemas.agentskills.io/discovery/0.2.0/schema.json
+  install: npx skills add https://docs.x.com
+skills:
+- id: x
+  name: X
+  file: x-x-skill.md
+  api: x:x
+  source: https://docs.x.com/.well-known/agent-skills/x/skill.md
+  mirror: https://docs.x.com/skill.md
+  digest: sha256:9389e17760e118214b30a5473a5142764e1903506660916cdf85d01eb182d419
+  http_status: 200
+  bytes: 10308
+  method: searched
+  description: >-
+    Use when building applications that interact with X (formerly Twitter) data and
+    functionality. Covers searching posts, managing user accounts, streaming real-time
+    data, publishing content, managing direct messages, and analyzing trends.
+  operations:
+  - searchPostsRecent
+  - searchPostsAll
+  - createPosts
+  - deletePosts
+  - getUsersByUsername
+  - getUsersById
+  - streamPosts
+  - updateRules
+  note: >-
+    operations[] lists the operationIds in openapi/ that back the endpoints the published
+    skill names in its "Essential endpoints" table; the skill body itself is verbatim X
+    content and names endpoints by path, not operationId.

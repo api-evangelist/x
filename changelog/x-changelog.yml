@@ -1,0 +1,81 @@
+generated: '2026-08-28'
+method: searched
+source: https://docs.x.com/changelog.md
+docs: https://docs.x.com/changelog
+feed: https://docs.x.com/changelog/rss.xml
+description: >-
+  Recent window of the dated X Developer Platform changelog, transcribed from X's own
+  published entries. Covers X API v2, Enterprise, Ads API and the SDKs.
+scheme: dated-entries
+current_contract_version: '2.168'
+cadence: irregular, several entries per quarter
+entries:
+- date: '2026-08-13'
+  product: X Ads API
+  title: Updated video_total_views definition
+  breaking: true
+  summary: >-
+    video_total_views now reports views 100% in-view for at least 3 seconds plus manual
+    play-button clicks. The prior MRC-standard definition (50% in-view for 2 seconds) no
+    longer applies; the old behaviour survives as video_3s100pct_views.
+- date: '2026-07-21'
+  product: X API v2
+  title: Mute and block events for X Activity API
+  breaking: false
+  additions: [mute.mute, mute.unmute, block.block, block.unblock]
+  summary: >-
+    Private events requiring user-context OAuth 2.0 with mute.read or block.read; the
+    user_id filter matches the user performing the action.
+- date: '2026-06-11'
+  product: X API v2
+  title: Articles draft and publish endpoints
+  breaking: false
+  additions: [articleCreateDraft, articlePublish]
+- date: '2026-06-04'
+  product: X API v2
+  title: Post create and delete events for X Activity API
+  breaking: false
+  additions: [post.create, post.delete]
+- date: '2026-06-03'
+  product: X API v2
+  title: paid_partnership Post field
+  breaking: false
+  summary: >-
+    POST /2/tweets accepts "paid_partnership": true; reads request it via
+    tweet.fields=paid_partnership.
+- date: '2026-05-04'
+  product: X API v2
+  title: Search endpoints migrating to a new search index
+  breaking: true
+  summary: >-
+    /2/tweets/search/recent, /2/tweets/search/all, /2/tweets/counts/recent and
+    /2/tweets/counts/all moved to the new X core platform search index. New operators
+    min_likes:, min_replies:, min_reposts:. Reposts are no longer returned in keyword
+    search results; the filtered stream is unchanged.
+- date: '2026-04-16'
+  product: X API
+  title: 'Pricing update: Owned Reads now $0.001'
+  breaking: true
+  effective: '2026-04-20'
+  summary: >-
+    Owned Reads priced at $0.001 per resource for a named list of self-owned endpoints.
+    POST /2/tweets moved to $0.015 per Post, $0.20 for Posts containing a URL, summoned
+    replies $0.01. Following, Likes and Quote-Posts removed from all self-serve tiers.
+- date: '2026-03-20'
+  product: X API v2
+  title: Deprecation of the Account Activity replay endpoint
+  breaking: true
+  effective: '2026-03-25'
+  summary: >-
+    POST /2/account_activity/replay/webhooks/{webhook_id}/subscriptions/all retired in
+    favour of the consolidated POST /2/webhooks/replay.
+- date: '2026-03-18'
+  product: X API v2
+  title: Direction filter for X Activity API subscriptions
+  breaking: false
+  summary: Optional `direction` filter scopes DM and chat events to sent, received, or both.
+- date: '2026-03-13'
+  product: X API v2
+  title: Updates to event type naming in the X Activity API
+  breaking: true
+  effective: '2026-03-18'

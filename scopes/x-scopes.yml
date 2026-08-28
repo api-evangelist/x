@@ -1,0 +1,228 @@
+generated: '2026-08-28'
+method: searched
+source: openapi/_original/x-api-v2-openapi.json, https://api.x.com/.well-known/oauth-authorization-server,
+  https://api.x.com/.well-known/oauth-protected-resource
+docs: https://docs.x.com/fundamentals/authentication/oauth-2-0/authorization-code
+description: 'OAuth 2.0 scopes for the X API v2, reconciled across three authoritative sources X publishes:
+  the securitySchemes block of its own OpenAPI, the RFC 8414 authorization server metadata at api.x.com,
+  and the RFC 9728 protected-resource metadata that governs the hosted MCP server. The three lists DISAGREE,
+  and the disagreement is recorded per scope rather than flattened.'
+flow:
+  type: authorizationCode
+  pkce: S256
+  authorizationUrl: https://x.com/i/oauth2/authorize
+  authorizationUrl_in_spec: https://api.x.com/2/oauth2/authorize
+  tokenUrl: https://api.x.com/2/oauth2/token
+  issuer: https://api.x.com
+  grant_types:
+  - authorization_code
+  - refresh_token
+  token_endpoint_auth_methods:
+  - none
+  - client_secret_basic
+  dynamic_client_registration: false
+  note: The spec names https://api.x.com/2/oauth2/authorize while the authorization server metadata names
+    https://x.com/i/oauth2/authorize. Both are published by X; the well-known document is the RFC 8414
+    authority for the running server.
+counts:
+  in_spec: 26
+  advertised_by_authorization_server: 18
+  mcp_resource_scopes: 15
+  union: 29
+  spec_only:
+  - broadcast.read
+  - broadcast.write
+  - developer.read
+  - dm.read
+  - dm.write
+  - follows.write
+  - like.write
+  - mute.write
+  - timeline.read
+  - tweet.moderate.write
+  - tweet.write
+  server_only:
+  - ads.read
+  - ads.write
+  - developer.billing.write
+reconciliation_note: Eleven scopes appear in the contract but are NOT advertised by the authorization
+  server (most of the .write family plus dm.read/dm.write, timeline.read, tweet.write, tweet.moderate.write,
+  media.write, broadcast.*). Three appear only in the server metadata (ads.read, ads.write, developer.billing.write).
+  An agent that builds its consent screen from the well-known document alone will be missing write scopes
+  the API requires.
+scopes:
+- scope: ads.read
+  description: null
+  in_spec: false
+  advertised_by_authorization_server: true
+  mcp_resource_scope: false
+  access: read
+- scope: ads.write
+  description: null
+  in_spec: false
+  advertised_by_authorization_server: true
+  mcp_resource_scope: false
+  access: write
+- scope: block.read
+  description: View accounts you have blocked.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: read
+- scope: block.write
+  description: Block and unblock accounts on your behalf.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: write
+- scope: bookmark.read
+  description: Read your bookmarked Posts.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: read
+- scope: bookmark.write
+  description: Create and delete your bookmarks.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: write
+- scope: broadcast.read
+  description: View your live broadcasts and their chat.
+  in_spec: true
+  advertised_by_authorization_server: false
+  mcp_resource_scope: false
+  access: read
+- scope: broadcast.write
+  description: Manage your live broadcasts and send chat messages on your behalf.
+  in_spec: true
+  advertised_by_authorization_server: false
+  mcp_resource_scope: false
+  access: write
+- scope: developer.billing.write
+  description: null
+  in_spec: false
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: write
+- scope: developer.read
+  description: View your developer accounts, apps, and settings.
+  in_spec: true
+  advertised_by_authorization_server: false
+  mcp_resource_scope: false
+  access: read
+- scope: developer.write
+  description: Create and manage your X Developer Platform account.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: write
+- scope: dm.read
+  description: Read all your Direct Messages.
+  in_spec: true
+  advertised_by_authorization_server: false
+  mcp_resource_scope: false
+  access: read
+- scope: dm.write
+  description: Send and manage your Direct Messages.
+  in_spec: true
+  advertised_by_authorization_server: false
+  mcp_resource_scope: false
+  access: write
+- scope: follows.read
+  description: View accounts you follow and accounts following you.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: read
+- scope: follows.write
+  description: Follow and unfollow accounts on your behalf.
+  in_spec: true
+  advertised_by_authorization_server: false
+  mcp_resource_scope: false
+  access: write
+- scope: like.read
+  description: View Posts you have liked and likes you can see.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: read
+- scope: like.write
+  description: Like and unlike Posts on your behalf.
+  in_spec: true
+  advertised_by_authorization_server: false
+  mcp_resource_scope: false
+  access: write
+- scope: list.read
+  description: View Lists, members, and followers of Lists you created or are a member of, including private
+    Lists.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: read
+- scope: list.write
+  description: Create and manage Lists on your behalf.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: write
+- scope: media.write
+  description: Upload media, such as photos and videos, on your behalf.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: false
+  access: write
+- scope: mute.read
+  description: View accounts you have muted.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: read
+- scope: mute.write
+  description: Mute and unmute accounts on your behalf.
+  in_spec: true
+  advertised_by_authorization_server: false
+  mcp_resource_scope: false
+  access: write
+- scope: offline.access
+  description: Request a refresh token for the app.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: other
+- scope: space.read
+  description: View all Spaces you have access to.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: read
+- scope: timeline.read
+  description: View all Custom Timelines you can see.
+  in_spec: true
+  advertised_by_authorization_server: false
+  mcp_resource_scope: false
+  access: read
+- scope: tweet.moderate.write
+  description: Hide and unhide replies to your posts.
+  in_spec: true
+  advertised_by_authorization_server: false
+  mcp_resource_scope: false
+  access: write
+- scope: tweet.read
+  description: View all posts you can see, including those from protected accounts.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: read
+- scope: tweet.write
+  description: Create and repost on your behalf.
+  in_spec: true
+  advertised_by_authorization_server: false
+  mcp_resource_scope: false
+  access: write
+- scope: users.read
+  description: View any account you can see, including protected accounts.
+  in_spec: true
+  advertised_by_authorization_server: true
+  mcp_resource_scope: true
+  access: read

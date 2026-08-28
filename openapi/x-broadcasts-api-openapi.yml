@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: X API v2 Posts API
+  title: X API v2 Broadcasts API
   version: '2.168'
-  description: The Posts surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  description: The Broadcasts surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
   termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
   contact:
     name: X Developers
@@ -14,49 +14,121 @@ servers:
 - description: X API
   url: https://api.x.com
 tags:
-- name: Posts
-  description: Endpoints related to retrieving, searching, and modifying Posts
+- name: Broadcasts
+  description: Endpoints related to live broadcasts and their chat
   externalDocs:
     description: Find out more
-    url: https://docs.x.com/x-api/posts/introduction
+    url: https://developer.x.com/
 paths:
-  /2/tweets:
+  /2/broadcasts:
     get:
       security:
       - OAuth2UserToken:
-        - tweet.read
-        - users.read
+        - broadcast.read
       - UserToken: []
-      - BearerToken: []
       tags:
-      - Posts
-      summary: Get Posts by IDs
-      operationId: getPostsByIds
+      - Broadcasts
+      summary: List broadcasts
+      description: 'Returns the authenticated user''s live-video broadcasts, or selected owned broadcasts
+        when ids are provided.
+
+
+        At most one of `ids`, `max_results` may be provided. At most one of `ids`, `pagination_token`
+        may be provided.'
+      operationId: listBroadcasts
       parameters:
       - name: ids
         in: query
-        required: true
+        description: Comma-separated broadcast IDs to retrieve instead of listing broadcasts.
+        required: false
         schema:
           type: array
           minItems: 1
           maxItems: 100
           items:
-            $ref: '#/components/schemas/PostId'
+            type: string
+            pattern: ^[a-zA-Z0-9]{1,13}$
         explode: false
         style: form
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      - $ref: '#/components/parameters/PostExpansionsParameter'
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/MediaFieldsParameter'
-      - $ref: '#/components/parameters/PollFieldsParameter'
-      - $ref: '#/components/parameters/PlaceFieldsParameter'
+      - name: max_results
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          format: int32
+        style: form
+      - name: pagination_token
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+        style: form
+      - $ref: '#/components/parameters/BroadcastFieldsParameter'
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetPostsByIdsResponse'
+                $ref: '#/components/schemas/ListBroadcastsResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/broadcasts/scheduled:
+    get:
+      security:
+      - OAuth2UserToken:
+        - broadcast.read
+      - UserToken: []
+      tags:
+      - Broadcasts
+      summary: List scheduled broadcasts
+      description: Returns scheduled broadcasts owned by the authenticated user.
+      operationId: listScheduledBroadcasts
+      parameters:
+      - name: max_results
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          format: int32
+        style: form
+      - name: oldest_start_time
+        in: query
+        required: false
+        schema:
+          type: string
+        style: form
+      - name: newest_start_time
+        in: query
+        required: false
+        schema:
+          type: string
+        style: form
+      - name: pagination_token
+        in: query
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListScheduledBroadcastsResponse'
         default:
           description: The request has failed.
           content:
@@ -69,19 +141,20 @@ paths:
     post:
       security:
       - OAuth2UserToken:
-        - tweet.read
-        - users.read
-        - tweet.write
+        - broadcast.read
+        - broadcast.write
       - UserToken: []
       tags:
-      - Posts
-      summary: Create Posts
-      operationId: createPosts
+      - Broadcasts
+      summary: Create a scheduled broadcast
+      description: Schedules a one-off or recurring broadcast for the authenticated user. A `source_id`
+        (ingest) is required at create time.
+      operationId: createScheduledBroadcast
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreatePostsRequest'
+              $ref: '#/components/schemas/CreateScheduledBroadcastRequest'
         required: true
       responses:
         '201':
@@ -89,7 +162,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreatePostsResponse'
+                $ref: '#/components/schemas/CreateScheduledBroadcastResponse'
         default:
           description: The request has failed.
           content:
@@ -99,513 +172,74 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-  /2/tweets/analytics:
+  /2/broadcasts/scheduled/{id}:
     get:
       security:
       - OAuth2UserToken:
-        - tweet.read
-        - users.read
+        - broadcast.read
       - UserToken: []
       tags:
-      - Posts
-      summary: Get Posts Analytics
-      operationId: getPostsAnalytics
-      parameters:
-      - name: ids
-        in: query
-        required: true
-        schema:
-          type: array
-          minItems: 1
-          maxItems: 100
-          items:
-            $ref: '#/components/schemas/AnalyticsId'
-        explode: false
-        style: form
-      - name: start_time
-        in: query
-        required: true
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: end_time
-        in: query
-        required: true
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: granularity
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - hourly
-          - weekly
-          - daily
-          - total
-          default: total
-        style: form
-      - $ref: '#/components/parameters/AnalyticsFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsAnalyticsResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/counts/all:
-    get:
-      security:
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Get Posts Counts All
-      description: At most one of `pagination_token`, `next_token` may be provided.
-      operationId: getPostsCountsAll
-      parameters:
-      - name: query
-        in: query
-        required: true
-        schema:
-          type: string
-          minLength: 1
-          maxLength: 4096
-        style: form
-      - name: start_time
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: end_time
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: since_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: until_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: next_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: granularity
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - minute
-          - hour
-          - day
-          default: hour
-        style: form
-      - name: search_count.fields
-        in: query
-        required: false
-        schema:
-          type: string
-        style: form
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsCountsAllResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/counts/recent:
-    get:
-      security:
-      - OAuth2UserToken: []
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Get Posts Counts Recent
-      description: At most one of `pagination_token`, `next_token` may be provided.
-      operationId: getPostsCountsRecent
-      parameters:
-      - name: query
-        in: query
-        required: true
-        schema:
-          type: string
-          minLength: 1
-          maxLength: 4096
-        style: form
-      - name: start_time
-        in: query
-        description: Must be within the last 7 days.
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: end_time
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: since_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: until_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: next_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: granularity
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - minute
-          - hour
-          - day
-          default: hour
-        style: form
-      - name: search_count.fields
-        in: query
-        required: false
-        schema:
-          type: string
-        style: form
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsCountsRecentResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/search/all:
-    get:
-      security:
-      - OAuth2UserToken:
-        - users.read
-        - tweet.read
-      - UserToken: []
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Search Posts All
-      description: At most one of `start_time`, `since_id` may be provided. At most one of `end_time`,
-        `until_id` may be provided. At most one of `pagination_token`, `next_token` may be provided.
-      operationId: searchPostsAll
-      parameters:
-      - name: query
-        in: query
-        required: true
-        schema:
-          type: string
-          minLength: 1
-          maxLength: 4096
-        style: form
-      - name: start_time
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: end_time
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: since_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: until_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: max_results
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 10
-          maximum: 500
-          format: int32
-          default: 10
-        style: form
-      - name: next_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: sort_order
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - recency
-          - relevancy
-        style: form
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      - $ref: '#/components/parameters/PostExpansionsParameter'
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/MediaFieldsParameter'
-      - $ref: '#/components/parameters/PollFieldsParameter'
-      - $ref: '#/components/parameters/PlaceFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SearchPostsAllResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/search/recent:
-    get:
-      security:
-      - OAuth2UserToken:
-        - users.read
-        - tweet.read
-      - UserToken: []
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Search Posts Recent
-      description: At most one of `start_time`, `since_id` may be provided. At most one of `end_time`,
-        `until_id` may be provided. At most one of `pagination_token`, `next_token` may be provided.
-      operationId: searchPostsRecent
-      parameters:
-      - name: query
-        in: query
-        required: true
-        schema:
-          type: string
-          minLength: 1
-          maxLength: 4096
-        style: form
-      - name: max_results
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 10
-          maximum: 100
-          format: int32
-          default: 10
-        style: form
-      - name: next_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - name: start_time
-        in: query
-        description: Must be within the last 7 days.
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: end_time
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date-time
-        style: form
-      - name: since_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: until_id
-        in: query
-        required: false
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: form
-      - name: sort_order
-        in: query
-        required: false
-        schema:
-          type: string
-          enum:
-          - recency
-          - relevancy
-        style: form
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      - $ref: '#/components/parameters/PostExpansionsParameter'
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/MediaFieldsParameter'
-      - $ref: '#/components/parameters/PollFieldsParameter'
-      - $ref: '#/components/parameters/PlaceFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SearchPostsRecentResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/{id}:
-    get:
-      security:
-      - OAuth2UserToken:
-        - tweet.read
-        - users.read
-      - UserToken: []
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Get Posts by ID
-      operationId: getPostsById
+      - Broadcasts
+      summary: Get a scheduled broadcast
+      description: Returns a single scheduled broadcast by its alphanumeric UBS broadcast id.
+      operationId: getScheduledBroadcast
       parameters:
       - name: id
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/PostId'
+          type: string
+          pattern: ^[a-zA-Z0-9]{1,13}$
         style: simple
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      - $ref: '#/components/parameters/PostExpansionsParameter'
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/MediaFieldsParameter'
-      - $ref: '#/components/parameters/PollFieldsParameter'
-      - $ref: '#/components/parameters/PlaceFieldsParameter'
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetPostsByIdResponse'
+                $ref: '#/components/schemas/GetScheduledBroadcastResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    put:
+      security:
+      - OAuth2UserToken:
+        - broadcast.write
+        - broadcast.read
+      - UserToken: []
+      tags:
+      - Broadcasts
+      summary: Update a scheduled broadcast
+      description: Fully replaces schedule fields for a broadcast. Path `:id` is the UBS broadcast id;
+        the body must include `scheduled_broadcast_id` and re-send any fields that should be kept.
+      operationId: updateScheduledBroadcast
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9]{1,13}$
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScheduledBroadcastRequest'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateScheduledBroadcastResponse'
         default:
           description: The request has failed.
           content:
@@ -618,28 +252,35 @@ paths:
     delete:
       security:
       - OAuth2UserToken:
-        - users.read
-        - tweet.read
-        - tweet.write
+        - broadcast.write
+        - broadcast.read
       - UserToken: []
       tags:
-      - Posts
-      summary: Delete Posts
-      operationId: deletePosts
+      - Broadcasts
+      summary: Delete a scheduled broadcast
+      description: Deletes a scheduled broadcast by its alphanumeric UBS broadcast id.
+      operationId: deleteScheduledBroadcast
       parameters:
       - name: id
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/PostId'
+          type: string
+          pattern: ^[a-zA-Z0-9]{1,13}$
         style: simple
+      - name: roll_forward
+        in: query
+        required: false
+        schema:
+          type: boolean
+        style: form
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeletePostsResponse'
+                $ref: '#/components/schemas/DeleteScheduledBroadcastResponse'
         default:
           description: The request has failed.
           content:
@@ -649,24 +290,97 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-  /2/tweets/{id}/liking_users:
-    get:
+  /2/broadcasts/scheduled/{id}/live:
+    post:
       security:
       - OAuth2UserToken:
-        - like.read
-        - tweet.read
-        - users.read
+        - broadcast.write
+        - broadcast.read
       - UserToken: []
       tags:
-      - Posts
-      summary: Get Posts Liking Users
-      operationId: getPostsLikingUsers
+      - Broadcasts
+      summary: Go live on a scheduled broadcast
+      description: 'Publishes a schedule that was created or updated with `manual_publish: true`. Without
+        that flag the coordinator auto-publishes at start and this call is rejected.'
+      operationId: goLiveScheduledBroadcast
       parameters:
       - name: id
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/PostId'
+          type: string
+          pattern: ^[a-zA-Z0-9]{1,13}$
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoLiveScheduledBroadcastResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/broadcasts/{id}:
+    get:
+      security:
+      - OAuth2UserToken:
+        - broadcast.read
+      - UserToken: []
+      tags:
+      - Broadcasts
+      summary: Get a broadcast
+      description: Returns a broadcast owned by the authenticated user.
+      operationId: getBroadcast
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9]{1,13}$
+        style: simple
+      - $ref: '#/components/parameters/BroadcastFieldsParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetBroadcastResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/broadcasts/{id}/chat:
+    get:
+      security:
+      - OAuth2UserToken:
+        - broadcast.read
+      - UserToken: []
+      tags:
+      - Broadcasts
+      summary: Get broadcast chat history
+      description: Returns newest-first chat messages for a broadcast owned by the authenticated user.
+      operationId: getBroadcastChat
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9]{1,13}$
         style: simple
       - name: max_results
         in: query
@@ -674,28 +388,27 @@ paths:
         schema:
           type: integer
           minimum: 1
-          maximum: 100
+          maximum: 200
           format: int32
           default: 100
         style: form
       - name: pagination_token
         in: query
-        description: A base32hex-encoded pagination token.
+        description: A 64-bit signed integer.
         required: false
         schema:
           type: string
-          minLength: 1
         style: form
+      - $ref: '#/components/parameters/BroadcastChatMessageFieldsParameter'
+      - $ref: '#/components/parameters/BroadcastChatMessageExpansionsParameter'
       - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/UserExpansionsParameter'
-      - $ref: '#/components/parameters/PostFieldsParameter'
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetPostsLikingUsersResponse'
+                $ref: '#/components/schemas/GetBroadcastChatResponse'
         default:
           description: The request has failed.
           content:
@@ -705,221 +418,30 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-  /2/tweets/{id}/quote_tweets:
-    get:
+    post:
       security:
       - OAuth2UserToken:
-        - users.read
-        - tweet.read
+        - broadcast.write
+        - broadcast.read
       - UserToken: []
-      - BearerToken: []
       tags:
-      - Posts
-      summary: Get Posts Quoted Posts
-      operationId: getPostsQuotedPosts
+      - Broadcasts
+      summary: Send a chat message to a live broadcast
+      description: Posts a chat message to a running broadcast, attributed to the authenticated user.
+      operationId: sendBroadcastChat
       parameters:
       - name: id
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/PostId'
-        style: simple
-      - name: max_results
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 10
-          maximum: 100
-          format: int32
-          default: 10
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
           type: string
-          minLength: 1
-        style: form
-      - name: exclude
-        in: query
-        required: false
-        schema:
-          type: array
-          minItems: 1
-          uniqueItems: true
-          items:
-            type: string
-            enum:
-            - replies
-            - retweets
-        explode: false
-        style: form
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      - $ref: '#/components/parameters/PostExpansionsParameter'
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/MediaFieldsParameter'
-      - $ref: '#/components/parameters/PollFieldsParameter'
-      - $ref: '#/components/parameters/PlaceFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsQuotedPostsResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/{id}/retweeted_by:
-    get:
-      security:
-      - OAuth2UserToken:
-        - tweet.read
-        - users.read
-      - UserToken: []
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Get Posts Reposted by
-      operationId: getPostsRepostedBy
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/PostId'
-        style: simple
-      - name: max_results
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          format: int32
-          default: 100
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/UserExpansionsParameter'
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsRepostedByResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/{id}/retweets:
-    get:
-      security:
-      - OAuth2UserToken:
-        - users.read
-        - tweet.read
-      - UserToken: []
-      - BearerToken: []
-      tags:
-      - Posts
-      summary: Get Posts Reposts
-      operationId: getPostsReposts
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/PostId'
-        style: simple
-      - name: max_results
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          format: int32
-          default: 100
-        style: form
-      - name: pagination_token
-        in: query
-        description: A base32hex-encoded pagination token.
-        required: false
-        schema:
-          type: string
-          minLength: 1
-        style: form
-      - $ref: '#/components/parameters/PostFieldsParameter'
-      - $ref: '#/components/parameters/PostExpansionsParameter'
-      - $ref: '#/components/parameters/UserFieldsParameter'
-      - $ref: '#/components/parameters/MediaFieldsParameter'
-      - $ref: '#/components/parameters/PollFieldsParameter'
-      - $ref: '#/components/parameters/PlaceFieldsParameter'
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetPostsRepostsResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-  /2/tweets/{tweet_id}/hidden:
-    put:
-      security:
-      - OAuth2UserToken:
-        - users.read
-        - tweet.read
-        - tweet.moderate.write
-      - UserToken: []
-      tags:
-      - Posts
-      summary: Hide reply
-      description: Hides or unhides a reply to a conversation owned by the authenticated user.
-      externalDocs:
-        url: https://developer.twitter.com/en/docs/twitter-api/tweets/hide-replies/api-reference/put-tweets-id-hidden
-      operationId: hidePostsReply
-      parameters:
-      - name: tweet_id
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/PostId'
+          pattern: ^[a-zA-Z0-9]{1,13}$
         style: simple
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/HidePostsReplyRequest'
+              $ref: '#/components/schemas/SendBroadcastChatRequest'
         required: true
       responses:
         '200':
@@ -927,7 +449,139 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HidePostsReplyResponse'
+                $ref: '#/components/schemas/SendBroadcastChatResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/broadcasts/{id}/chat/mutes:
+    post:
+      security:
+      - OAuth2UserToken:
+        - broadcast.read
+        - broadcast.write
+      - UserToken: []
+      tags:
+      - Broadcasts
+      summary: Mute or time out a user in a broadcast chat
+      description: Prevents a user from posting further messages in a running broadcast chat. When `end_at_ms`
+        is provided, the mute expires at that time. The authenticated user must own the broadcast.
+      operationId: muteBroadcastChatUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9]{1,13}$
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MuteBroadcastChatUserRequest'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MuteBroadcastChatUserResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/broadcasts/{id}/chat/mutes/{user_id}:
+    delete:
+      security:
+      - OAuth2UserToken:
+        - broadcast.write
+        - broadcast.read
+      - UserToken: []
+      tags:
+      - Broadcasts
+      summary: Unmute a user in a broadcast chat
+      description: Allows a muted user to post messages in a running broadcast chat again. The authenticated
+        user must own the broadcast.
+      operationId: unmuteBroadcastChatUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9]{1,13}$
+        style: simple
+      - name: user_id
+        in: path
+        description: A 64-bit signed integer.
+        required: true
+        schema:
+          type: string
+          pattern: ^[1-9][0-9]{0,18}$
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnmuteBroadcastChatUserResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/broadcasts/{id}/chat/{message_id}:
+    delete:
+      security:
+      - OAuth2UserToken:
+        - broadcast.read
+        - broadcast.write
+      - UserToken: []
+      tags:
+      - Broadcasts
+      summary: Remove a chat message from a live broadcast
+      description: Removes a specific chat message from a running broadcast owned by the authenticated
+        user.
+      operationId: deleteBroadcastChatMessage
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9]{1,13}$
+        style: simple
+      - name: message_id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{1,19}$
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteBroadcastChatMessageResponse'
         default:
           description: The request has failed.
           content:
@@ -960,120 +614,68 @@ components:
           - https://api.x.com/2/problems/invalid-request
         value:
           type: string
-    CreatePostsGeo:
+    SendBroadcastChatResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SendBroadcastChatResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    CreateScheduledBroadcastRequest:
       type: object
       required:
-      - place_id
+      - source_id
+      - scheduled_start_ms
+      - scheduled_end_ms
       properties:
-        place_id:
+        available_for_replay:
+          type: boolean
+          description: Enable replay.
+        chat_option:
           type: string
-          description: Place ID for geo tagging.
-      additionalProperties: false
-    CreatePostsRequest:
-      type: object
-      properties:
-        card_uri:
-          type: string
-          description: Card URI parameter.
-        community_id:
-          type: string
-          description: Community to post the tweet to.
+          description: Chat permission option (numeric string).
           pattern: ^[0-9]{1,19}$
-        direct_message_deep_link:
+        description:
           type: string
-          description: Direct message deep link.
-        edit_options:
-          description: Edit an existing tweet rather than creating a new one.
-          $ref: '#/components/schemas/CreatePostsEditOptions'
-        for_super_followers_only:
+          description: Description.
+        is_locked:
           type: boolean
-          description: Restrict tweet to super followers.
-        geo:
-          description: Geo location for the tweet.
-          $ref: '#/components/schemas/CreatePostsGeo'
-        made_with_ai:
-          type: boolean
-          description: Disclose that the tweet contains AI-generated media.
-        media:
-          description: Media attachments.
-          $ref: '#/components/schemas/CreatePostsMedia'
-        nullcast:
-          type: boolean
-          description: If true, the tweet is not shown in the public timeline.
-        paid_partnership:
-          type: boolean
-          description: Disclose that the tweet is a paid partnership.
-        poll:
-          description: Poll configuration.
-          $ref: '#/components/schemas/CreatePostsPoll'
-        quote_tweet_id:
+          description: Lock the broadcast.
+        locale:
           type: string
-          description: Tweet ID to quote.
+          description: Locale.
+        manual_publish:
+          type: boolean
+          description: If true, do not auto-publish at start; call POST .../live when ready.
+        recurrence:
+          description: If set, creates a recurring series.
+          $ref: '#/components/schemas/CreateScheduledBroadcastRecurrence'
+        scheduled_end_ms:
+          type: string
+          description: End time, ms since Unix epoch (decimal string).
           pattern: ^[0-9]{1,19}$
-        reply:
-          description: Tweet reply configuration.
-          $ref: '#/components/schemas/CreatePostsReply'
-        reply_settings:
+        scheduled_start_ms:
           type: string
-          description: Who can reply to this tweet.
-          enum:
-          - following
-          - mentionedUsers
-          - subscribers
-          - verified
-        share_with_followers:
-          type: boolean
-          description: Share an exclusive (super-follower) tweet with all followers.
-        text:
+          description: Start time, ms since Unix epoch (decimal string).
+          pattern: ^[0-9]{1,19}$
+        source_id:
           type: string
-          description: 'Text of the tweet. Required unless media is provided.  Defaulted to an empty string
-            so it is always sent: the backend''s `tweet_text` variable is non-null and rejects an absent
-            value.'
-          default: ''
+          description: Ingest / source id to bind (same as sources `rtmp_stream_key`).
+          minLength: 1
+        telecast_id:
+          type: string
+          description: Optional telecast id (numeric string).
+          pattern: ^[0-9]{1,19}$
+        thumbnail_media_id:
+          type: string
+          description: Pre-live slate media id (numeric string).
+          pattern: ^[0-9]{1,19}$
+        title:
+          type: string
+          description: Title / status text.
       additionalProperties: false
-    SearchPostsRecentResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            newest_id:
-              type: string
-              description: Most recent ID in the data array.
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            oldest_id:
-              type: string
-              description: Oldest ID in the data array.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    GetPostsByIdResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
     PostNoteRequestSuggestions:
       type: array
       description: Community-Notes request suggestions for this Post.
@@ -1093,6 +695,15 @@ components:
             type: string
             description: The unique identifier of the note request suggestion.
             nullable: true
+    UpdateScheduledBroadcastResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UpdateScheduledBroadcastResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     PostEditControls:
       type: object
       description: Indicates how much longer (if at all) this Post can be edited.
@@ -1161,45 +772,6 @@ components:
           - post
           - user
           nullable: true
-    HidePostsReplyResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/HidePostsReplyResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    CreatePostsPoll:
-      type: object
-      required:
-      - options
-      - duration_minutes
-      properties:
-        duration_minutes:
-          type: integer
-          description: Duration of the poll in minutes.
-          minimum: 5
-          maximum: 10080
-        options:
-          type: array
-          description: Poll options (2-4 choices, 1-25 characters each).
-          minItems: 2
-          maxItems: 4
-          items:
-            type: string
-            minLength: 1
-            maxLength: 25
-        reply_settings:
-          type: string
-          description: Who can reply to the poll Tweet. Accepted for compatibility; it carries no backend
-            argument and is dropped before the mutation is issued (see `translate_body`).
-          enum:
-          - following
-          - mentionedUsers
-          - subscribers
-          - verified
-      additionalProperties: false
     PostContextAnnotations:
       type: array
       description: Annotations inferred about the Post (domain and entity context).
@@ -1240,32 +812,15 @@ components:
                 name:
                   type: string
                   nullable: true
-    GetPostsRepostedByResponse:
+    MuteBroadcastChatUserResponse:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
+          $ref: '#/components/schemas/MuteBroadcastChatUserResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
     Error:
       type: object
       required:
@@ -1277,15 +832,70 @@ components:
           format: int32
         message:
           type: string
-    HidePostsReplyRequest:
+    DeleteBroadcastChatMessageResponse:
       type: object
-      required:
-      - hidden
       properties:
-        hidden:
+        data:
+          $ref: '#/components/schemas/DeleteBroadcastChatMessageResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    Broadcast:
+      type: object
+      properties:
+        available_for_replay:
           type: boolean
-          description: Whether the reply should be hidden.
-      additionalProperties: false
+        broadcast_id:
+          type: string
+        chat_option:
+          type: integer
+        created_at_ms:
+          type: string
+        end_ms:
+          type: string
+        height:
+          type: integer
+        id:
+          type: string
+        image_url:
+          type: string
+        image_url_medium:
+          type: string
+        image_url_small:
+          type: string
+        is_high_latency:
+          type: boolean
+        language:
+          type: string
+        media_key:
+          type: string
+        scheduled_end_ms:
+          type: string
+        scheduled_start_ms:
+          type: string
+        share_url:
+          type: string
+        source_id:
+          type: string
+        start_ms:
+          type: string
+        state:
+          type: string
+        title:
+          type: string
+        total_watched:
+          type: string
+        total_watching:
+          type: string
+        tweet_id:
+          type: string
+        twitter_user_id:
+          type: string
+        updated_at_ms:
+          type: string
+        width:
+          type: integer
     PostAttachments:
       type: object
       description: Specifies the type of attachments (if any) present in this Post.
@@ -1308,55 +918,15 @@ components:
           items:
             type: string
           nullable: true
-    AnalyticsId:
-      type: string
-      description: Unique identifier of a Analytics
-      pattern: ^[0-9]{1,19}$
-    CreatePostsMediaCallToActionsVisitSite:
-      type: object
-      required:
-      - url
-      properties:
-        url:
-          type: string
-          description: HTTPS URL the CTA links to.
-      additionalProperties: false
-    GetPostsCountsRecentResponseData:
-      type: object
-      required:
-      - start
-      - end
-      - post_count
-      properties:
-        end:
-          type: string
-          description: End of the count bucket (exclusive), RFC 3339.
-        post_count:
-          type: integer
-          description: Number of Posts in the bucket.
-        start:
-          type: string
-          description: Start of the count bucket (inclusive), RFC 3339.
-    GetPostsCountsRecentResponse:
+    DeleteScheduledBroadcastResponse:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/GetPostsCountsRecentResponseData'
+          $ref: '#/components/schemas/DeleteScheduledBroadcastResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            total_post_count:
-              type: integer
-              format: int64
     User:
       type: object
       properties:
@@ -1472,6 +1042,18 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
           type: string
+    SendBroadcastChatResponseData:
+      type: object
+      required:
+      - success
+      - timestamp
+      properties:
+        success:
+          type: boolean
+          description: Whether the chat message was sent.
+        timestamp:
+          type: string
+          description: Server timestamp of the message, in nanoseconds.
     PostReferencedPosts:
       type: array
       description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes
@@ -1495,14 +1077,23 @@ components:
               - retweeted
               - quoted
               - replied_to
-    DeletePostsResponseData:
+    CreateScheduledBroadcastRecurrence:
       type: object
       required:
-      - deleted
+      - frequency
+      - repeats
       properties:
-        deleted:
-          type: boolean
-          description: Whether the Post was deleted.
+        frequency:
+          type: string
+          description: Recurrence frequency.
+          enum:
+          - Daily
+          - Weekly
+        repeats:
+          type: string
+          description: Number of repeats (numeric string).
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
     MediaVariants:
       type: array
       description: Each media object may have multiple display or playback variants, with different resolutions
@@ -1524,25 +1115,24 @@ components:
             type: string
             description: The URL to this media variant.
             nullable: true
-    CreatePostsReply:
+    GetBroadcastResponse:
       type: object
-      required:
-      - in_reply_to_tweet_id
       properties:
-        auto_populate_reply_metadata:
-          type: boolean
-          description: If true, reply metadata is automatically populated. Accepted for compatibility;
-            it carries no backend argument and is dropped before the mutation is issued (see `translate_body`).
-        exclude_reply_user_ids:
+        data:
+          $ref: '#/components/schemas/Broadcast'
+        errors:
           type: array
-          description: User IDs to exclude from the reply thread.
           items:
-            type: string
-        in_reply_to_tweet_id:
-          type: string
-          description: The ID of the tweet being replied to.
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
+            $ref: '#/components/schemas/Problem'
+    UnmuteBroadcastChatUserResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UnmuteBroadcastChatUserResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     PostMatchedMediaNotes:
       type: array
       description: Community-Notes media matches for this Post.
@@ -1768,38 +1358,6 @@ components:
                     description: The t.co shortened URL.
               nullable: true
           nullable: true
-    SearchPostsAllResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            newest_id:
-              type: string
-              description: Most recent ID in the data array.
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            oldest_id:
-              type: string
-              description: Oldest ID in the data array.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
     PostEntities:
       type: object
       description: A list of metadata entities (hashtags, mentions, URLs) found in the Post text.
@@ -1934,23 +1492,6 @@ components:
                 description: The t.co shortened URL.
                 nullable: true
           nullable: true
-    InternalErrorProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
     UserWithheld:
       type: object
       description: Withholding details for withheld content.
@@ -1968,6 +1509,23 @@ components:
           enum:
           - user
           nullable: true
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
     Post:
       type: object
       properties:
@@ -2100,24 +1658,6 @@ components:
           type: integer
           description: Number of Posts (including Reposts) created by this User.
           format: int64
-    CreatePostsResponseData:
-      type: object
-      required:
-      - id
-      - text
-      properties:
-        edit_history_post_ids:
-          type: array
-          description: Post IDs in this Post's edit history chain.
-          items:
-            type: string
-        id:
-          type: string
-          description: Unique identifier of the created Post.
-          pattern: ^[0-9]{1,19}$
-        text:
-          type: string
-          description: The content of the created Post.
     Media:
       type: object
       properties:
@@ -2147,113 +1687,39 @@ components:
           $ref: '#/components/schemas/MediaVariants'
         width:
           type: integer
-    AnalyticsTimestampedMetrics:
-      type: array
-      description: Time-bucketed engagement metrics for the Post, one entry per granularity bucket.
-      items:
-        type: object
-        properties:
-          metrics:
-            type: object
-            description: Engagement metric counts for this bucket.
-            properties:
-              app_install_attempts:
-                type: integer
-                format: int64
-                nullable: true
-              app_opens:
-                type: integer
-                format: int64
-                nullable: true
-              bookmarks:
-                type: integer
-                format: int64
-                nullable: true
-              detail_expands:
-                type: integer
-                format: int64
-                nullable: true
-              email_tweet:
-                type: integer
-                format: int64
-                nullable: true
-              engagements:
-                type: integer
-                format: int64
-                nullable: true
-              follows:
-                type: integer
-                format: int64
-                nullable: true
-              hashtag_clicks:
-                type: integer
-                format: int64
-                nullable: true
-              impressions:
-                type: integer
-                format: int64
-                nullable: true
-              likes:
-                type: integer
-                format: int64
-                nullable: true
-              media_views:
-                type: integer
-                format: int64
-                nullable: true
-              permalink_clicks:
-                type: integer
-                format: int64
-                nullable: true
-              quote_tweets:
-                type: integer
-                format: int64
-                nullable: true
-              replies:
-                type: integer
-                format: int64
-                nullable: true
-              retweets:
-                type: integer
-                format: int64
-                nullable: true
-              shares:
-                type: integer
-                format: int64
-                nullable: true
-              unfollows:
-                type: integer
-                format: int64
-                nullable: true
-              unlikes:
-                type: integer
-                format: int64
-                nullable: true
-              url_clicks:
-                type: integer
-                format: int64
-                nullable: true
-              user_profile_clicks:
-                type: integer
-                format: int64
-                nullable: true
-            nullable: true
-          timestamp:
-            type: string
-            description: Start of the metrics bucket, as an ISO 8601 date-time.
-            nullable: true
-    CreatePostsMediaCallToActions:
+    SendBroadcastChatRequest:
       type: object
+      required:
+      - text
       properties:
-        app_install:
-          description: App Install CTA. At least one store id should be provided.
-          $ref: '#/components/schemas/CreatePostsMediaCallToActionsAppInstall'
-        visit_site:
-          description: Visit Site CTA.
-          $ref: '#/components/schemas/CreatePostsMediaCallToActionsVisitSite'
-        watch_now:
-          description: Watch Now CTA.
-          $ref: '#/components/schemas/CreatePostsMediaCallToActionsWatchNow'
+        reply_to:
+          type: string
+          description: Message id to reply to, returned as timestamp when sent.
+          pattern: ^[0-9]{1,19}$
+        text:
+          type: string
+          description: The chat message text.
+          minLength: 1
+          maxLength: 140
+      additionalProperties: false
+    MuteBroadcastChatUserRequest:
+      type: object
+      required:
+      - user_id
+      properties:
+        end_at_ms:
+          type: string
+          description: The Unix timestamp in milliseconds when the mute expires. Omit this field to mute
+            indefinitely.
+          pattern: ^[1-9][0-9]{0,18}$
+        message_id:
+          type: string
+          description: A chat message to remove while muting the user.
+          pattern: ^[1-9][0-9]{0,18}$
+        user_id:
+          type: string
+          description: The user to mute.
+          pattern: ^[1-9][0-9]{0,18}$
       additionalProperties: false
     MediaOrganicMetrics:
       type: object
@@ -2290,6 +1756,14 @@ components:
             data without a view count.
           format: int64
           nullable: true
+    MuteBroadcastChatUserResponseData:
+      type: object
+      required:
+      - muted
+      properties:
+        muted:
+          type: boolean
+          description: Whether the user is muted in this broadcast chat.
     Topic:
       type: object
       properties:
@@ -2348,16 +1822,106 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/disallowed-resource
-    CreatePostsEditOptions:
+    UpdateScheduledBroadcastRequest:
       type: object
       required:
-      - previous_post_id
+      - scheduled_broadcast_id
+      - scheduled_start_ms
+      - scheduled_end_ms
       properties:
-        previous_post_id:
+        available_for_replay:
+          type: boolean
+          description: Enable replay.
+        chat_option:
           type: string
-          description: The ID of the Post being edited.
+          description: Chat permission option (numeric string).
           pattern: ^[0-9]{1,19}$
+        description:
+          type: string
+          description: Description.
+        is_locked:
+          type: boolean
+          description: Lock the broadcast.
+        locale:
+          type: string
+          description: Locale.
+        manual_publish:
+          type: boolean
+          description: If true, do not auto-publish at start; call POST .../live when ready.
+        roll_forward:
+          type: boolean
+          description: When true, shift the head of a recurring series.
+        scheduled_broadcast_id:
+          type: string
+          description: Numeric scheduler id from create/list/get.
+          pattern: ^[0-9]{1,19}$
+        scheduled_end_ms:
+          type: string
+          description: End time, ms since Unix epoch (decimal string).
+          pattern: ^[0-9]{1,19}$
+        scheduled_start_ms:
+          type: string
+          description: Start time, ms since Unix epoch (decimal string).
+          pattern: ^[0-9]{1,19}$
+        source_id:
+          type: string
+          description: Ingest / source id.
+        thumbnail_media_id:
+          type: string
+          description: Pre-live slate media id (numeric string).
+          pattern: ^[0-9]{1,19}$
+        title:
+          type: string
+          description: Title / status text.
       additionalProperties: false
+    GetScheduledBroadcastResponseData:
+      type: object
+      properties:
+        available_for_replay:
+          type: boolean
+          description: Whether replay is enabled.
+        broadcast_id:
+          type: string
+          description: Alphanumeric UBS broadcast id (path `:id` for get/update/delete/live).
+        chat_option:
+          type: string
+          description: Optional chat permission option.
+        description:
+          type: string
+          description: Optional description.
+        locale:
+          type: string
+          description: Optional locale.
+        manual_publish:
+          type: boolean
+          description: When true, coordinator will not auto-publish; call POST .../live when ready.
+        recurring_schedule_id:
+          type: string
+          description: Set when this occurrence belongs to a recurrence.
+        scheduled_broadcast_id:
+          type: string
+          description: Numeric scheduler id. Required in the update request body.
+        scheduled_end_ms:
+          type: string
+          description: Scheduled end, milliseconds since Unix epoch (decimal string).
+        scheduled_start_ms:
+          type: string
+          description: Scheduled start, milliseconds since Unix epoch (decimal string).
+        source_id:
+          type: string
+          description: Bound ingest / source id (`rtmp_stream_key`).
+        state:
+          type: string
+          description: Scheduler state (Created, Scheduled, Running, …).
+        telecast_id:
+          type: string
+          description: Optional telecast association.
+        thumbnail_media_id:
+          type: string
+          description: Optional pre-live slate media id.
+        title:
+          type: string
+          description: Broadcast title / status text.
     ResourceNotFoundProblem:
       type: object
       required:
@@ -2384,53 +1948,59 @@ components:
           - https://api.x.com/2/problems/resource-not-found
         value:
           type: string
+    GoLiveScheduledBroadcastResponseData:
+      type: object
+      properties:
+        available_for_replay:
+          type: boolean
+          description: Whether replay is enabled.
+        broadcast_id:
+          type: string
+          description: Alphanumeric UBS broadcast id (path `:id` for get/update/delete/live).
+        chat_option:
+          type: string
+          description: Optional chat permission option.
+        description:
+          type: string
+          description: Optional description.
+        locale:
+          type: string
+          description: Optional locale.
+        manual_publish:
+          type: boolean
+          description: When true, coordinator will not auto-publish; call POST .../live when ready.
+        recurring_schedule_id:
+          type: string
+          description: Set when this occurrence belongs to a recurrence.
+        scheduled_broadcast_id:
+          type: string
+          description: Numeric scheduler id. Required in the update request body.
+        scheduled_end_ms:
+          type: string
+          description: Scheduled end, milliseconds since Unix epoch (decimal string).
+        scheduled_start_ms:
+          type: string
+          description: Scheduled start, milliseconds since Unix epoch (decimal string).
+        source_id:
+          type: string
+          description: Bound ingest / source id (`rtmp_stream_key`).
+        state:
+          type: string
+          description: Scheduler state (Created, Scheduled, Running, …).
+        telecast_id:
+          type: string
+          description: Optional telecast association.
+        thumbnail_media_id:
+          type: string
+          description: Optional pre-live slate media id.
+        title:
+          type: string
+          description: Broadcast title / status text.
     PostSuggestedSourceLinks:
       type: array
       description: URLs suggested as sources for this Post.
       items:
         type: string
-    GetPostsCountsAllResponseData:
-      type: object
-      required:
-      - start
-      - end
-      - post_count
-      properties:
-        end:
-          type: string
-          description: End of the count bucket (exclusive), RFC 3339.
-        post_count:
-          type: integer
-          description: Number of Posts in the bucket.
-        start:
-          type: string
-          description: Start of the count bucket (inclusive), RFC 3339.
-    GetPostsLikingUsersResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
     MediaPromotedMetrics:
       type: object
       description: Promoted nonpublic engagement metrics for the media at the time of the request.
@@ -2466,35 +2036,54 @@ components:
             data without a view count.
           format: int64
           nullable: true
-    DeletePostsResponse:
+    CreateScheduledBroadcastResponseData:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/DeletePostsResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    GetPostsByIdsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
+        available_for_replay:
+          type: boolean
+          description: Whether replay is enabled.
+        broadcast_id:
+          type: string
+          description: Alphanumeric UBS broadcast id (path `:id` for get/update/delete/live).
+        chat_option:
+          type: string
+          description: Optional chat permission option.
+        description:
+          type: string
+          description: Optional description.
+        locale:
+          type: string
+          description: Optional locale.
+        manual_publish:
+          type: boolean
+          description: When true, coordinator will not auto-publish; call POST .../live when ready.
+        recurring_schedule_id:
+          type: string
+          description: Set when this occurrence belongs to a recurrence.
+        scheduled_broadcast_id:
+          type: string
+          description: Numeric scheduler id. Required in the update request body.
+        scheduled_end_ms:
+          type: string
+          description: Scheduled end, milliseconds since Unix epoch (decimal string).
+        scheduled_start_ms:
+          type: string
+          description: Scheduled start, milliseconds since Unix epoch (decimal string).
+        source_id:
+          type: string
+          description: Bound ingest / source id (`rtmp_stream_key`).
+        state:
+          type: string
+          description: Scheduler state (Created, Scheduled, Running, …).
+        telecast_id:
+          type: string
+          description: Optional telecast association.
+        thumbnail_media_id:
+          type: string
+          description: Optional pre-live slate media id.
+        title:
+          type: string
+          description: Broadcast title / status text.
     UserSubscription:
       type: object
       description: The subscription relationship between this User and you.
@@ -2552,6 +2141,14 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    DeleteScheduledBroadcastResponseData:
+      type: object
+      required:
+      - deleted
+      properties:
+        deleted:
+          type: boolean
+          description: Whether the scheduled broadcast was deleted.
     Place:
       type: object
       properties:
@@ -2622,75 +2219,77 @@ components:
             type: integer
             description: The number of votes this option has received.
             format: int64
-    GetPostsCountsAllResponse:
+    ListScheduledBroadcastsResponseData:
+      type: object
+      properties:
+        available_for_replay:
+          type: boolean
+          description: Whether replay is enabled.
+        broadcast_id:
+          type: string
+          description: Alphanumeric UBS broadcast id (path `:id` for get/update/delete/live).
+        chat_option:
+          type: string
+          description: Optional chat permission option.
+        description:
+          type: string
+          description: Optional description.
+        locale:
+          type: string
+          description: Optional locale.
+        manual_publish:
+          type: boolean
+          description: When true, coordinator will not auto-publish; call POST .../live when ready.
+        recurring_schedule_id:
+          type: string
+          description: Set when this occurrence belongs to a recurrence.
+        scheduled_broadcast_id:
+          type: string
+          description: Numeric scheduler id. Required in the update request body.
+        scheduled_end_ms:
+          type: string
+          description: Scheduled end, milliseconds since Unix epoch (decimal string).
+        scheduled_start_ms:
+          type: string
+          description: Scheduled start, milliseconds since Unix epoch (decimal string).
+        source_id:
+          type: string
+          description: Bound ingest / source id (`rtmp_stream_key`).
+        state:
+          type: string
+          description: Scheduler state (Created, Scheduled, Running, …).
+        telecast_id:
+          type: string
+          description: Optional telecast association.
+        thumbnail_media_id:
+          type: string
+          description: Optional pre-live slate media id.
+        title:
+          type: string
+          description: Broadcast title / status text.
+    GetBroadcastChatResponse:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/GetPostsCountsAllResponseData'
+            $ref: '#/components/schemas/BroadcastChatMessage'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
         meta:
           type: object
           properties:
             next_token:
               type: string
               description: Pagination token for the next page of results.
-            total_post_count:
+            result_count:
               type: integer
-              format: int64
-    Analytics:
-      type: object
-      properties:
-        app_install_attempts:
-          type: integer
-        app_opens:
-          type: integer
-        bookmarks:
-          type: integer
-        detail_expands:
-          type: integer
-        email_tweet:
-          type: integer
-        engagements:
-          type: integer
-        follows:
-          type: integer
-        hashtag_clicks:
-          type: integer
-        id:
-          type: string
-        impressions:
-          type: integer
-        likes:
-          type: integer
-        media_views:
-          type: integer
-        permalink_clicks:
-          type: integer
-        quote_tweets:
-          type: integer
-        replies:
-          type: integer
-        retweets:
-          type: integer
-        shares:
-          type: integer
-        timestamp:
-          type: string
-        timestamped_metrics:
-          $ref: '#/components/schemas/AnalyticsTimestampedMetrics'
-        unfollows:
-          type: integer
-        unlikes:
-          type: integer
-        url_clicks:
-          type: integer
-        user_profile_clicks:
-          type: integer
+              description: Number of items in the data array.
+              format: int32
     PostPublicMetrics:
       type: object
       description: Engagement metrics for the Post at the time of the request.
@@ -2748,19 +2347,63 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/resource-unavailable
-    CreatePostsMediaCallToActionsAppInstall:
+    UpdateScheduledBroadcastResponseData:
       type: object
       properties:
-        app_store_id:
+        available_for_replay:
+          type: boolean
+          description: Whether replay is enabled.
+        broadcast_id:
           type: string
-          description: Apple App Store iPhone app id.
-        ipad_app_store_id:
+          description: Alphanumeric UBS broadcast id (path `:id` for get/update/delete/live).
+        chat_option:
           type: string
-          description: Apple App Store iPad app id.
-        play_store_id:
+          description: Optional chat permission option.
+        description:
           type: string
-          description: Google Play Store app id.
-      additionalProperties: false
+          description: Optional description.
+        locale:
+          type: string
+          description: Optional locale.
+        manual_publish:
+          type: boolean
+          description: When true, coordinator will not auto-publish; call POST .../live when ready.
+        recurring_schedule_id:
+          type: string
+          description: Set when this occurrence belongs to a recurrence.
+        scheduled_broadcast_id:
+          type: string
+          description: Numeric scheduler id. Required in the update request body.
+        scheduled_end_ms:
+          type: string
+          description: Scheduled end, milliseconds since Unix epoch (decimal string).
+        scheduled_start_ms:
+          type: string
+          description: Scheduled start, milliseconds since Unix epoch (decimal string).
+        source_id:
+          type: string
+          description: Bound ingest / source id (`rtmp_stream_key`).
+        state:
+          type: string
+          description: Scheduler state (Created, Scheduled, Running, …).
+        telecast_id:
+          type: string
+          description: Optional telecast association.
+        thumbnail_media_id:
+          type: string
+          description: Optional pre-live slate media id.
+        title:
+          type: string
+          description: Broadcast title / status text.
+    GetScheduledBroadcastResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GetScheduledBroadcastResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     Poll:
       type: object
       properties:
@@ -2773,34 +2416,6 @@ components:
         options:
           $ref: '#/components/schemas/PollOptions'
         voting_status:
-          type: string
-    NotAuthorizedForResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
           type: string
     PostNotePost:
       type: object
@@ -2905,6 +2520,43 @@ components:
         text:
           type: string
           description: The full note text of the Post.
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+    GoLiveScheduledBroadcastResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GoLiveScheduledBroadcastResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     UserConnectionStatus:
       type: array
       description: Returns detailed information about the relationship between two users.
@@ -2918,38 +2570,17 @@ components:
         - followed_by
         - following
         - muting
-    GetPostsRepostsResponse:
+    ListScheduledBroadcastsResponse:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Post'
+            $ref: '#/components/schemas/ListScheduledBroadcastsResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    HidePostsReplyResponseData:
-      type: object
-      properties:
-        hidden:
-          type: boolean
-          description: Whether the reply is hidden.
     UserAffiliation:
       type: object
       description: Metadata about a user's affiliation.
@@ -2972,22 +2603,14 @@ components:
           items:
             type: string
           nullable: true
-    GetPostsAnalyticsResponse:
+    DeleteBroadcastChatMessageResponseData:
       type: object
+      required:
+      - deleted
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Analytics'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    PostId:
-      type: string
-      description: Unique identifier of a Post
-      pattern: ^[0-9]{1,19}$
-      example: '1346889436626259968'
+        deleted:
+          type: boolean
+          description: Whether the chat message was removed.
     Expansions:
       type: object
       properties:
@@ -3015,29 +2638,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
-    GetPostsQuotedPostsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
     PostMediaMetadata:
       type: array
       description: Metadata for media attached to this Post.
@@ -3061,44 +2661,6 @@ components:
             type: string
             description: Title of the media.
             nullable: true
-    CreatePostsMedia:
-      type: object
-      required:
-      - media_ids
-      properties:
-        call_to_actions:
-          description: Call-to-action button rendered on the media entity.
-          $ref: '#/components/schemas/CreatePostsMediaCallToActions'
-        description:
-          type: string
-          description: Description for the media, rendered on the Post card for video and Amplify content.
-        embeddable:
-          type: boolean
-          description: When true, the media's asset URLs do not expire and external syndicated playback
-            is allowed.
-        media_ids:
-          type: array
-          description: Media IDs to attach to the tweet.
-          minItems: 1
-          maxItems: 4
-          items:
-            type: string
-            pattern: ^[0-9]{1,19}$
-        preview_media_id:
-          type: string
-          description: Media id whose asset is used as the preview image.
-          pattern: ^[0-9]{1,19}$
-        tagged_user_ids:
-          type: array
-          description: User IDs tagged in the media.
-          maxItems: 10
-          items:
-            type: string
-            pattern: ^[0-9]{1,19}$
-        title:
-          type: string
-          description: Title for the media, rendered on the Post card for video and Amplify content.
-      additionalProperties: false
     FieldHydrationFailureProblem:
       type: object
       required:
@@ -3133,29 +2695,68 @@ components:
           type: integer
           description: The number of times this video has been viewed.
           format: int64
-    CreatePostsMediaCallToActionsWatchNow:
-      type: object
-      required:
-      - url
-      properties:
-        url:
-          type: string
-          description: HTTPS URL the CTA links to.
-      additionalProperties: false
-    CreatePostsResponse:
+    CreateScheduledBroadcastResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/CreatePostsResponseData'
+          $ref: '#/components/schemas/CreateScheduledBroadcastResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
+    ListBroadcastsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Broadcast'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    BroadcastChatMessage:
+      type: object
+      properties:
+        author_id:
+          type: string
+        author_name:
+          type: string
+        author_username:
+          type: string
+        broadcast_id:
+          type: string
+        created_at_ms:
+          type: string
+        id:
+          type: string
+        reply_to:
+          type: string
+        text:
+          type: string
     PlaceContainedWithin:
       type: array
       description: A list of unique identifiers of the Places that contain this place.
       items:
         type: string
+    UnmuteBroadcastChatUserResponseData:
+      type: object
+      required:
+      - muted
+      properties:
+        muted:
+          type: boolean
+          description: Whether the user is muted in this broadcast chat.
     PostDisplayTextRange:
       type: array
       description: The inclusive start and exclusive end indices of the displayable content of the Post.
@@ -3229,188 +2830,29 @@ components:
           - withheld
       explode: false
       style: form
-    MediaFieldsParameter:
-      name: media.fields
+    BroadcastChatMessageFieldsParameter:
+      name: broadcast_chat_message.fields
       in: query
-      description: A comma separated list of Media fields to display.
+      description: A comma separated list of BroadcastChatMessage fields to display.
       required: false
       schema:
         type: array
-        description: The fields available for a Media object.
+        description: The fields available for a BroadcastChatMessage object.
         minItems: 1
         uniqueItems: true
         items:
           type: string
           enum:
-          - alt_text
-          - duration_ms
-          - height
-          - media_key
-          - non_public_metrics
-          - organic_metrics
-          - preview_image_url
-          - promoted_metrics
-          - public_metrics
-          - type
-          - url
-          - variants
-          - width
-      explode: false
-      style: form
-    AnalyticsFieldsParameter:
-      name: analytics.fields
-      in: query
-      description: A comma separated list of Analytics fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Analytics object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - app_install_attempts
-          - app_opens
-          - bookmarks
-          - detail_expands
-          - email_tweet
-          - engagements
-          - follows
-          - hashtag_clicks
+          - author_name
+          - author_username
+          - broadcast_id
+          - created_at_ms
           - id
-          - impressions
-          - likes
-          - media_views
-          - permalink_clicks
-          - quote_tweets
-          - replies
-          - retweets
-          - shares
-          - timestamp
-          - timestamped_metrics
-          - unfollows
-          - unlikes
-          - url_clicks
-          - user_profile_clicks
-      explode: false
-      style: form
-    PostExpansionsParameter:
-      name: expansions
-      in: query
-      description: A comma separated list of fields to expand.
-      required: false
-      schema:
-        type: array
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - article.cover_media
-          - article.media_entities
-          - attachments.media_keys
-          - attachments.media_source_tweet
-          - attachments.poll_ids
-          - author_id
-          - edit_history_post_ids
-          - entities.mentions.username
-          - geo.place_id
-          - in_reply_to_user_id
-          - referenced_posts
-          - username
-      explode: false
-      style: form
-    PlaceFieldsParameter:
-      name: place.fields
-      in: query
-      description: A comma separated list of Place fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Place object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - contained_within
-          - country
-          - country_code
-          - full_name
-          - geo
-          - id
-          - name
-          - place_type
-      explode: false
-      style: form
-    PollFieldsParameter:
-      name: poll.fields
-      in: query
-      description: A comma separated list of Poll fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Poll object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - duration_minutes
-          - end_datetime
-          - id
-          - options
-          - voting_status
-      explode: false
-      style: form
-    PostFieldsParameter:
-      name: post.fields
-      in: query
-      description: A comma separated list of Post fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Post object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - article
-          - article_title
-          - attachments
-          - card_uri
-          - community_id
-          - context_annotations
-          - conversation_id
-          - created_at
-          - display_text_range
-          - edit_controls
-          - entities
-          - geo
-          - id
-          - lang
-          - matched_media_notes
-          - media_metadata
-          - non_public_metrics
-          - note_post
-          - note_request_suggestions
-          - organic_metrics
-          - paid_partnership
-          - possibly_sensitive
-          - promoted_metrics
-          - public_metrics
-          - reply_settings
-          - scopes
-          - source
-          - suggested_source_links
-          - suggested_source_links_with_counts
+          - reply_to
           - text
-          - withheld
       explode: false
       style: form
-    UserExpansionsParameter:
+    BroadcastChatMessageExpansionsParameter:
       name: expansions
       in: query
       description: A comma separated list of fields to expand.
@@ -3422,9 +2864,48 @@ components:
         items:
           type: string
           enum:
-          - affiliation
-          - most_recent_post_id
-          - pinned_post_id
+          - author_id
+      explode: false
+      style: form
+    BroadcastFieldsParameter:
+      name: broadcast.fields
+      in: query
+      description: A comma separated list of Broadcast fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a Broadcast object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - available_for_replay
+          - broadcast_id
+          - chat_option
+          - created_at_ms
+          - end_ms
+          - height
+          - id
+          - image_url
+          - image_url_medium
+          - image_url_small
+          - is_high_latency
+          - language
+          - media_key
+          - scheduled_end_ms
+          - scheduled_start_ms
+          - share_url
+          - source_id
+          - start_ms
+          - state
+          - title
+          - total_watched
+          - total_watching
+          - tweet_id
+          - twitter_user_id
+          - updated_at_ms
+          - width
       explode: false
       style: form
   securitySchemes:
@@ -3462,9 +2943,6 @@ components:
             tweet.read: View all posts you can see, including those from protected accounts.
             tweet.write: Create and repost on your behalf.
             users.read: View any account you can see, including protected accounts.
-    BearerToken:
-      type: http
-      scheme: bearer
     UserToken:
       type: http
       scheme: OAuth

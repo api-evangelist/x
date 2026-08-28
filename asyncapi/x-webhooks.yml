@@ -1,0 +1,142 @@
+generated: '2026-08-28'
+method: searched
+source: >-
+  https://docs.x.com/x-api/activity/introduction.md,
+  https://docs.x.com/x-api/getting-started/pricing.md,
+  openapi/_original/x-api-v2-openapi.json
+docs: https://docs.x.com/x-api/webhooks/introduction
+description: >-
+  X's event and real-time surface. X publishes NO AsyncAPI document (https://docs.x.com/asyncapi.yaml
+  returns 404), so this is a webhook + streaming catalog assembled from X's own event tables
+  and the webhook management operations in its OpenAPI. Nothing here is fabricated; event
+  names come from the X Activity API documentation and the billing table.
+asyncapi_document: null
+asyncapi_probe:
+  url: https://docs.x.com/asyncapi.yaml
+  status: 404
+delivery_mechanisms:
+- name: Webhooks
+  description: HTTP callbacks registered against a webhook URL, with CRC validation and replay.
+  docs: https://docs.x.com/x-api/webhooks/introduction
+- name: Persistent HTTP stream
+  description: X Activity API events delivered over a long-lived HTTP connection.
+  operation: activityStream
+- name: Filtered stream
+  description: Rule-driven real-time Post stream with up to 1000 rules and 250 posts/sec delivery.
+  operations: [streamPosts, getRules, updateRules, getRuleCounts]
+- name: Volume streams
+  description: Sampled and firehose streams for Posts and Likes.
+  operations: [streamPostsSample, streamPostsSample10, streamPostsFirehose, streamLikesFirehose, streamLikesSample10]
+- name: Compliance streams
+  description: Deletion, edit and withheld-content compliance events.
+  operations: [streamPostsCompliance, streamUsersCompliance, streamLikesCompliance, streamLabelsCompliance]
+management_operations:
+- operationId: createWebhooks
+  path: POST /2/webhooks
+- operationId: getWebhooks
+  path: GET /2/webhooks
+- operationId: deleteWebhooks
+  path: DELETE /2/webhooks/{webhook_id}
+- operationId: validateWebhooks
+  path: PUT /2/webhooks/{webhook_id}
+- operationId: createWebhookReplayJob
+  path: POST /2/webhooks/replay
+- operationId: createActivitySubscription
+  path: POST /2/activity/subscriptions
+- operationId: getActivitySubscriptions
+  path: GET /2/activity/subscriptions
+- operationId: updateActivitySubscription
+  path: PUT /2/activity/subscriptions/{subscription_id}
+- operationId: deleteActivitySubscription
+  path: DELETE /2/activity/subscriptions/{subscription_id}
+- operationId: createWebhooksStreamLink
+  path: POST /2/tweets/search/webhooks/{webhook_id}
+- operationId: deleteWebhooksStreamLink
+  path: DELETE /2/tweets/search/webhooks/{webhook_id}
+- operationId: getWebhooksStreamLinks
+  path: GET /2/tweets/search/webhooks
+subscription_filters: [user_id, direction]
+events:
+- name: post.create
+  category: Post
+  filter: user_id
+  billed: '0.005'
+  description: Fired when the filtered user creates a Post — standalone, reply, quote or repost.
+- name: post.delete
+  category: Post
+  filter: user_id
+  billed: null
+  description: Fired when the filtered user deletes a Post.
+- name: post.mention.create
+  category: Post
+  filter: user_id
+  description: Fired when another user explicitly @mentions the filtered user in a Post body.
+- name: follow.follow
+  category: Connection
+  billed: '0.010'
+- name: follow.unfollow
+  category: Connection
+  billed: '0.010'
+- name: mute.mute
+  category: Connection
+  billed: '0.001'
+  added: '2026-07-21'
+  scope: mute.read
+- name: mute.unmute
+  category: Connection
+  billed: '0.001'
+  added: '2026-07-21'
+  scope: mute.read
+- name: block.block
+  category: Connection
+  billed: '0.001'
+  added: '2026-07-21'
+  scope: block.read
+- name: block.unblock
+  category: Connection
+  billed: '0.001'
+  added: '2026-07-21'
+  scope: block.read
+- name: profile.update.*
+  category: Profile
+  billed: '0.005'
+  description: Profile field updates, e.g. profile.update.bio.
+- name: chat.received
+  category: Chat
+  billed: '0.010'
+- name: chat.sent
+  category: Chat
+  billed: null
+- name: chat.conversation_join
+  category: Chat
+  billed: null
+- name: dm.received
+  category: Direct Message
+  billed: '0.010'
+- name: dm.sent
+  category: Direct Message
+  billed: null
+- name: dm.read
+  category: Direct Message
+  billed: null
+- name: dm.indicate_typing
+  category: Direct Message
+  billed: null
+- name: news.new
+  category: News
+  billed: '0.005'
+- name: spaces.start
+  category: Spaces
+  billed: '0.005'
+- name: spaces.end
+  category: Spaces
+  billed: '0.005'
+event_payloads: https://docs.x.com/x-api/activity/event-payloads
+latency: sub-second (X's own description of XAA delivery)
+notes:
+- >-
+  Event NAMING changed on 2026-03-18 (changelog 2026-03-13); consumers pinned to the older
+  format needed to migrate.
+- >-
+  Webhook events are billed per event delivered, deduplicated in the same 24-hour UTC window
+  as resource reads. An over-broad subscription is a cost decision, not just a noise decision.

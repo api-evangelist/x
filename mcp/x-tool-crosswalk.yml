@@ -1,0 +1,108 @@
+generated: '2026-08-28'
+method: derived
+source: mcp/x-mcp.yml, openapi/_original/x-api-v2-openapi.json, https://docs.x.com/tools/mcp.md
+description: >-
+  Binds the capabilities X documents for its hosted MCP server at https://api.x.com/mcp to the
+  backing X API v2 operationIds in openapi/. The live MCP tools/list is auth-gated (HTTP 401),
+  so tool NAMES were not observed; rows below are bound from X's own published capability table
+  by name and semantics, and confidence is set accordingly. Every operationId listed was grepped
+  out of the published spec — none is invented.
+surfaces:
+  openapi: openapi/_original/x-api-v2-openapi.json
+  openapi_split: openapi/x-*-api-openapi.yml
+  mcp_url: https://api.x.com/mcp
+  mcp_gated: true
+  docs_mcp_url: https://docs.x.com/mcp
+  docs_mcp_gated: false
+  graphql: null
+crosswalk:
+- tool: posts.lookup
+  category: Posts
+  rest: [getPostsById, getPostsByIds]
+  binding: capability-table
+  confidence: high
+- tool: posts.engagement
+  category: Posts
+  rest: [getPostsLikingUsers, getPostsRepostedBy, getPostsQuotedPosts]
+  binding: capability-table
+  confidence: medium
+  note: X names "likers / reposters / quoters"; these are the three published operations that serve them.
+- tool: posts.counts
+  category: Posts
+  rest: [getPostsCountsRecent]
+  binding: capability-table
+  confidence: high
+  note: X's table says "recent counts" only; getPostsCountsAll is full-archive and was not claimed.
+- tool: search.posts
+  category: Search
+  rest: [searchPostsAll, searchPostsRecent]
+  binding: capability-table
+  confidence: high
+- tool: search.users
+  category: Search
+  rest: [searchUsers]
+  binding: capability-table
+  confidence: high
+- tool: search.news
+  category: Search
+  rest: [searchNews, getNews]
+  binding: capability-table
+  confidence: high
+- tool: users.me
+  category: Users
+  rest: [getUsersMe]
+  binding: capability-table
+  confidence: high
+- tool: users.lookup
+  category: Users
+  rest: [getUsersById, getUsersByIds, getUsersByUsername, getUsersByUsernames]
+  binding: capability-table
+  confidence: high
+- tool: users.timeline
+  category: Users
+  rest: [getUsersPosts, getUsersTimeline, getUsersMentions]
+  binding: capability-table
+  confidence: high
+- tool: bookmarks.list
+  category: Bookmarks
+  rest: [getUsersBookmarks, getUsersBookmarkFolders, getUsersBookmarksByFolderId]
+  binding: capability-table
+  confidence: high
+- tool: bookmarks.write
+  category: Bookmarks
+  rest: [createUsersBookmark, deleteUsersBookmark, createUsersBookmarkFolder]
+  binding: capability-table
+  confidence: high
+- tool: trends.get
+  category: News & Trends
+  rest: [getTrendsByWoeid]
+  binding: capability-table
+  confidence: high
+  note: X's table says "trends for a location (WOEID)", which is exactly this operation.
+- tool: articles.draft
+  category: Articles
+  rest: [articleCreateDraft]
+  binding: capability-table
+  confidence: high
+- tool: articles.publish
+  category: Articles
+  rest: [articlePublish]
+  binding: capability-table
+  confidence: high
+mcp_only: []
+rest_only_summary:
+  note: >-
+    The hosted MCP server exposes a deliberately narrow read-mostly slice. The large majority of
+    the 190 published REST operations have no documented MCP tool — notably the entire Direct
+    Messages, Chat, Media upload, Spaces, Lists write, Compliance, Broadcasts, Community Notes,
+    Bots, Webhooks and Account Activity surfaces, plus all filtered/firehose/sample streaming.
+  rest_only_tag_groups: [Direct Messages, Chat, Media, Spaces, Lists, Compliance, Broadcasts, Community Notes, Bots, Webhooks, Account Activity, Connections, Stream, Usage, Account, Communities, Activity]
+coverage:
+  rest_operations_total: 190
+  mcp_capability_categories: 6
+  crosswalk_rows: 14
+  rest_operations_bound: 28
+  rest_operations_unbound: 162
+  confidence_high: 12
+  confidence_medium: 2
+  confidence_low: 0

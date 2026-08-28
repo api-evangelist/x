@@ -1,0 +1,97 @@
+generated: '2026-08-28'
+method: searched
+source: https://docs.x.com/x-api/fundamentals/versioning.md
+docs: https://docs.x.com/x-api/fundamentals/versioning
+description: >-
+  Versioning, deprecation, change-communication and status posture for the X API,
+  read from X's own published versioning policy, changelog and status page.
+versioning:
+  scheme: path
+  pattern: https://api.x.com/{version}/...
+  current: '2'
+  contract_version: '2.168'
+  contract_url: https://api.x.com/2/openapi.json
+  docs: https://docs.x.com/x-api/fundamentals/versioning
+  versions:
+  - version: v2
+    status: current
+    description: Modern endpoints, pay-per-usage pricing, all new features ship here.
+  - version: v1.1
+    status: legacy
+    description: Limited support, minimal updates. Some media upload and specialized endpoints remain.
+    migration: https://docs.x.com/x-api/migrate/overview
+  - version: Enterprise
+    status: available
+    description: High-volume access (GNIP/PowerTrack lineage) with dedicated support.
+  breaking_changes:
+  - Removing an endpoint
+  - Removing a response field
+  - Removing a query parameter
+  - Adding a new required parameter
+  - Changing a field's data type
+  - Renaming a field or resource
+  - Changing response codes or error types
+  - Modifying authorization scopes
+  non_breaking_changes:
+  - Adding a new endpoint
+  - Adding a new optional parameter
+  - Adding a new response field
+  - Adding new OAuth scopes
+  - Changing error message text
+  - Nulling fields for privacy or security reasons
+  release_schedule:
+  - type: Major versions
+    frequency: No more than annually
+    notice: Migration guides provided
+  - type: Non-breaking changes
+    frequency: Ongoing
+    notice: Changelog updates
+  - type: Security patches
+    frequency: As needed
+    notice: May be applied to the current version
+deprecation_policy:
+  published: true
+  url: https://docs.x.com/x-api/fundamentals/versioning
+  stages:
+  - status: Active
+    meaning: Fully supported with new features and fixes
+  - status: Deprecated
+    meaning: No new features; critical bugs only; use discouraged
+  - status: Retired
+    meaning: No longer accessible
+  process: >-
+    On a new major version the previous version is marked deprecated, continues to work for a
+    defined support period, then is retired. Migration guides and a v1→v2 endpoint map are
+    provided.
+  machine_readable: false
+  rfc8594_headers: false
+  note: >-
+    The policy is prose. No Sunset or Deprecation response header is declared in the contract
+    and no operation carries `deprecated: true`, so an agent cannot detect an impending
+    retirement from a response — it has to read the changelog or the forum.
+  observed_deprecations:
+  - operation: POST /2/account_activity/replay/webhooks/{webhook_id}/subscriptions/all
+    announced: '2026-03-20'
+    effective: '2026-03-25'
+    replacement: POST /2/webhooks/replay
+    source: https://docs.x.com/changelog
+    note: >-
+      Five days' notice from announcement to effect, and the endpoint is already absent from
+      the current published contract.
+status_page:
+  url: https://developer.x.com/status
+  http_status: 200
+  incident_history: https://docs.x.com/incidents.md
+  secondary: https://api.twitterstat.us/
+  note: X's error reference tells callers to check https://developer.x.com/status on 5xx.
+change_communication:
+  changelog: https://docs.x.com/changelog
+  changelog_rss: https://docs.x.com/changelog/rss.xml
+  forum_announcements: https://devcommunity.x.com/c/announcements/22
+  social: https://x.com/XDevelopers
+  newsletter: https://docs.x.com/newsletter
+sla:
+  published: false
+  note: >-
+    No public SLA. Pay-per-usage has no contractual uptime commitment; X directs
+    high-volume users to an Enterprise agreement (/forms/enterprise-api-interest).

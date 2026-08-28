@@ -1,0 +1,80 @@
+generated: '2026-08-28'
+method: probed
+source: direct DNS (dig) and TLS/HTTP header probes, 2026-08-28
+description: >-
+  Domain-level security posture for the hosts X serves its API and developer surface from.
+  Probed by hand rather than by 0-working/probe-domain-security.py: that tool's shared
+  provider_hosts() helper carries a global EXCLUDE list containing x.com (there to strip
+  social-profile links from other providers' apis.yml files), so for THIS provider it
+  discards every real host and returns no-hosts. The finding is about our tooling, not
+  about X. Absence of a record below is a real absence, not an unchecked field.
+website: x.com
+hosts:
+- host: x.com
+  role: web application, security.txt
+  tls: true
+  hsts: true
+  hsts_header: max-age=631138519; includeSubdomains
+  hsts_preload: false
+  server: cloudflare envoy
+  caa: false
+  dnssec: false
+  http_status: 200
+- host: api.x.com
+  role: API base (OpenAPI servers[], MCP endpoint, OAuth token endpoint)
+  tls: true
+  hsts: true
+  hsts_header: max-age=631138519; includeSubdomains
+  server: cloudflare envoy
+  caa: false
+  caa_note: >-
+    api.x.com is a CNAME to dynamic.x.com.cdn.cloudflare.net; no CAA record is published at
+    the name or resolved through the alias chain.
+  dnssec: false
+  http_status: 404
+  http_status_note: The bare host root 404s by design; /2/openapi.json on the same host returns 200.
+- host: developer.x.com
+  role: developer portal, status page, developer terms
+  tls: true
+  hsts: true
+  hsts_header: max-age=631138519; includeSubdomains
+  server: cloudflare envoy
+  caa: false
+  dnssec: false
+  http_status: 200
+- host: docs.x.com
+  role: documentation, llms.txt, agent card, agent skill, docs MCP
+  tls: true
+  hsts: true
+  hsts_header: max-age=63072000
+  server: Vercel
+  caa: true
+  caa_issuers: [letsencrypt.org, pki.goog, sectigo.com, globalsign.com]
+  caa_note: >-
+    The only host in the set with CAA, and it comes from the Vercel platform
+    (cname.vercel-dns.com) rather than from X. Note this is where the agent card and agent
+    skill live — X's agent-facing discovery surface sits on third-party hosting.
+  dnssec: false
+  http_status: 308
+email:
+  domain: x.com
+  spf: true
+  spf_record: >-
+    v=spf1 ip4:199.16.156.0/22 ip4:199.59.148.0/22 include:_spf.google.com
+    include:_spf.salesforce.com include:_oerp.x.com include:phx1.rp.oracleemaildelivery.com
+    include:iad1.rp.oracleemaildelivery.com -all
+  spf_policy: '-all (hard fail)'
+  dmarc: true
+  dmarc_policy: reject
+  dmarc_record: 'v=DMARC1; p=reject; rua=mailto:...@dmarc-reports.cloudflare.net'
+dnssec:
+  enabled: false
+  note: No DS record is published for x.com; the zone is unsigned.
+summary:
+  tls: 4/4 hosts
+  hsts: 4/4 hosts
+  hsts_includesubdomains: 3/4 hosts (docs.x.com omits it)
+  caa: 1/4 hosts (docs.x.com only, platform-supplied)
+  dnssec: 0/4 hosts
+  spf: true
+  dmarc: reject

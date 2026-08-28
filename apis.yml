@@ -1,74 +1,466 @@
 aid: x
 name: X
-description: >-
-  Get immediate access to the X API and unlock the potential of X data.
+description: X (formerly Twitter) operates the X Developer Platform, the programmable interface to the public conversation
+  on X. The X API v2 is a 190-operation REST surface covering Posts, Users, Direct Messages, the encrypted Chat
+  API, Lists, Spaces, Media, Communities, Community Notes, Broadcasts, News, Trends, Articles and Bots, plus a substantial
+  real-time layer — filtered stream, firehose and sample volume streams, compliance streams, Account Activity webhooks
+  and the X Activity API. X publishes a machine-readable OpenAPI at api.x.com/2/openapi.json, an llms.txt family,
+  an AGENTS.md, an agentskills.io skill, an A2A agent card and two hosted MCP servers. Access is sold pay-per-usage
+  in prepaid credits rather than by subscription tier, with an Enterprise agreement for volume above the published
+  cap.
 type: Index
 accessModel:
-  pricing: freemium
+  pricing: paid
   onboarding: self-serve
   trial: false
   try_now: true
   public: false
-  label: Freemium · Self-serve signup
+  label: Pay-per-usage credits · Self-serve signup
   confidence: high
   source:
   - plans
-  - authentication
-  generated: '2026-07-22'
-  method: derived
+  generated: '2026-08-28'
+  method: searched
+  note: X publishes no free tier for the X API v2. Access is prepaid credits consumed per resource read and per
+    write request; the previous freemium classification came from a scaffolded plans file that has since been replaced
+    with X's published pricing.
 position: Consumer
 access: 3rd-Party
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/x.png
-tags: []
+tags:
+- Social
+- Social Media
+- Posts
+- Users
+- Direct Messages
+- Streaming
+- Webhooks
+- Real Time
+- Trends
+- Media
+- Spaces
+- Content
+- Conversation
+- Agents
+- MCP
 created: '2025-08-14'
-modified: '2026-03-16'
+modified: '2026-08-28'
 url: https://raw.githubusercontent.com/api-evangelist/x/refs/heads/main/apis.yml
 specificationVersion: '0.23'
 common:
-  - type: AgenticAccess
-    url: agentic-access/x-agentic-access.yml
-  - type: Authentication
-    url: authentication/x-authentication.yml
-  - type: GitHubOrganization
-    url: https://github.com/twitter
+- type: Website
+  url: https://x.com/
+- type: OpenAPI
+  url: openapi/_original/x-api-v2-openapi.json
+- type: Authentication
+  url: authentication/x-authentication.yml
+- type: OAuthScopes
+  url: scopes/x-scopes.yml
+- type: AgenticAccess
+  url: agentic-access/x-agentic-access.yml
+- type: Packages
+  url: packages/x-packages.yml
+- type: SDKs
+  url: packages/x-packages.yml
+- type: CLI
+  url: cli/x-cli.yml
+- type: Components
+  url: components/x-components.yml
+- type: Sandbox
+  url: sandbox/x-sandbox.yml
+- type: MCPServer
+  url: mcp/x-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/x-tool-crosswalk.yml
+- type: AgentCard
+  url: a2a/x-a2a.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: LLMsTxt
+  url: llms/x-llms.txt
+- type: WellKnown
+  url: well-known/x-well-known.yml
+- type: SecurityTxt
+  url: well-known/x-security.txt
+- type: Conformance
+  url: conformance/x-conformance.yml
+- type: ErrorCatalog
+  url: errors/x-problem-types.yml
+- type: Conventions
+  url: conventions/x-conventions.yml
+- type: Idempotency
+  url: conventions/x-conventions.yml
+- type: DataModel
+  url: data-model/x-data-model.yml
+- type: Webhooks
+  url: asyncapi/x-webhooks.yml
+- type: Lifecycle
+  url: lifecycle/x-lifecycle.yml
+- type: ChangeLog
+  url: changelog/x-changelog.yml
+- type: Overlay
+  url: overlays/x-api-v2-overlay.yaml
+- type: Plans
+  url: plans/x-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/x-rate-limits.yml
+- type: FinOps
+  url: finops/x-finops.yml
+- type: DomainSecurity
+  url: security/x-domain-security.yml
+- type: VulnerabilityDisclosure
+  url: security/x-vulnerability-disclosure.yml
+- type: Security
+  url: security/x-vulnerability-disclosure.yml
+- type: DeveloperPortal
+  url: https://developer.x.com/
+- type: Documentation
+  url: https://docs.x.com/
+- type: APIReference
+  url: https://docs.x.com/x-api/introduction
+- type: GettingStarted
+  url: https://docs.x.com/x-api/getting-started/make-your-first-request
+- type: Support
+  url: https://devcommunity.x.com/
+- type: GitHubOrganization
+  url: https://github.com/xdevplatform
+- type: Pricing
+  url: https://docs.x.com/x-api/getting-started/pricing
+- type: SignUp
+  url: https://console.x.com
+- type: TermsOfService
+  url: https://developer.x.com/en/developer-terms/agreement-and-policy
+- type: PrivacyPolicy
+  url: https://x.com/en/privacy
+- type: StatusPage
+  url: https://developer.x.com/status
+- type: Deprecation
+  url: https://docs.x.com/x-api/fundamentals/versioning
+- type: Postman
+  url: https://www.postman.com/xapidevelopers/x-api-public-workspace/collection/34902927-2efc5689-99c6-4ab6-8091-996f35c2fd80
 apis:
 - aid: x:x
-  name: X
-  description: Get immediate access to the X API and unlock the potential of X data.
-  humanURL: ' https://developer.x.com/en'
-  tags: []
+  name: X API v2
+  description: The complete X API v2 as X publishes it — 190 operations across 23 tags, harvested verbatim from
+    https://api.x.com/2/openapi.json (contract version 2.168). The per-tag documents below are mechanically split
+    from this one document.
+  humanURL: https://docs.x.com/x-api/introduction
+  baseURL: https://api.x.com
+  tags:
+  - X API v2
   properties:
+  - type: OpenAPI
+    url: openapi/_original/x-api-v2-openapi.json
   - type: Documentation
-    url: ' https://developer.x.com/en'
+    url: https://docs.x.com/x-api/introduction
+  - type: APIReference
+    url: https://docs.x.com/x-api/introduction
+  - type: MCPServer
+    url: mcp/x-mcp.yml
+  - type: AgentSkill
+    url: skills/x-x-skill.md
+  - type: LLMsTxt
+    url: llms/x-llms.txt
+- aid: x:x-account-activity-api
+  name: X Account Activity API
+  description: Endpoints relating to retrieving, managing Account Activity subscriptions — 5 operation(s) in the
+    X-published contract.
+  humanURL: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
+  baseURL: https://api.x.com
+  tags:
+  - Account Activity
+  properties:
+  - type: OpenAPI
+    url: openapi/x-account-activity-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
+- aid: x:x-account-api
+  name: X Account API
+  description: Endpoints for managing the authenticated user's X Developer Platform account — 2 operation(s) in
+    the X-published contract.
+  humanURL: https://docs.x.com/x-api/introduction
+  baseURL: https://api.x.com
+  tags:
+  - Account
+  properties:
+  - type: OpenAPI
+    url: openapi/x-account-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/introduction
+- aid: x:x-activity-api
+  name: X Activity API
+  description: Endpoints relating to retrieving, managing activity subscriptions — 5 operation(s) in the X-published
+    contract.
+  humanURL: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
+  baseURL: https://api.x.com
+  tags:
+  - Activity
+  properties:
+  - type: OpenAPI
+    url: openapi/x-activity-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
+- aid: x:x-articles-api
+  name: X Articles API
+  description: Endpoints related to retrieving, creating & modifying Articles — 2 operation(s) in the X-published
+    contract.
+  humanURL: https://docs.x.com/x-api/articles/introduction
+  baseURL: https://api.x.com
+  tags:
+  - Articles
+  properties:
+  - type: OpenAPI
+    url: openapi/x-articles-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/articles/introduction
+- aid: x:x-bots-api
+  name: X Bots API
+  description: The Bots surface of the X API v2. — 6 operation(s) in the X-published contract.
+  humanURL: https://docs.x.com/x-api/introduction
+  baseURL: https://api.x.com
+  tags:
+  - Bots
+  properties:
+  - type: OpenAPI
+    url: openapi/x-bots-api-openapi.yml
+- aid: x:x-broadcasts-api
+  name: X Broadcasts API
+  description: Endpoints related to live broadcasts and their chat — 13 operation(s) in the X-published contract.
+  humanURL: https://developer.x.com/
+  baseURL: https://api.x.com
+  tags:
+  - Broadcasts
+  properties:
+  - type: OpenAPI
+    url: openapi/x-broadcasts-api-openapi.yml
+  - type: Documentation
+    url: https://developer.x.com/
+- aid: x:x-chat-api
+  name: X Chat API
+  description: Endpoints related to Chat encrypted messaging — 16 operation(s) in the X-published contract.
+  humanURL: https://developer.x.com/
+  baseURL: https://api.x.com
+  tags:
+  - Chat
+  properties:
+  - type: OpenAPI
+    url: openapi/x-chat-api-openapi.yml
+  - type: Documentation
+    url: https://developer.x.com/
+- aid: x:x-communities-api
+  name: X Communities API
+  description: Endpoints related to retrieving and managing Communities — 2 operation(s) in the X-published contract.
+  humanURL: https://docs.x.com/x-api/communities/introduction
+  baseURL: https://api.x.com
+  tags:
+  - Communities
+  properties:
+  - type: OpenAPI
+    url: openapi/x-communities-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/communities/introduction
+- aid: x:x-community-notes-api
+  name: X Community Notes API
+  description: Endpoints related to retrieving, searching, and modifying Community Notes — 5 operation(s) in the
+    X-published contract.
+  humanURL: https://docs.x.com/x-api/community-notes/introduction
+  baseURL: https://api.x.com
+  tags:
+  - Community Notes
+  properties:
+  - type: OpenAPI
+    url: openapi/x-community-notes-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/community-notes/introduction
+- aid: x:x-compliance-api
+  name: X Compliance API
+  description: Endpoints related to keeping X data in your systems compliant — 6 operation(s) in the X-published
+    contract.
+  humanURL: https://docs.x.com/x-api/compliance/batch-compliance/introduction
+  baseURL: https://api.x.com
+  tags:
+  - Compliance
+  properties:
+  - type: OpenAPI
+    url: openapi/x-compliance-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/compliance/batch-compliance/introduction
+- aid: x:x-connections-api
+  name: X Connections API
+  description: Endpoints related to streaming connections — 4 operation(s) in the X-published contract.
+  humanURL: https://developer.x.com/en/docs/x-api/connections
+  baseURL: https://api.x.com
+  tags:
+  - Connections
+  properties:
+  - type: OpenAPI
+    url: openapi/x-connections-api-openapi.yml
+  - type: Documentation
+    url: https://developer.x.com/en/docs/x-api/connections
+- aid: x:x-direct-messages-api
+  name: X Direct Messages API
+  description: Endpoints related to retrieving, managing Direct Messages — 9 operation(s) in the X-published contract.
+  humanURL: https://docs.x.com/x-api/direct-messages/introduction
+  baseURL: https://api.x.com
+  tags:
+  - Direct Messages
+  properties:
+  - type: OpenAPI
+    url: openapi/x-direct-messages-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/direct-messages/introduction
+- aid: x:x-general-api
+  name: X General API
+  description: Miscellaneous endpoints for general API functionality — 1 operation(s) in the X-published contract.
+  humanURL: https://docs.x.com/x-api/introduction
+  baseURL: https://api.x.com
+  tags:
+  - General
+  properties:
+  - type: OpenAPI
+    url: openapi/x-general-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/introduction
+- aid: x:x-lists-api
+  name: X Lists API
+  description: Endpoints related to retrieving, managing Lists — 9 operation(s) in the X-published contract.
+  humanURL: https://docs.x.com/x-api/lists/introduction
+  baseURL: https://api.x.com
+  tags:
+  - Lists
+  properties:
+  - type: OpenAPI
+    url: openapi/x-lists-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/lists/introduction
+- aid: x:x-media-api
+  name: X Media API
+  description: Endpoints related to retrieving and uploading Media — 11 operation(s) in the X-published contract.
+  humanURL: https://docs.x.com/x-api/media/introduction
+  baseURL: https://api.x.com
+  tags:
+  - Media
+  properties:
+  - type: OpenAPI
+    url: openapi/x-media-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/media/introduction
+- aid: x:x-news-api
+  name: X News API
+  description: Endpoint for retrieving news stories — 2 operation(s) in the X-published contract.
+  humanURL: https://developer.x.com/
+  baseURL: https://api.x.com
+  tags:
+  - News
+  properties:
+  - type: OpenAPI
+    url: openapi/x-news-api-openapi.yml
+  - type: Documentation
+    url: https://developer.x.com/
 - aid: x:x-posts-api
   name: X Posts API
-  description: The Posts API from X — 4 operation(s) for posts.
-  humanURL: ' https://developer.x.com/en'
+  description: Endpoints related to retrieving, searching, and modifying Posts — 14 operation(s) in the X-published
+    contract.
+  humanURL: https://docs.x.com/x-api/posts/introduction
+  baseURL: https://api.x.com
   tags:
   - Posts
   properties:
   - type: OpenAPI
     url: openapi/x-posts-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/posts/introduction
+  - type: OpenCollection
+    url: collections/x-posts-api.opencollection.json
+  - type: PostmanCollection
+    url: collections/x-posts-api.postman_collection.json
+- aid: x:x-spaces-api
+  name: X Spaces API
+  description: Endpoints related to retrieving, managing Spaces — 6 operation(s) in the X-published contract.
+  humanURL: https://docs.x.com/x-api/spaces/introduction
+  baseURL: https://api.x.com
+  tags:
+  - Spaces
+  properties:
+  - type: OpenAPI
+    url: openapi/x-spaces-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/spaces/introduction
+- aid: x:x-stream-api
+  name: X Stream API
+  description: Endpoints related to streaming — 18 operation(s) in the X-published contract.
+  humanURL: https://developer.x.com/
+  baseURL: https://api.x.com
+  tags:
+  - Stream
+  properties:
+  - type: OpenAPI
+    url: openapi/x-stream-api-openapi.yml
+  - type: Documentation
+    url: https://developer.x.com/
 - aid: x:x-trends-api
   name: X Trends API
-  description: The Trends API from X — 1 operation(s) for trends.
-  humanURL: ' https://developer.x.com/en'
+  description: Endpoint for retrieving trends — 2 operation(s) in the X-published contract.
+  humanURL: https://docs.x.com/x-api/trends/introduction
+  baseURL: https://api.x.com
   tags:
   - Trends
   properties:
   - type: OpenAPI
     url: openapi/x-trends-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/trends/introduction
+  - type: OpenCollection
+    url: collections/x-trends-api.opencollection.json
+  - type: PostmanCollection
+    url: collections/x-trends-api.postman_collection.json
+- aid: x:x-usage-api
+  name: X Usage API
+  description: Endpoints related to retrieving usage — 2 operation(s) in the X-published contract.
+  humanURL: https://docs.x.com/x-api/usage/introduction
+  baseURL: https://api.x.com
+  tags:
+  - Usage
+  properties:
+  - type: OpenAPI
+    url: openapi/x-usage-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/usage/introduction
 - aid: x:x-users-api
   name: X Users API
-  description: The Users API from X — 2 operation(s) for users.
-  humanURL: ' https://developer.x.com/en'
+  description: Endpoints related to retrieving, managing relationships of Users — 42 operation(s) in the X-published
+    contract.
+  humanURL: https://docs.x.com/x-api/users/introduction
+  baseURL: https://api.x.com
   tags:
-  - User
-  tags_raw:
   - Users
   properties:
   - type: OpenAPI
     url: openapi/x-users-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/users/introduction
+  - type: OpenCollection
+    url: collections/x-users-api.opencollection.json
+  - type: PostmanCollection
+    url: collections/x-users-api.postman_collection.json
+- aid: x:x-webhooks-api
+  name: X Webhooks API
+  description: Endpoints relating to retrieving, managing webhooks and webhook configs — 8 operation(s) in the X-published
+    contract.
+  humanURL: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
+  baseURL: https://api.x.com
+  tags:
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/x-webhooks-api-openapi.yml
+  - type: Documentation
+    url: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
 maintainers:
-  - FN: Kin Lane
-    email: kin@apievangelist.com
+- FN: Kin Lane
+  email: kin@apievangelist.com
+x-enrichment:
+  date: '2026-08-28'
+  status: enriched
+  artifacts_added: 49
+  pass: local-v1

@@ -4,135 +4,299 @@ schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main
 provider: X
 providerId: x
 created: '2026-05-04'
-# Provenance stamped 2026-08-11: this artifact was written by the API Evangelist
-# bulk sweep dated 2026-05-04, not harvested from the provider. See roadmap#35.
-method: generated
-modified: '2026-05-04'
-tags: []
-description: Machine-readable plans and pricing scaffold for this API provider. Conforms to the API Commons
-  Plans schema. Tier limits and prices are scaffold defaults; replace with provider-published values.
+modified: '2026-08-28'
+generated: '2026-08-28'
+method: searched
+source: https://docs.x.com/x-api/getting-started/pricing.md
+docs: https://docs.x.com/x-api/getting-started/pricing
+pricing_page: https://developer.x.com/#pricing
+console: https://console.x.com
+tags:
+  - Pricing
+  - Pay-per-usage
+  - Credits
+description: >-
+  X API pricing, transcribed from X's own pricing documentation on 2026-08-28. This file
+  REPLACES a 2026-05-04 scaffold that invented a Free / Professional / Enterprise tier
+  ladder with placeholder quotas. X does NOT sell subscription tiers for the X API: it sells
+  prepaid credits consumed per resource read and per write request. The only named plan
+  boundary is self-serve pay-per-usage versus a negotiated Enterprise agreement.
+model:
+  type: pay-per-usage
+  billing: prepaid credits, deducted in real time
+  subscriptions: false
+  commitments: false
+  currency: USD
+  deduplication:
+    window: 24-hour UTC day
+    description: >-
+      A billable resource requested more than once inside the same UTC day is charged once.
+      X calls this a soft guarantee — outages may cause a resource not to be deduplicated.
+  auto_recharge: true
+  negative_balance: >-
+    A balance can go slightly negative, after which requests are blocked until credits cover it.
+  incentive: >-
+    Up to 20% back in free xAI API credits based on X API credit spend.
+plan_count: 2
 plans:
-  - id: x-free
-    name: Free
-    type: freemium
-    description: Free entry tier for the X API surface. Intended for evaluation, prototyping, and low-volume
-      integrations. Real limits and pricing must be reconciled with the provider's published plan documentation.
+  - id: x-pay-per-usage
+    name: Pay-per-usage
+    type: usage-based
+    price: '0.00'
+    description: >-
+      Self-serve. Buy credits in the Developer Console and pay per resource read or per write
+      request. No contract, subscription, or minimum spend.
+    signup: https://console.x.com
+    limits:
+      - name: Post reads
+        limit: 3000000
+        timeFrame: monthly billing cycle
+        description: Pay-per-usage plans are capped at 3 million Post reads per monthly billing cycle.
     entries:
-      - label: API Requests
-        description: Monthly API request quota across all included endpoints
-        name: api_requests
-        type: quota
-        metric: requests
-        limit: 1000
-        timeFrame: month
-        geo: global
-        domains: []
-        unit: 1
-        price: '0.00'
-        userMultiplied: false
-      - label: Rate Limit
-        description: Maximum requests per minute on the free tier
-        name: rate_limit
-        type: rate
-        metric: requests_per_minute
-        limit: 10
-        timeFrame: minute
-        geo: global
-        domains: []
-        unit: 1
-        price: '0.00'
-        userMultiplied: false
-    elements:
-      - name: Public Documentation
-      - name: Community Support
-      - name: Sandbox Access
-      - name: X
-  - id: x-pro
-    name: Professional
-    type: paid
-    description: Production tier for X. Provides higher quotas, priority support, and access to the broader
-      API portfolio. Pricing placeholder; align with the provider's pricing page.
-    entries:
-      - label: API Requests
-        description: Monthly API request quota
-        name: api_requests
-        type: quota
-        metric: requests
-        limit: 100000
-        timeFrame: month
-        geo: global
-        domains: []
-        unit: 1
-        price: TBD
-        userMultiplied: false
-      - label: Rate Limit
-        description: Maximum requests per minute on the professional tier
-        name: rate_limit
-        type: rate
-        metric: requests_per_minute
-        limit: 100
-        timeFrame: minute
-        geo: global
-        domains: []
-        unit: 1
-        price: '0.00'
-        userMultiplied: false
-      - label: Overage
-        description: Per-request price after monthly quota is exceeded
-        name: overage
+      - label: 'Posts: Read'
+        name: posts_read
         type: metered
-        metric: requests
-        limit: -1
-        timeFrame: month
-        geo: global
-        domains: []
-        unit: 1000
-        price: TBD
-        userMultiplied: false
+        metric: resource
+        unit: 1
+        price: '0.005'
+      - label: 'User: Read'
+        name: user_read
+        type: metered
+        metric: resource
+        unit: 1
+        price: '0.010'
+      - label: 'DM Event: Read'
+        name: dm_event_read
+        type: metered
+        metric: resource
+        unit: 1
+        price: '0.010'
+      - label: 'Following/Followers: Read'
+        name: graph_read
+        type: metered
+        metric: resource
+        unit: 1
+        price: '0.010'
+      - label: 'List: Read'
+        name: list_read
+        type: metered
+        metric: resource
+        unit: 1
+        price: '0.005'
+      - label: 'Space: Read'
+        name: space_read
+        type: metered
+        metric: resource
+        unit: 1
+        price: '0.005'
+      - label: 'Community: Read'
+        name: community_read
+        type: metered
+        metric: resource
+        unit: 1
+        price: '0.005'
+      - label: 'Note: Read'
+        name: note_read
+        type: metered
+        metric: resource
+        unit: 1
+        price: '0.005'
+      - label: 'Like: Read'
+        name: like_read
+        type: metered
+        metric: resource
+        unit: 1
+        price: '0.001'
+      - label: 'Mute: Read'
+        name: mute_read
+        type: metered
+        metric: resource
+        unit: 1
+        price: '0.001'
+      - label: 'Block: Read'
+        name: block_read
+        type: metered
+        metric: resource
+        unit: 1
+        price: '0.001'
+      - label: 'Profile Update: Read'
+        name: profile_update_read
+        type: metered
+        metric: resource
+        unit: 1
+        price: '0.005'
+      - label: Owned Reads
+        name: owned_reads
+        type: metered
+        metric: resource
+        unit: 1
+        price: '0.001'
+        description: >-
+          Reads of your own data through your own app — bookmarks, blocking, muting,
+          pinned_lists, tweets, mentions, liked_tweets, followers, following, owned_lists,
+          followed_lists, list_memberships.
+      - label: 'Post: Create'
+        name: post_create
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.015'
+      - label: 'Post: Create (with URL)'
+        name: post_create_url
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.200'
+      - label: 'Post: Create (summoned reply)'
+        name: post_create_summoned
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.010'
+      - label: 'DM Interaction: Create'
+        name: dm_create
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.015'
+      - label: 'User Interaction: Create'
+        name: user_interaction_create
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.015'
+      - label: 'Interaction: Delete'
+        name: interaction_delete
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.010'
+      - label: 'Content: Manage'
+        name: content_manage
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.005'
+      - label: 'List: Create'
+        name: list_create
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.010'
+      - label: 'List: Manage'
+        name: list_manage
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.005'
+      - label: Bookmark
+        name: bookmark
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.005'
+      - label: Media Metadata
+        name: media_metadata
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.005'
+      - label: 'Privacy: Update'
+        name: privacy_update
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.010'
+      - label: 'Mute: Delete'
+        name: mute_delete
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.005'
+      - label: 'Counts: Recent'
+        name: counts_recent
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.005'
+      - label: 'Counts: All'
+        name: counts_all
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.010'
+      - label: Trends
+        name: trends
+        type: metered
+        metric: request
+        unit: 1
+        price: '0.010'
+    webhook_events:
+      description: >-
+        X Activity API webhook events are billed per event delivered, deduplicated in the same
+        24-hour UTC window.
+      priced:
+        - event: post.create
+          price: '0.005'
+        - event: follow.follow
+          price: '0.010'
+        - event: follow.unfollow
+          price: '0.010'
+        - event: mute.mute
+          price: '0.001'
+        - event: mute.unmute
+          price: '0.001'
+        - event: block.block
+          price: '0.001'
+        - event: block.unblock
+          price: '0.001'
+        - event: profile.update.*
+          price: '0.005'
+        - event: chat.received
+          price: '0.010'
+        - event: dm.received
+          price: '0.010'
+        - event: news.new
+          price: '0.005'
+        - event: spaces.start
+          price: '0.005'
+        - event: spaces.end
+          price: '0.005'
+      not_billed:
+        - post.delete
+        - chat.sent
+        - chat.conversation_join
+        - dm.sent
+        - dm.read
+        - dm.indicate_typing
     elements:
-      - name: All Production Endpoints
-      - name: Email Support
-      - name: SLA Targets
-      - name: Webhook Subscriptions
-      - name: X
+      - name: Self-serve signup
+      - name: Developer Console usage + cost tracking
+      - name: Spending limits
+      - name: Auto-recharge
+      - name: Up to 20% back in xAI API credits
   - id: x-enterprise
     name: Enterprise
     type: enterprise
-    description: Custom-negotiated tier for X. Includes dedicated capacity, contractual SLAs, security
-      review, data residency options, and named technical account management.
-    entries:
-      - label: API Requests
-        description: Negotiated request volume; -1 indicates uncapped subject to fair use
-        name: api_requests
-        type: quota
-        metric: requests
-        limit: -1
-        timeFrame: month
-        geo: configurable
-        domains: []
-        unit: 1
-        price: custom
-        userMultiplied: false
-      - label: Rate Limit
-        description: Negotiated burst and steady-state rate
-        name: rate_limit
-        type: rate
-        metric: requests_per_minute
-        limit: 1000
-        timeFrame: minute
-        geo: configurable
-        domains: []
-        unit: 1
-        price: custom
-        userMultiplied: false
+    price: custom
+    description: >-
+      Negotiated agreement for volume above the 3M Post reads/month pay-per-usage cap, and for
+      the Enterprise API surface (Account Activity, X Activity, GNIP/PowerTrack, Compliance).
+      Pricing is not published.
+    contact: https://docs.x.com/forms/enterprise-api-interest
     elements:
-      - name: Unlimited / Negotiated Volume
-      - name: 24/7 Dedicated Support
-      - name: Contractual SLA
-      - name: Security & Compliance Review
-      - name: Dedicated Account Manager
-      - name: Custom Data Residency
-      - name: X
+      - name: Volume above the pay-per-usage cap
+      - name: Enterprise API surface
+      - name: Dedicated support
+      - name: Contractual limits
+notes:
+  - >-
+    X states prices are subject to change and that the Developer Console and
+    https://developer.x.com/#pricing carry the current rates. Values above were read on
+    2026-08-28 and are consistent with the 2026-04-16 changelog pricing update.
+  - >-
+    Free access: X does not publish a free tier for the X API v2. The Usage API for enterprise
+    consumption reporting is documented as free.
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com

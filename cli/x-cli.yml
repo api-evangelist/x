@@ -1,0 +1,43 @@
+generated: '2026-08-28'
+method: searched
+source: https://docs.x.com/tools/mcp.md, https://docs.x.com/tools-and-libraries.md
+docs: https://docs.x.com/tools/xurl
+description: First-party command-line tooling for the X API.
+clis:
+- name: xurl
+  official: true
+  description: >-
+    Auth-enabled, curl-like CLI for the X API. Handles OAuth 1.0a and OAuth 2.0 PKCE login
+    with automatic token refresh, so there is no manual token management. Also ships the
+    `xurl mcp` local stdio bridge that fronts the hosted MCP server at api.x.com/mcp.
+  repository: https://github.com/xdevplatform/xurl
+  install:
+  - method: homebrew
+    command: brew install --cask xdevplatform/tap/xurl
+  - method: npm
+    command: npm install -g @xdevplatform/xurl
+  - method: script
+    command: curl -fsSL https://raw.githubusercontent.com/xdevplatform/xurl/main/install.sh | bash
+  - method: npx
+    command: npx -y @xdevplatform/xurl
+  package: packages/x-packages.yml#@xdevplatform/xurl
+  version: 1.3.1
+  published: '2026-07-21'
+  commands:
+  - group: auth
+    examples: ['xurl auth oauth2', 'xurl auth oauth2 --headless']
+    description: One-time browser or paste-a-code OAuth login; caches and auto-refreshes the token.
+  - group: mcp
+    examples: ['xurl mcp']
+    description: Runs the local MCP bridge; diagnostics go to stderr so stdout stays a clean JSON-RPC channel.
+  env:
+  - CLIENT_ID
+  - CLIENT_SECRET
+  - REDIRECT_URI
+  note: Default redirect URI for the first-run login is http://localhost:8080/callback and must be registered on the app.
+- name: twurl
+  official: true
+  description: >-
+    Long-standing curl-like CLI for the X API, listed by X alongside xurl on its
+    Tools & Libraries page. Predates xurl and does not include the MCP bridge.
+  source: https://docs.x.com/tools-and-libraries

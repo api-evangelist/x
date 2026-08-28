@@ -1,0 +1,109 @@
+generated: '2026-08-28'
+method: probed
+source: direct HTTP GET of each path on each host, 2026-08-28
+description: >-
+  /.well-known/ probe across every X host that appears in apis.yml baseURLs, the
+  OpenAPI servers[] block (https://api.x.com) and the docs/console hosts.
+  NOTE ON x.com: the x.com web app answers 200 with the same 287KB SPA shell for
+  EVERY /.well-known/* path, so only x.com/.well-known/security.txt — which returns
+  text/plain with a real PGP-signed document — is counted as served. Every other
+  x.com row below is recorded with its 200 status and marked shell: true, i.e. a miss.
+hosts:
+- host: api.x.com
+  documents:
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    file: x-oauth-authorization-server.json
+    note: RFC 8414 authorization server metadata; issuer https://api.x.com, 18 scopes, PKCE S256.
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    file: x-oauth-protected-resource.json
+    note: RFC 9728 protected resource metadata; resource is https://api.x.com/mcp — the hosted MCP server.
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: docs.x.com
+  documents:
+  - path: /.well-known/agent-card.json
+    status: 200
+    file: ../a2a/x-agent-card.json
+    note: A2A Agent Card, protocolVersion 0.3. Saved verbatim under a2a/ and graded there.
+  - path: /.well-known/agent-skills/index.json
+    status: 200
+    file: x-agent-skills-index.json
+    note: agentskills.io discovery 0.2.0 index pointing at /.well-known/agent-skills/x/skill.md.
+  - path: /.well-known/skills/index.json
+    status: 200
+    note: Legacy skills discovery format, same single skill.
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: x.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    file: x-security.txt
+    note: >-
+      Real PGP-signed RFC 9116 document. Contact https://hackerone.com/twitter.
+      Its Expires field reads 2024-01-01T06:00:00.000Z, i.e. the published document
+      is past its own stated expiry and the canonical URI still names twitter.com.
+  - path: /.well-known/openid-configuration
+    status: 200
+    shell: true
+    note: SPA catch-all, 287KB of HTML — not a document.
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    shell: true
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    shell: true
+  - path: /.well-known/api-catalog
+    status: 200
+    shell: true
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    shell: true
+  - path: /.well-known/agent-card.json
+    status: 200
+    shell: true
+  - path: /.well-known/agent.json
+    status: 200
+    shell: true
+- host: developer.x.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404

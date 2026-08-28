@@ -1,0 +1,650 @@
+openapi: 3.1.0
+info:
+  title: X API v2 Compliance API
+  version: '2.168'
+  description: The Compliance surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
+  contact:
+    name: X Developers
+    url: https://developer.x.com/
+  license:
+    name: X Developer Agreement and Policy
+    url: https://developer.x.com/en/developer-terms/agreement-and-policy.html
+servers:
+- description: X API
+  url: https://api.x.com
+tags:
+- name: Compliance
+  description: Endpoints related to keeping X data in your systems compliant
+  externalDocs:
+    description: Find out more
+    url: https://docs.x.com/x-api/compliance/batch-compliance/introduction
+paths:
+  /2/compliance/jobs:
+    get:
+      security:
+      - BearerToken: []
+      tags:
+      - Compliance
+      summary: Get Compliance Jobs
+      description: Retrieves a list of Compliance Jobs filtered by job type and optional status.
+      externalDocs:
+        url: https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/get-compliance-jobs
+      operationId: getComplianceJobs
+      parameters:
+      - name: type
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - tweets
+          - users
+        style: form
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - created
+          - in_progress
+          - failed
+          - complete
+        style: form
+      - $ref: '#/components/parameters/ComplianceJobFieldsParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetComplianceJobsResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      security:
+      - BearerToken: []
+      tags:
+      - Compliance
+      summary: Create Compliance Job
+      description: Creates a new Compliance Job for the specified job type.
+      externalDocs:
+        url: https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/post-compliance-jobs
+      operationId: createComplianceJobs
+      parameters:
+      - $ref: '#/components/parameters/ComplianceJobFieldsParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateComplianceJobsRequest'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateComplianceJobsResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/compliance/jobs/{id}:
+    get:
+      security:
+      - BearerToken: []
+      tags:
+      - Compliance
+      summary: Get Compliance Job by ID
+      description: Retrieves details of a specific Compliance Job by its ID.
+      externalDocs:
+        url: https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/api-reference/get-compliance-jobs-id
+      operationId: getComplianceJobsById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{1,19}$
+        style: simple
+      - $ref: '#/components/parameters/ComplianceJobFieldsParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetComplianceJobsByIdResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      security:
+      - BearerToken: []
+      tags:
+      - Compliance
+      summary: Cancel Compliance Job
+      description: Cancels a Compliance Job that has not finished processing; its status becomes failed
+        and a new job of the same type can be created.
+      externalDocs:
+        url: https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/introduction
+      operationId: deleteComplianceJobsById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{1,19}$
+        style: simple
+      - $ref: '#/components/parameters/ComplianceJobFieldsParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteComplianceJobsByIdResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/compliance/jobs/{id}/download:
+    get:
+      security:
+      - BearerToken: []
+      tags:
+      - Compliance
+      summary: Download Compliance Job Results
+      description: Downloads the results file of a completed Compliance Job using the signed URL returned
+        at job creation.
+      externalDocs:
+        url: https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/introduction
+      operationId: downloadComplianceJobResults
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{1,19}$
+        style: simple
+      - name: token
+        in: query
+        description: Signed download token from the job's download_url.
+        required: true
+        schema:
+          type: string
+        style: form
+      - $ref: '#/components/parameters/ComplianceJobFieldsParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/compliance/jobs/{id}/upload:
+    put:
+      security:
+      - BearerToken: []
+      tags:
+      - Compliance
+      summary: Upload Compliance Job Submission
+      description: Uploads the newline-delimited ID file for a Compliance Job using the signed URL returned
+        at job creation.
+      externalDocs:
+        url: https://developer.twitter.com/en/docs/twitter-api/compliance/batch-compliance/introduction
+      operationId: uploadComplianceJobSubmission
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{1,19}$
+        style: simple
+      - name: token
+        in: query
+        description: Signed upload token from the job's upload_url.
+        required: true
+        schema:
+          type: string
+        style: form
+      - $ref: '#/components/parameters/ComplianceJobFieldsParameter'
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadComplianceJobSubmissionResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  schemas:
+    NotAuthorizedForFieldProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
+          type: string
+    InvalidRequestProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    ResourceNotFoundProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    GetComplianceJobsByIdResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ComplianceJob'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetComplianceJobsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplianceJob'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    ComplianceJob:
+      type: object
+      properties:
+        created_at:
+          type: string
+        download_expires_at:
+          type: string
+        download_url:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        resumable:
+          type: boolean
+        status:
+          type: string
+        type:
+          type: string
+        upload_expires_at:
+          type: string
+        upload_url:
+          type: string
+    UploadComplianceJobSubmissionResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ComplianceJob'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    Problem:
+      oneOf:
+      - $ref: '#/components/schemas/ResourceNotFoundProblem'
+      - $ref: '#/components/schemas/InvalidRequestProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
+      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
+      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
+      - $ref: '#/components/schemas/ResourceUnavailableProblem'
+      - $ref: '#/components/schemas/DisallowedResourceProblem'
+      - $ref: '#/components/schemas/InternalErrorProblem'
+      discriminator:
+        propertyName: type
+        mapping:
+          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
+          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
+          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
+          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
+          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
+          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
+          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
+          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
+          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    DeleteComplianceJobsByIdResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ComplianceJob'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    CreateComplianceJobsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ComplianceJob'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    CreateComplianceJobsRequest:
+      type: object
+      required:
+      - type
+      properties:
+        name:
+          type: string
+          description: A user-provided name for this job.
+          maxLength: 64
+        resumable:
+          type: boolean
+          description: Whether to enable the upload URL with support for resumable uploads.
+        type:
+          type: string
+          description: Type of compliance job to list.
+          enum:
+          - tweets
+          - users
+      additionalProperties: false
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    FieldUnauthorizedProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-unauthorized
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+  parameters:
+    ComplianceJobFieldsParameter:
+      name: compliance_job.fields
+      in: query
+      description: A comma separated list of ComplianceJob fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a ComplianceJob object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - created_at
+          - download_expires_at
+          - download_url
+          - id
+          - name
+          - resumable
+          - status
+          - type
+          - upload_expires_at
+          - upload_url
+      explode: false
+      style: form
+  securitySchemes:
+    BearerToken:
+      type: http
+      scheme: bearer

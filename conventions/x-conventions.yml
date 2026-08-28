@@ -1,0 +1,218 @@
+generated: '2026-08-28'
+method: searched
+source: >-
+  https://docs.x.com/x-api/fundamentals/rate-limits.md,
+  https://docs.x.com/x-api/fundamentals/response-codes-and-errors.md,
+  https://docs.x.com/x-api/fundamentals/versioning.md,
+  https://docs.x.com/x-api/getting-started/pricing.md,
+  openapi/_original/x-api-v2-openapi.json
+description: >-
+  Cross-cutting runtime semantics of the X API v2 — the things an agent needs that the
+  contract alone does not state. Every value here is either published by X in prose or read
+  directly out of its OpenAPI; nothing is inferred.
+auth:
+  styles:
+  - name: App-only Bearer token
+    scheme: BearerToken (http/bearer)
+    use: Read-only access to public data. No user context.
+  - name: OAuth 2.0 Authorization Code with PKCE
+    scheme: OAuth2UserToken
+    use: User context with scopes. Required for all writes.
+    authorization_url: https://api.x.com/2/oauth2/authorize
+    token_url: https://api.x.com/2/oauth2/token
+    scopes: 26
+  - name: OAuth 1.0a user context
+    scheme: UserToken (http/OAuth)
+    use: Legacy user context, still supported.
+  discovery:
+    authorization_server: https://api.x.com/.well-known/oauth-authorization-server
+    protected_resource: https://api.x.com/.well-known/oauth-protected-resource
+  detail: authentication/x-authentication.yml, scopes/x-scopes.yml
+idempotency:
+  supported: partial
+  key_header: null
+  scope: operation-level
+  operations:
+  - operationId: ensureAccount
+    path: POST /2/account
+    quote: >-
+      "Idempotent: when the user already has an account it is returned unchanged with
+      `created` false."
+  - operationId: createBot
+    path: POST /2/bots
+    quote: >-
+      "Idempotent on handle: repeating the request for a handle that already names one of the
+      project's bots returns that bot with a freshly minted token, revoking the previous one —
+      safe to retry when a response was lost."
+  note: >-
+    X publishes explicit idempotent-retry semantics on two operations, in the contract itself.
+    There is NO client-supplied Idempotency-Key header anywhere in the API, so an agent cannot
+    make an arbitrary write (create a Post, send a DM, add a bookmark) safely retryable. Retry
+    of a lost POST /2/tweets response risks a duplicate Post AND a duplicate charge — writes
+    are billed per request.
+  source: openapi/_original/x-api-v2-openapi.json
+pagination:
+  style: token
+  request_param: pagination_token
+  size_param: max_results
+  response_field: meta.next_token
+  previous_field: meta.previous_token
+  docs: https://docs.x.com/x-api/fundamentals/pagination
+  occurrences:
+    request_parameters: 48
+    response_fields: 50
+field_selection:
+  sparse_fieldsets:
+    params: ['tweet.fields', 'user.fields', 'media.fields', 'place.fields', 'poll.fields', 'space.fields', 'list.fields']
+    description: Request only the attributes you need on each object type.
+  expansions:
+    param: expansions
+    description: Inline related objects (author_id, referenced_tweets.id, attachments.media_keys …) into `includes`.
+  docs: https://docs.x.com/x-api/fundamentals/fields
+  note: >-
+    Field selection is billing-relevant, not just bandwidth-relevant — reads are charged per
+    resource returned, and expansions return additional resources.
+request_id_tracing:
+  header: null
+  note: >-
+    X does not document a request-id response header. Its support guidance asks callers to
+    include the endpoint URL, sanitized request headers and the full error body when reporting
+    a problem, which is the substitute.
+versioning:
+  style: path
+  current: '2'
+  detail: lifecycle/x-lifecycle.yml
+error_envelope:
+  format: rfc9457
+  media_type: application/problem+json
+  fields: [type, title, detail]
+  partial_errors: true
+  detail_artifact: errors/x-problem-types.yml
+rate_limit_signaling:
+  headers: [x-rate-limit-limit, x-rate-limit-remaining, x-rate-limit-reset]
+  reset_format: unix timestamp (seconds)
+  status_on_exhaustion: 429
+  retry_after: false
+  detail_artifact: ../rate-limits/x-rate-limits.yml
+  note: >-
+    X does NOT return Retry-After. The reset time is an absolute unix timestamp in
+    x-rate-limit-reset, so a client must compute its own wait.
+metadata:
+  supported: false
+  note: No arbitrary key/value metadata can be attached to X resources by an API caller.
+dry_run_mode:
+  supported: false
+  note: >-
+    No preview/simulate/validate-only mode on any write operation. The closest thing is the
+    self-hosted API Playground mock server (see sandbox/x-sandbox.yml), which is a local
+    stand-in rather than a provider-side dry run.
+reversibility:
+  grade: documented
+  credit: 0.4
+  basis: >-
+    Nearly every write X exposes has a first-class inverse operation published in the same
+    contract, and the inverses are named and easy to find. What is missing is a WINDOW: X
+    does not state a time limit inside which any of these reversals is valid, so the grade
+    stops at `documented` rather than `verified`. No window is asserted here, because
+    asserting one X has not published would be a guess about somebody's data.
+  reversible:
+  - action: Create a Post
+    operationId: createPosts
+    reversal: deletePosts
+    reversal_path: DELETE /2/tweets/{id}
+    window: null
+    window_source: null
+    note: >-
+      Deletion is available with no documented deadline, but it does not refund the write
+      charge and does not un-deliver the post.create webhook event.
+  - action: Like a Post
+    operationId: likePost
+    reversal: unlikePost
+    window: null
+  - action: Repost a Post
+    operationId: repostPost
+    reversal: unrepostPost
+    window: null
+  - action: Follow a user
+    operationId: followUser
+    reversal: unfollowUser
+    window: null
+  - action: Mute a user
+    operationId: muteUser
+    reversal: unmuteUser
+    window: null
+  - action: Block a user's Direct Messages
+    operationId: blockUsersDms
+    reversal: unblockUsersDms
+    window: null
+    note: >-
+      X API v2 exposes no general block/unblock write — only DM-level block, plus a
+      read-only GET /2/users/{id}/blocking lookup.
+  - action: Add a bookmark
+    operationId: createUsersBookmark
+    reversal: deleteUsersBookmark
+    window: null
+  - action: Create a List
+    operationId: createLists
+    reversal: deleteLists
+    window: null
+  - action: Add a List member
+    operationId: addListsMember
+    reversal: removeListsMemberByUserId
+    window: null
+  - action: Follow a List
+    operationId: followList
+    reversal: unfollowList
+    window: null
+  - action: Pin a List
+    operationId: pinList
+    reversal: unpinList
+    window: null
+  - action: Hide a reply
+    operationId: hidePostsReply
+    reversal: hidePostsReply
+    reversal_kind: toggle
+    window: null
+    note: PUT /2/tweets/{tweet_id}/hidden takes a boolean, so hide and unhide are the same operation.
+  - action: Create a webhook
+    operationId: createWebhooks
+    reversal: deleteWebhooks
+    window: null
+  - action: Create an X Activity subscription
+    operationId: createActivitySubscription
+    reversal: deleteActivitySubscription
+    window: null
+  - action: Schedule a broadcast
+    operationId: createScheduledBroadcast
+    reversal: deleteScheduledBroadcast
+    window: null
+  - action: Start a compliance job
+    operationId: createComplianceJobs
+    reversal: deleteComplianceJobsById
+    reversal_kind: cancel
+    window: null
+  - action: Create a bot
+    operationId: createBot
+    reversal: deleteBot
+    window: null
+  irreversible:
+  - action: Send a Direct Message
+    operationId: createDirectMessagesByConversationId
+    note: >-
+      DELETE /2/dm_events/{event_id} removes the event from the API surface; X does not
+      document it as unsending a delivered message, and the dm.received webhook has already
+      fired and been billed.
+  - action: Publish an Article
+    operationId: articlePublish
+    note: No unpublish operation is exposed; the draft/publish pair is one-way.
+  - action: Revoke a bot token
+    operationId: revokeBotToken
+    note: A revoked token cannot be restored; a new one must be minted.
+  - action: Any billed read or write
+    note: >-
+      Charges are not reversible. Deleting a Post does not refund the $0.015 (or $0.20 with a
+      URL) write charge, and resource reads are billed on return, deduplicated only within the
+      same 24-hour UTC window.
+  no_soft_delete: >-
+    X publishes no restore/undelete operation for any resource. Every DELETE above is final
+    for the resource itself.

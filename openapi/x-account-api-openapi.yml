@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: X API v2 Trends API
+  title: X API v2 Account API
   version: '2.168'
-  description: The Trends surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  description: The Account surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
   termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
   contact:
     name: X Developers
@@ -14,47 +14,30 @@ servers:
 - description: X API
   url: https://api.x.com
 tags:
-- name: Trends
-  description: Endpoint for retrieving trends
+- name: Account
+  description: Endpoints for managing the authenticated user's X Developer Platform account
   externalDocs:
     description: Find out more
-    url: https://docs.x.com/x-api/trends/introduction
+    url: https://docs.x.com/x-api/introduction
 paths:
-  /2/trends/by/woeid/{woeid}:
+  /2/account:
     get:
       security:
-      - OAuth2UserToken: []
-      - BearerToken: []
+      - OAuth2UserToken:
+        - developer.read
       tags:
-      - Trends
-      summary: Get Trends by Woeid
-      operationId: getTrendsByWoeid
-      parameters:
-      - name: woeid
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-        style: simple
-      - name: max_trends
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 50
-          format: int32
-          default: 20
-        style: form
-      - $ref: '#/components/parameters/TrendFieldsParameter'
+      - Account
+      summary: Get developer account
+      description: Returns the authenticated user's X Developer Platform account. A user without an account
+        gets a resource-not-found error entry.
+      operationId: getDeveloperAccount
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetTrendsByWoeidResponse'
+                $ref: '#/components/schemas/GetDeveloperAccountResponse'
         default:
           description: The request has failed.
           content:
@@ -64,26 +47,30 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-  /2/users/personalized_trends:
-    get:
+    post:
       security:
       - OAuth2UserToken:
-        - users.read
-        - tweet.read
-      - UserToken: []
+        - developer.write
       tags:
-      - Trends
-      summary: Get Trends Personalized Trends
-      operationId: getTrendsPersonalizedTrends
-      parameters:
-      - $ref: '#/components/parameters/PersonalizedTrendFieldsParameter'
+      - Account
+      summary: Ensure developer account
+      description: 'Creates an X Developer Platform account for the authenticated user if they do not
+        already have one, and returns it. Idempotent: when the user already has an account it is returned
+        unchanged with `created` false.'
+      operationId: ensureAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnsureAccountRequest'
+        required: true
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetTrendsPersonalizedTrendsResponse'
+                $ref: '#/components/schemas/EnsureAccountResponse'
         default:
           description: The request has failed.
           content:
@@ -94,44 +81,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
 components:
-  parameters:
-    TrendFieldsParameter:
-      name: trend.fields
-      in: query
-      description: A comma separated list of Trend fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Trend object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - trend_name
-          - tweet_count
-      explode: false
-      style: form
-    PersonalizedTrendFieldsParameter:
-      name: personalized_trend.fields
-      in: query
-      description: A comma separated list of PersonalizedTrend fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a PersonalizedTrend object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - category
-          - post_count
-          - trend_name
-          - trending_since
-      explode: false
-      style: form
   schemas:
+    GetDeveloperAccountResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GetDeveloperAccountResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     NotAuthorizedForFieldProblem:
       type: object
       required:
@@ -218,24 +177,15 @@ components:
           format: int32
         message:
           type: string
-    GetTrendsByWoeidResponse:
+    EnsureAccountRequest:
       type: object
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Trend'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    Trend:
-      type: object
-      properties:
-        trend_name:
+        metadata:
           type: string
-        tweet_count:
-          type: integer
+          description: Optional provisioning-credit metadata (an opaque string, e.g. a subscription tier)
+            to claim for the account, attributed to the calling app. Omit to just ensure the account.
+          maxLength: 64
+          pattern: ^[\x00-\x{FFFF}]*$
     ResourceNotFoundProblem:
       type: object
       required:
@@ -262,13 +212,11 @@ components:
           - https://api.x.com/2/problems/resource-not-found
         value:
           type: string
-    GetTrendsPersonalizedTrendsResponse:
+    EnsureAccountResponse:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PersonalizedTrend'
+          $ref: '#/components/schemas/EnsureAccountResponseData'
         errors:
           type: array
           items:
@@ -313,17 +261,34 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    PersonalizedTrend:
+    EnsureAccountResponseData:
       type: object
+      required:
+      - account_id
+      - created
       properties:
-        category:
+        account_id:
           type: string
-        post_count:
+          description: Unique identifier of the developer account.
+        created:
+          type: boolean
+          description: Whether this request created the account.
+    GetDeveloperAccountResponseData:
+      type: object
+      required:
+      - account_id
+      - name
+      - created_at
+      properties:
+        account_id:
           type: string
-        trend_name:
+          description: Unique identifier of the developer account.
+        created_at:
           type: string
-        trending_since:
+          description: Creation time of the account (ISO 8601).
+        name:
           type: string
+          description: Display name of the developer account.
     ResourceUnavailableProblem:
       type: object
       required:
@@ -456,9 +421,3 @@ components:
             tweet.read: View all posts you can see, including those from protected accounts.
             tweet.write: Create and repost on your behalf.
             users.read: View any account you can see, including protected accounts.
-    BearerToken:
-      type: http
-      scheme: bearer
-    UserToken:
-      type: http
-      scheme: OAuth

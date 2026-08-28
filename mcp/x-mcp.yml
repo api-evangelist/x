@@ -1,0 +1,100 @@
+generated: '2026-08-28'
+method: probed
+source: https://docs.x.com/tools/mcp.md
+docs: https://docs.x.com/tools/mcp
+description: >-
+  X ships TWO hosted MCP servers: an API server at https://api.x.com/mcp that calls X API
+  v2 endpoints, and a documentation-search server at https://docs.x.com/mcp. Both are
+  Streamable HTTP remote endpoints. The API server also has a first-party local stdio
+  bridge (`xurl mcp`, launched via npx) that owns the OAuth app identity and injects a
+  fresh bearer token, so the deployment mode for X as a provider is `both`.
+deployment:
+  mode: both
+  endpoint: https://api.x.com/mcp
+  install: npx -y @xdevplatform/xurl mcp
+  package: https://www.npmjs.com/package/@xdevplatform/xurl
+  auth: oauth
+  verified: probed
+servers:
+- id: x-mcp
+  name: X MCP
+  endpoint: https://api.x.com/mcp
+  transport: streamable-http
+  protocol_version: '2025-06-18'
+  server_info: xmcp
+  auth: oauth
+  status: live
+  x-evidence:
+    fetched: '2026-08-28'
+    method: POST tools/list
+    http_status: 401
+    body: '{"title":"Unauthorized","type":"about:blank","status":401,"detail":"Unauthorized"}'
+    note: >-
+      The endpoint exists and answers with an RFC 9457 problem document rather than a 404,
+      so the live tool schemas are auth-gated. X documents that api.x.com/mcp does NOT
+      advertise native MCP OAuth discovery and has no dynamic client registration — you
+      bring your own developer app. However, RFC 9728 protected-resource metadata IS served
+      at https://api.x.com/.well-known/oauth-protected-resource and names
+      resource: https://api.x.com/mcp with 15 supported scopes (see well-known/).
+  access:
+  - route: app-only bearer
+    description: Paste an app-only Bearer token as an Authorization header directly on the remote URL. Read-only, no user context.
+  - route: xurl bridge
+    description: Local stdio bridge doing OAuth 2.0 PKCE with auto-refresh. Required for writes (bookmarks, Articles) and any user-context tool.
+    install: npx -y @xdevplatform/xurl mcp
+  tools_source: >-
+    Capability categories below are transcribed from X's own documented capability table at
+    https://docs.x.com/tools/mcp.md. Per-tool inputSchema requires authenticated introspection
+    and has NOT been captured — see mcp/x-tool-crosswalk.yml for the name/semantic binding.
+  capabilities:
+  - category: Posts
+    description: Fetch posts, see likers / reposters / quoters, recent counts
+  - category: Search
+    description: Full-archive post search, user search, news search
+  - category: Users
+    description: Resolve the current user, look up by id / handle, read a user's posts, timeline, and mentions
+  - category: Bookmarks
+    description: List / add / remove bookmarks and manage bookmark folders
+  - category: News & Trends
+    description: Get news stories, get trends for a location (WOEID)
+  - category: Articles
+    description: Create draft Articles and publish them
+- id: x-docs-mcp
+  name: X Docs MCP
+  endpoint: https://docs.x.com/mcp
+  transport: streamable-http
+  auth: none
+  status: live
+  x-evidence:
+    fetched: '2026-08-28'
+    method: POST tools/list
+    http_status: 200
+    content_type: text/event-stream
+    note: Anonymous tools/list returned the real tool list with inputSchema.
+  tools:
+  - name: search_x
+    title: Search documentation
+    description: Search across the X knowledge base for documentation, code examples, API references and guides.
+    inputSchema:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Search query
+      required: [query]
+      additionalProperties: false
+    annotations:
+      readOnlyHint: true
+      destructiveHint: false
+      idempotentHint: true
+      openWorldHint: false
+  - name: query_docs_filesystem_x
+    description: >-
+      Read-only shell-like query (rg/grep/find/tree/ls/cat/head/tail/jq and friends) against a
+      virtualized in-memory filesystem containing only the X documentation pages and OpenAPI specs.
+      Stateless per call; no writes, no network.
+clients_documented:
+- Grok Build
+- Cursor
+- Claude
+- VS Code

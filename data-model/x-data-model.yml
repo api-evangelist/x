@@ -1,0 +1,176 @@
+generated: '2026-08-28'
+method: derived
+source: openapi/_original/x-api-v2-openapi.json
+description: >-
+  Entity/relationship graph of the X API v2, derived from the 555 schemas in X's published
+  OpenAPI. Relationships are read from id-reference properties and expansion targets that
+  exist in the contract; none is inferred from product knowledge. 43 schemas declare an `id`
+  and are treated as addressable entities; the eight below are the core objects the rest hang
+  off, matching X's own "Posts, Users and Spaces are the core objects" statement in AGENTS.md.
+schema_count: 555
+entity_count: 43
+expansion_mechanism:
+  description: >-
+    X returns related objects in a top-level `includes` block rather than nesting them.
+    A caller asks with `expansions=` and selects attributes with the per-type `*.fields`
+    parameters, so the graph below is traversed explicitly, one hop at a time.
+  docs: https://docs.x.com/x-api/fundamentals/expansions
+entities:
+- name: Post
+  properties: 36
+  primary_key: id
+  relationships:
+  - type: belongs_to
+    target: User
+    via: author_id
+  - type: belongs_to
+    target: Post
+    via: conversation_id
+    note: Root Post of the conversation thread.
+  - type: belongs_to
+    target: User
+    via: in_reply_to_user_id
+  - type: belongs_to
+    target: Community
+    via: community_id
+  - type: has_many
+    target: Post
+    via: referenced_posts
+    note: Replies, quotes and reposts, each carrying a type discriminator.
+  - type: has_many
+    target: Post
+    via: edit_history_post_ids
+  - type: has_many
+    target: Media
+    via: attachments.media_keys
+  - type: has_many
+    target: Poll
+    via: attachments.poll_ids
+  - type: has_one
+    target: Place
+    via: geo.place_id
+  - type: has_many
+    target: Note
+    via: matched_media_notes
+    note: Community Notes matched to media in the Post.
+  metrics_objects: [public_metrics, non_public_metrics, organic_metrics, promoted_metrics]
+  access_note: >-
+    non_public_metrics, organic_metrics and promoted_metrics are author-only and require
+    user context; requesting them without authorization yields a not-authorized-for-field problem.
+- name: User
+  properties: 28
+  primary_key: id
+  natural_key: username
+  relationships:
+  - type: has_one
+    target: Post
+    via: pinned_post_id
+  - type: has_one
+    target: Post
+    via: most_recent_post_id
+  - type: has_many
+    target: User
+    via: GET /2/users/{id}/followers
+  - type: has_many
+    target: User
+    via: GET /2/users/{id}/following
+  - type: has_many
+    target: List
+    via: GET /2/users/{id}/owned_lists
+  - type: has_many
+    target: Post
+    via: GET /2/users/{id}/tweets
+  - type: has_many
+    target: Post
+    via: GET /2/users/{id}/liked_tweets
+  connection_status_note: >-
+    connection_status, receives_your_dm, subscribes_to_you and subscribed_to are relationship
+    facts about the CALLER and the user, only populated in user context.
+- name: List
+  properties: 8
+  primary_key: id
+  relationships:
+  - type: belongs_to
+    target: User
+    via: owner_id
+  - type: has_many
+    target: User
+    via: GET /2/lists/{id}/members
+  - type: has_many
+    target: Post
+    via: GET /2/lists/{id}/tweets
+- name: Space
+  properties: 17
+  primary_key: id
+  relationships:
+  - type: belongs_to
+    target: User
+    via: creator_id
+  - type: has_many
+    target: User
+    via: host_ids
+  - type: has_many
+    target: User
+    via: speaker_ids
+  - type: has_many
+    target: User
+    via: invited_user_ids
+  - type: has_many
+    target: Topic
+    via: topic_ids
+- name: DmEvent
+  properties: 10
+  primary_key: id
+  relationships:
+  - type: belongs_to
+    target: DmConversation
+    via: dm_conversation_id
+  - type: belongs_to
+    target: User
+    via: sender_id
+  - type: has_many
+    target: User
+    via: participant_ids
+  - type: has_many
+    target: Post
+    via: referenced_posts
+  - type: has_many
+    target: Media
+    via: attachments
+- name: ChatConversation
+  properties: 13
+  primary_key: id
+  relationships:
+  - type: has_many
+    target: ChatMessageEvent
+    via: GET /2/chat/conversations/{id}/messages
+  note: The X Chat surface is end-to-end encrypted and has its own SDK (@xdevplatform/chat-xdk).
+- name: Community
+  properties: 7
+  primary_key: id
+  relationships:
+  - type: has_many
+    target: Post
+    via: Post.community_id
+- name: Broadcast
+  properties: 26
+  primary_key: id
+  relationships:
+  - type: has_many
+    target: BroadcastChatMessage
+    via: broadcast_id
+  - type: has_one
+    target: Media
+    via: thumbnail_media_id
+supporting_entities: [Media, Poll, Place, Note, Analytics, ComplianceJob, Connection, WebhookConfig, News, Topic]
+id_conventions:
+  prefixes: none
+  note: >-
+    X ids are opaque numeric strings (snowflake ids) with NO type prefix — a Post id and a
+    User id are indistinguishable by shape. An agent must track which id came from which
+    field; there is no self-describing identifier convention as with prefixed-id APIs.
+  legacy_naming: >-
+    The contract still uses `tweet_id`, `liked_tweets`, `retweets` and `/2/tweets` in paths and
+    parameters while the documentation and schemas say "Post". Both vocabularies are live and
+    an agent must map between them.
+render: null

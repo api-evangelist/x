@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: X API v2 Trends API
+  title: X API v2 Communities API
   version: '2.168'
-  description: The Trends surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  description: The Communities surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
   termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
   contact:
     name: X Developers
@@ -14,47 +14,64 @@ servers:
 - description: X API
   url: https://api.x.com
 tags:
-- name: Trends
-  description: Endpoint for retrieving trends
+- name: Communities
+  description: Endpoints related to retrieving and managing Communities
   externalDocs:
     description: Find out more
-    url: https://docs.x.com/x-api/trends/introduction
+    url: https://docs.x.com/x-api/communities/introduction
 paths:
-  /2/trends/by/woeid/{woeid}:
+  /2/communities/search:
     get:
       security:
-      - OAuth2UserToken: []
-      - BearerToken: []
+      - OAuth2UserToken:
+        - tweet.read
+        - users.read
+      - UserToken: []
       tags:
-      - Trends
-      summary: Get Trends by Woeid
-      operationId: getTrendsByWoeid
+      - Communities
+      summary: Search Communities
+      operationId: searchCommunities
       parameters:
-      - name: woeid
-        in: path
+      - name: query
+        in: query
         required: true
         schema:
-          type: integer
-          format: int32
-        style: simple
-      - name: max_trends
+          type: string
+          minLength: 1
+          maxLength: 4096
+        style: form
+      - name: max_results
         in: query
         required: false
         schema:
           type: integer
-          minimum: 1
-          maximum: 50
+          minimum: 10
+          maximum: 100
           format: int32
-          default: 20
+          default: 10
         style: form
-      - $ref: '#/components/parameters/TrendFieldsParameter'
+      - name: next_token
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+        style: form
+      - name: pagination_token
+        in: query
+        required: false
+        schema:
+          type: string
+          minLength: 1
+        style: form
+      - $ref: '#/components/parameters/CommunityFieldsParameter'
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetTrendsByWoeidResponse'
+                $ref: '#/components/schemas/SearchCommunitiesResponse'
         default:
           description: The request has failed.
           content:
@@ -64,26 +81,34 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-  /2/users/personalized_trends:
+  /2/communities/{id}:
     get:
       security:
       - OAuth2UserToken:
         - users.read
         - tweet.read
+        - list.read
       - UserToken: []
+      - BearerToken: []
       tags:
-      - Trends
-      summary: Get Trends Personalized Trends
-      operationId: getTrendsPersonalizedTrends
+      - Communities
+      summary: Get Communities by ID
+      operationId: getCommunitiesById
       parameters:
-      - $ref: '#/components/parameters/PersonalizedTrendFieldsParameter'
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/CommunityId'
+        style: simple
+      - $ref: '#/components/parameters/CommunityFieldsParameter'
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetTrendsPersonalizedTrendsResponse'
+                $ref: '#/components/schemas/GetCommunitiesByIdResponse'
         default:
           description: The request has failed.
           content:
@@ -94,43 +119,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
 components:
-  parameters:
-    TrendFieldsParameter:
-      name: trend.fields
-      in: query
-      description: A comma separated list of Trend fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Trend object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - trend_name
-          - tweet_count
-      explode: false
-      style: form
-    PersonalizedTrendFieldsParameter:
-      name: personalized_trend.fields
-      in: query
-      description: A comma separated list of PersonalizedTrend fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a PersonalizedTrend object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - category
-          - post_count
-          - trend_name
-          - trending_since
-      explode: false
-      style: form
   schemas:
     NotAuthorizedForFieldProblem:
       type: object
@@ -218,24 +206,6 @@ components:
           format: int32
         message:
           type: string
-    GetTrendsByWoeidResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Trend'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    Trend:
-      type: object
-      properties:
-        trend_name:
-          type: string
-        tweet_count:
-          type: integer
     ResourceNotFoundProblem:
       type: object
       required:
@@ -262,13 +232,11 @@ components:
           - https://api.x.com/2/problems/resource-not-found
         value:
           type: string
-    GetTrendsPersonalizedTrendsResponse:
+    GetCommunitiesByIdResponse:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PersonalizedTrend'
+          $ref: '#/components/schemas/Community'
         errors:
           type: array
           items:
@@ -313,17 +281,6 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    PersonalizedTrend:
-      type: object
-      properties:
-        category:
-          type: string
-        post_count:
-          type: string
-        trend_name:
-          type: string
-        trending_since:
-          type: string
     ResourceUnavailableProblem:
       type: object
       required:
@@ -346,6 +303,10 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/resource-unavailable
+    CommunityId:
+      type: string
+      description: Unique identifier of a Community
+      pattern: ^[0-9]{1,19}$
     FieldUnauthorizedProblem:
       type: object
       required:
@@ -370,6 +331,23 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
+    Community:
+      type: object
+      properties:
+        access:
+          type: string
+        created_at:
+          type: string
+        description:
+          type: string
+        id:
+          type: string
+        join_policy:
+          type: string
+        member_count:
+          type: integer
+        name:
+          type: string
     DisallowedResourceProblem:
       type: object
       required:
@@ -393,6 +371,23 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/disallowed-resource
+    SearchCommunitiesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Community'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
     NotAuthorizedForResourceProblem:
       type: object
       required:
@@ -421,6 +416,29 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-resource
         value:
           type: string
+  parameters:
+    CommunityFieldsParameter:
+      name: community.fields
+      in: query
+      description: A comma separated list of Community fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a Community object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - access
+          - created_at
+          - description
+          - id
+          - join_policy
+          - member_count
+          - name
+      explode: false
+      style: form
   securitySchemes:
     OAuth2UserToken:
       type: oauth2

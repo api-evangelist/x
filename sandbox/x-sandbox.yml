@@ -1,0 +1,56 @@
+generated: '2026-08-28'
+method: searched
+source: https://docs.x.com/tools-and-libraries.md
+description: >-
+  Testing surfaces X publishes for the X API. X operates NO hosted sandbox or test mode:
+  there are no test-vs-live key prefixes, no test fixtures, no time simulation, and every
+  call against api.x.com is a real, billed call against real accounts. What X does publish
+  is a self-hosted mock server, an interactive Postman workspace, and a bot-account facility
+  in the live API for automated testing.
+hosted_sandbox: false
+test_mode: false
+key_prefixes:
+  test: null
+  live: null
+  note: >-
+    X issues one set of credentials per app (API key/secret, app-only Bearer, OAuth 2.0
+    client id/secret). Nothing in the credential distinguishes test from production.
+surfaces:
+- name: X API Playground
+  type: self-hosted mock server
+  url: https://github.com/xdevplatform/playground
+  http_status: 200
+  official: true
+  description: >-
+    Local mock server for testing X API v2 endpoints without spending real credits. X's own
+    Tools & Libraries page frames it exactly that way — cost avoidance, not a provider-side
+    sandbox environment.
+  runs: locally
+- name: Postman public workspace
+  type: interactive collection
+  url: https://www.postman.com/xapidevelopers/x-api-public-workspace/collection/34902927-2efc5689-99c6-4ab6-8091-996f35c2fd80
+  http_status: 200
+  official: true
+  description: Interactive API testing for all v2 endpoints. Calls go to the live API with live credentials.
+- name: Bot accounts
+  type: live-API test identity
+  operations: [createBot, getBots, updateBot, deleteBot, revokeBotToken]
+  description: >-
+    POST /2/bots creates a bot account inside the calling app's project and returns a bearer
+    token, and the operation is documented as idempotent on handle. It gives an automated
+    caller its own identity to act as, but on the production platform, at production prices.
+  source: openapi/_original/x-api-v2-openapi.json
+- name: Developer Console
+  type: console
+  url: https://console.x.com
+  http_status: 200
+  description: Credential management, live usage and cost tracking, spending limits, per-endpoint rate limit tables.
+test_values:
+  published: false
+  note: >-
+    X publishes no test cards, test tokens, test accounts or fixture ids. None are invented here.
+cost_of_testing:
+  note: >-
+    Because every live call is billed per resource or per request, and writes are not
+    refundable, the practical guardrails X offers are the spending limit and auto-recharge
+    settings in the Developer Console plus the 24-hour read deduplication window.

@@ -1,0 +1,775 @@
+openapi: 3.1.0
+info:
+  title: X API v2 Webhooks API
+  version: '2.168'
+  description: The Webhooks surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
+  contact:
+    name: X Developers
+    url: https://developer.x.com/
+  license:
+    name: X Developer Agreement and Policy
+    url: https://developer.x.com/en/developer-terms/agreement-and-policy.html
+servers:
+- description: X API
+  url: https://api.x.com
+tags:
+- name: Webhooks
+  description: Endpoints relating to retrieving, managing webhooks and webhook configs
+  externalDocs:
+    description: Find out more
+    url: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
+paths:
+  /2/tweets/search/webhooks:
+    get:
+      security:
+      - BearerToken: []
+      tags:
+      - Webhooks
+      summary: Get stream links
+      description: Get a list of webhook links associated with a filtered stream ruleset.
+      externalDocs:
+        url: https://docs.x.com/x-api/webhooks/introduction
+      operationId: getWebhooksStreamLinks
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWebhooksStreamLinksResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/tweets/search/webhooks/{webhook_id}:
+    post:
+      security:
+      - BearerToken: []
+      tags:
+      - Webhooks
+      summary: Create stream link
+      description: Creates a link to deliver FilteredStream events to the given webhook.
+      externalDocs:
+        url: https://docs.x.com/x-api/webhooks/introduction
+      operationId: createWebhooksStreamLink
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{1,19}$
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWebhooksStreamLinkResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      security:
+      - BearerToken: []
+      tags:
+      - Webhooks
+      summary: Delete stream link
+      description: Deletes the link delivering FilteredStream events to the given webhook.
+      externalDocs:
+        url: https://docs.x.com/x-api/webhooks/introduction
+      operationId: deleteWebhooksStreamLink
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{1,19}$
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWebhooksStreamLinkResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/webhooks:
+    get:
+      security:
+      - BearerToken: []
+      tags:
+      - Webhooks
+      summary: Get webhook
+      description: Get a list of webhook configs associated with a client app.
+      externalDocs:
+        url: https://docs.x.com/x-api/webhooks/introduction
+      operationId: getWebhooks
+      parameters:
+      - $ref: '#/components/parameters/WebhookConfigFieldsParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWebhooksResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      security:
+      - UserToken: []
+      - BearerToken: []
+      tags:
+      - Webhooks
+      summary: Create webhook
+      description: Creates a new webhook configuration.
+      externalDocs:
+        url: https://docs.x.com/x-api/webhooks/introduction
+      operationId: createWebhooks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhooksRequest'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWebhooksResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/webhooks/replay:
+    post:
+      security:
+      - BearerToken: []
+      tags:
+      - Webhooks
+      summary: Create replay job for webhook
+      description: Creates a replay job to retrieve events from up to the past 24 hours for all events
+        delivered or attempted to be delivered to the webhook.
+      externalDocs:
+        url: https://docs.x.com/x-api/webhooks/introduction
+      operationId: createWebhookReplayJob
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookReplayJobRequest'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWebhookReplayJobResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+  /2/webhooks/{webhook_id}:
+    put:
+      security:
+      - UserToken: []
+      - BearerToken: []
+      tags:
+      - Webhooks
+      summary: Validate webhook
+      description: Triggers a CRC check for a given webhook.
+      externalDocs:
+        url: https://docs.x.com/x-api/webhooks/introduction
+      operationId: validateWebhooks
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{1,19}$
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateWebhooksResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    delete:
+      security:
+      - UserToken: []
+      - BearerToken: []
+      tags:
+      - Webhooks
+      summary: Delete webhook
+      description: Deletes an existing webhook configuration.
+      externalDocs:
+        url: https://docs.x.com/x-api/webhooks/introduction
+      operationId: deleteWebhooks
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{1,19}$
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteWebhooksResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  schemas:
+    CreateWebhookReplayJobResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateWebhookReplayJobResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    NotAuthorizedForFieldProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
+          type: string
+    InvalidRequestProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    WebhookConfig:
+      type: object
+      properties:
+        created_at:
+          type: string
+        id:
+          type: string
+        url:
+          type: string
+        valid:
+          type: boolean
+    CreateWebhooksRequest:
+      type: object
+      required:
+      - url
+      properties:
+        url:
+          type: string
+          description: The URL the webhook delivers events to.
+          minLength: 1
+          maxLength: 200
+    DeleteWebhooksResponseData:
+      type: object
+      required:
+      - deleted
+      properties:
+        deleted:
+          type: boolean
+          description: Indicates whether the webhook configuration was deleted.
+    ResourceNotFoundProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    CreateWebhookReplayJobRequest:
+      type: object
+      required:
+      - webhook_id
+      - from_date
+      - to_date
+      properties:
+        from_date:
+          type: string
+          description: The oldest (inclusive) UTC timestamp from which events are replayed, in yyyymmddhhmm
+            format.
+          pattern: ^[0-9]{12}$
+        to_date:
+          type: string
+          description: The newest (inclusive) UTC timestamp up to which events are replayed, in yyyymmddhhmm
+            format.
+          pattern: ^[0-9]{12}$
+        webhook_id:
+          type: string
+          description: The ID of the webhook to replay events to.
+          pattern: ^[0-9]{1,19}$
+    CreateWebhooksResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateWebhooksResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    CreateWebhookReplayJobResponseData:
+      type: object
+      required:
+      - job_id
+      - created_at
+      properties:
+        created_at:
+          type: string
+          description: The UTC timestamp when the replay job was created.
+        job_id:
+          type: string
+          description: The unique identifier for the initiated replay job.
+    GetWebhooksStreamLinksResponseData:
+      type: object
+      properties:
+        application_id:
+          type: string
+          description: The application ID
+        business_user_id:
+          type: string
+          description: The user ID
+        created_at:
+          type: string
+          description: The datetime the webhook was linked to the stream
+        fields:
+          type: array
+          description: Requested fields to be rendered
+          items:
+            type: string
+        instance_id:
+          type: string
+          description: The stream ID associated with the FilteredStream instance
+        webhook_id:
+          type: string
+          description: The unique identifier for the webhook
+    ValidateWebhooksResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ValidateWebhooksResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    Problem:
+      oneOf:
+      - $ref: '#/components/schemas/ResourceNotFoundProblem'
+      - $ref: '#/components/schemas/InvalidRequestProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
+      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
+      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
+      - $ref: '#/components/schemas/ResourceUnavailableProblem'
+      - $ref: '#/components/schemas/DisallowedResourceProblem'
+      - $ref: '#/components/schemas/InternalErrorProblem'
+      discriminator:
+        propertyName: type
+        mapping:
+          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
+          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
+          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
+          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
+          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
+          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
+          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
+          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
+          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    GetWebhooksResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookConfig'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    DeleteWebhooksResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteWebhooksResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetWebhooksStreamLinksResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetWebhooksStreamLinksResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    DeleteWebhooksStreamLinkResponseData:
+      type: object
+      required:
+      - deleted
+      properties:
+        deleted:
+          type: boolean
+          description: Indicates whether the stream link was deleted.
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    ValidateWebhooksResponseData:
+      type: object
+      required:
+      - valid
+      properties:
+        valid:
+          type: boolean
+          description: Indicates whether the CRC validation check was triggered.
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    DeleteWebhooksStreamLinkResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteWebhooksStreamLinkResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    CreateWebhooksResponseData:
+      type: object
+      required:
+      - id
+      - url
+      - valid
+      - created_at
+      properties:
+        created_at:
+          type: string
+          description: Creation time of the webhook configuration.
+        id:
+          type: string
+          description: Unique identifier of the webhook configuration.
+        url:
+          type: string
+          description: The URL the webhook delivers events to.
+        valid:
+          type: boolean
+          description: Indicates whether the webhook URL passed validation.
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    FieldUnauthorizedProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-unauthorized
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    CreateWebhooksStreamLinkResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateWebhooksStreamLinkResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    CreateWebhooksStreamLinkResponseData:
+      type: object
+      required:
+      - provisioned
+      properties:
+        provisioned:
+          type: boolean
+          description: Indicates whether the stream link was provisioned.
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+  parameters:
+    WebhookConfigFieldsParameter:
+      name: webhook_config.fields
+      in: query
+      description: A comma separated list of WebhookConfig fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a WebhookConfig object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - created_at
+          - id
+          - url
+          - valid
+      explode: false
+      style: form
+  securitySchemes:
+    BearerToken:
+      type: http
+      scheme: bearer
+    UserToken:
+      type: http
+      scheme: OAuth
