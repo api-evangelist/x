@@ -1,8 +1,8 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: X API v2 General API
+  description: X API v2 core endpoints
   version: '2.168'
-  description: The General surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  title: X API v2 General API
   termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
   contact:
     name: X Developers
@@ -35,3 +35,44 @@ paths:
             application/json:
               schema:
                 type: object
+components:
+  securitySchemes:
+    BearerToken:
+      type: http
+      scheme: bearer
+    OAuth2UserToken:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.x.com/2/oauth2/authorize
+          tokenUrl: https://api.x.com/2/oauth2/token
+          scopes:
+            block.read: View accounts you have blocked.
+            block.write: Block and unblock accounts on your behalf.
+            bookmark.read: Read your bookmarked Posts.
+            bookmark.write: Create and delete your bookmarks.
+            broadcast.read: View your live broadcasts and their chat.
+            broadcast.write: Manage your live broadcasts and send chat messages on your behalf.
+            developer.read: View your developer accounts, apps, and settings.
+            developer.write: Create and manage your X Developer Platform account.
+            dm.read: Read all your Direct Messages.
+            dm.write: Send and manage your Direct Messages.
+            follows.read: View accounts you follow and accounts following you.
+            follows.write: Follow and unfollow accounts on your behalf.
+            like.read: View Posts you have liked and likes you can see.
+            like.write: Like and unlike Posts on your behalf.
+            list.read: View Lists, members, and followers of Lists you created or are a member of, including private Lists.
+            list.write: Create and manage Lists on your behalf.
+            media.write: Upload media, such as photos and videos, on your behalf.
+            mute.read: View accounts you have muted.
+            mute.write: Mute and unmute accounts on your behalf.
+            offline.access: Request a refresh token for the app.
+            space.read: View all Spaces you have access to.
+            timeline.read: View all Custom Timelines you can see.
+            tweet.moderate.write: Hide and unhide replies to your posts.
+            tweet.read: View all posts you can see, including those from protected accounts.
+            tweet.write: Create and repost on your behalf.
+            users.read: View any account you can see, including protected accounts.
+    UserToken:
+      type: http
+      scheme: OAuth

@@ -1,8 +1,8 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: X API v2 Connections API
+  description: X API v2 core endpoints
   version: '2.168'
-  description: The Connections surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  title: X API v2 Connections API
   termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
   contact:
     name: X Developers
@@ -21,14 +21,43 @@ tags:
     url: https://developer.x.com/en/docs/x-api/connections
 paths:
   /2/connections:
+    delete:
+      security:
+      - BearerToken: []
+      tags:
+      - Connections
+      summary: Terminate multiple connections
+      description: Terminates multiple streaming connections by their UUIDs for the authenticated application.
+      operationId: deleteConnectionsByUuids
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteConnectionsByUuidsRequest'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteConnectionsByUuidsResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
     get:
       security:
       - BearerToken: []
       tags:
       - Connections
       summary: Get Connection History
-      description: Returns active and historical streaming connections with disconnect reasons for the
-        authenticated application.
+      description: Returns active and historical streaming connections with disconnect reasons for the authenticated application.
       operationId: getConnectionHistory
       parameters:
       - name: status
@@ -100,36 +129,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-    delete:
-      security:
-      - BearerToken: []
-      tags:
-      - Connections
-      summary: Terminate multiple connections
-      description: Terminates multiple streaming connections by their UUIDs for the authenticated application.
-      operationId: deleteConnectionsByUuids
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeleteConnectionsByUuidsRequest'
-        required: true
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeleteConnectionsByUuidsResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
   /2/connections/all:
     delete:
       security:
@@ -164,8 +163,7 @@ paths:
       tags:
       - Connections
       summary: Terminate connections by endpoint
-      description: Terminates all streaming connections for a specific endpoint ID for the authenticated
-        application.
+      description: Terminates all streaming connections for a specific endpoint ID for the authenticated application.
       operationId: deleteConnectionsByEndpoint
       parameters:
       - name: endpoint_id
@@ -207,6 +205,96 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    DeleteConnectionsByEndpointResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteConnectionsByEndpointResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+    DeleteAllConnectionsResponseData:
+      type: object
+      required:
+      - successful_kills
+      - failed_kills
+      properties:
+        failed_kills:
+          type: integer
+          description: Number of connections that could not be terminated.
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteAllConnectionsResponseDataResults'
+        successful_kills:
+          type: integer
+          description: Number of connections successfully terminated.
+    DeleteConnectionsByEndpointResponseDataResults:
+      type: object
+      required:
+      - uuid
+      - success
+      properties:
+        error_message:
+          type: string
+        success:
+          type: boolean
+        uuid:
+          type: string
+      additionalProperties: false
     NotAuthorizedForFieldProblem:
       type: object
       required:
@@ -237,74 +325,18 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
           type: string
-    InvalidRequestProblem:
+    DeleteAllConnectionsResponseDataResults:
       type: object
       required:
-      - type
-      - title
-      - detail
+      - uuid
+      - success
       properties:
-        detail:
+        error_message:
           type: string
-        parameter:
+        success:
+          type: boolean
+        uuid:
           type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/invalid-request
-        value:
-          type: string
-    DeleteConnectionsByUuidsResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteConnectionsByUuidsResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    DeleteConnectionsByUuidsRequest:
-      type: object
-      required:
-      - uuids
-      properties:
-        uuids:
-          type: array
-          description: Connection UUIDs to terminate (1-100).
-          minItems: 1
-          maxItems: 100
-          items:
-            type: string
       additionalProperties: false
     GetConnectionHistoryResponse:
       type: object
@@ -343,15 +375,138 @@ components:
         successful_kills:
           type: integer
           description: Number of connections successfully terminated.
-    DeleteAllConnectionsResponse:
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    InvalidRequestProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    DeleteConnectionsByUuidsResponseDataResults:
+      type: object
+      required:
+      - uuid
+      - success
+      properties:
+        error_message:
+          type: string
+        success:
+          type: boolean
+        uuid:
+          type: string
+      additionalProperties: false
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    DeleteConnectionsByUuidsResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/DeleteAllConnectionsResponseData'
+          $ref: '#/components/schemas/DeleteConnectionsByUuidsResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
+    DeleteConnectionsByEndpointResponseData:
+      type: object
+      required:
+      - successful_kills
+      - failed_kills
+      properties:
+        failed_kills:
+          type: integer
+          description: Number of connections that could not be terminated.
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteConnectionsByEndpointResponseDataResults'
+        successful_kills:
+          type: integer
+          description: Number of connections successfully terminated.
     Problem:
       oneOf:
       - $ref: '#/components/schemas/ResourceNotFoundProblem'
@@ -375,23 +530,16 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    DeleteConnectionsByEndpointResponseData:
+    DeleteAllConnectionsResponse:
       type: object
-      required:
-      - successful_kills
-      - failed_kills
       properties:
-        failed_kills:
-          type: integer
-          description: Number of connections that could not be terminated.
-        results:
+        data:
+          $ref: '#/components/schemas/DeleteAllConnectionsResponseData'
+        errors:
           type: array
           items:
-            $ref: '#/components/schemas/DeleteConnectionsByEndpointResponseDataResults'
-        successful_kills:
-          type: integer
-          description: Number of connections successfully terminated.
-    NotAuthorizedForResourceProblem:
+            $ref: '#/components/schemas/Problem'
+    ResourceNotFoundProblem:
       type: object
       required:
       - type
@@ -407,8 +555,6 @@ components:
           type: string
         resource_type:
           type: string
-        section:
-          type: string
         status:
           type: integer
         title:
@@ -416,147 +562,9 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
+          - https://api.x.com/2/problems/resource-not-found
         value:
           type: string
-    DeleteAllConnectionsResponseDataResults:
-      type: object
-      required:
-      - uuid
-      - success
-      properties:
-        error_message:
-          type: string
-        success:
-          type: boolean
-        uuid:
-          type: string
-      additionalProperties: false
-    DeleteConnectionsByEndpointResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteConnectionsByEndpointResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    InternalErrorProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    DeleteConnectionsByEndpointResponseDataResults:
-      type: object
-      required:
-      - uuid
-      - success
-      properties:
-        error_message:
-          type: string
-        success:
-          type: boolean
-        uuid:
-          type: string
-      additionalProperties: false
-    DeleteAllConnectionsResponseData:
-      type: object
-      required:
-      - successful_kills
-      - failed_kills
-      properties:
-        failed_kills:
-          type: integer
-          description: Number of connections that could not be terminated.
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/DeleteAllConnectionsResponseDataResults'
-        successful_kills:
-          type: integer
-          description: Number of connections successfully terminated.
-    DeleteConnectionsByUuidsResponseDataResults:
-      type: object
-      required:
-      - uuid
-      - success
-      properties:
-        error_message:
-          type: string
-        success:
-          type: boolean
-        uuid:
-          type: string
-      additionalProperties: false
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
     FieldUnauthorizedProblem:
       type: object
       required:
@@ -581,29 +589,19 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
-    DisallowedResourceProblem:
+    DeleteConnectionsByUuidsRequest:
       type: object
       required:
-      - type
-      - title
-      - detail
+      - uuids
       properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
+        uuids:
+          type: array
+          description: Connection UUIDs to terminate (1-100).
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+      additionalProperties: false
     Connection:
       type: object
       properties:
@@ -647,3 +645,39 @@ components:
     BearerToken:
       type: http
       scheme: bearer
+    OAuth2UserToken:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.x.com/2/oauth2/authorize
+          tokenUrl: https://api.x.com/2/oauth2/token
+          scopes:
+            block.read: View accounts you have blocked.
+            block.write: Block and unblock accounts on your behalf.
+            bookmark.read: Read your bookmarked Posts.
+            bookmark.write: Create and delete your bookmarks.
+            broadcast.read: View your live broadcasts and their chat.
+            broadcast.write: Manage your live broadcasts and send chat messages on your behalf.
+            developer.read: View your developer accounts, apps, and settings.
+            developer.write: Create and manage your X Developer Platform account.
+            dm.read: Read all your Direct Messages.
+            dm.write: Send and manage your Direct Messages.
+            follows.read: View accounts you follow and accounts following you.
+            follows.write: Follow and unfollow accounts on your behalf.
+            like.read: View Posts you have liked and likes you can see.
+            like.write: Like and unlike Posts on your behalf.
+            list.read: View Lists, members, and followers of Lists you created or are a member of, including private Lists.
+            list.write: Create and manage Lists on your behalf.
+            media.write: Upload media, such as photos and videos, on your behalf.
+            mute.read: View accounts you have muted.
+            mute.write: Mute and unmute accounts on your behalf.
+            offline.access: Request a refresh token for the app.
+            space.read: View all Spaces you have access to.
+            timeline.read: View all Custom Timelines you can see.
+            tweet.moderate.write: Hide and unhide replies to your posts.
+            tweet.read: View all posts you can see, including those from protected accounts.
+            tweet.write: Create and repost on your behalf.
+            users.read: View any account you can see, including protected accounts.
+    UserToken:
+      type: http
+      scheme: OAuth

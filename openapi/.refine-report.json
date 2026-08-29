@@ -1,23 +1,68 @@
 {
   "provider": "x",
   "sources": [
-    "x-posts-api-openapi.yml",
-    "x-trends-api-openapi.yml",
-    "x-users-api-openapi.yml"
+    "_original/x-api-v2-openapi.json",
+    "_original/x-openapi.yml"
   ],
   "outputs": [
+    "x-account-api-openapi.yml",
+    "x-account-activity-api-openapi.yml",
+    "x-activity-api-openapi.yml",
+    "x-articles-api-openapi.yml",
+    "x-bots-api-openapi.yml",
+    "x-broadcasts-api-openapi.yml",
+    "x-chat-api-openapi.yml",
+    "x-communities-api-openapi.yml",
+    "x-community-notes-api-openapi.yml",
+    "x-compliance-api-openapi.yml",
+    "x-connections-api-openapi.yml",
+    "x-direct-messages-api-openapi.yml",
+    "x-general-api-openapi.yml",
+    "x-lists-api-openapi.yml",
+    "x-media-api-openapi.yml",
+    "x-news-api-openapi.yml",
     "x-posts-api-openapi.yml",
+    "x-spaces-api-openapi.yml",
+    "x-stream-api-openapi.yml",
     "x-trends-api-openapi.yml",
-    "x-users-api-openapi.yml"
+    "x-usage-api-openapi.yml",
+    "x-users-api-openapi.yml",
+    "x-webhooks-api-openapi.yml"
   ],
   "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
-    "x-posts-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "x-trends-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "x-users-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "apis.yml register: already-registered"
+    "sourced from openapi/_original/ (2 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "x-api-v2-openapi.json: upgraded openapi 3.0.0 -> OpenAPI 3.2.0",
+    "x-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "tag 'Posts' spans 2 source specs (x-api-v2-openapi.json, x-openapi.yml): per-path servers applied",
+    "tag 'Trends' spans 2 source specs (x-api-v2-openapi.json, x-openapi.yml): per-path servers applied",
+    "tag 'Users' spans 2 source specs (x-api-v2-openapi.json, x-openapi.yml): per-path servers applied"
   ],
-  "skipped": []
+  "skipped": [
+    "x-account-activity-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-account-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-activity-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-articles-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-bots-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-broadcasts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-chat-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-communities-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-community-notes-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-compliance-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-connections-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-direct-messages-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-general-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-lists-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-media-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-news-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-posts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-spaces-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-stream-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-trends-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-usage-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-users-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "x-webhooks-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

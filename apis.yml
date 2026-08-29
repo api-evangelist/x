@@ -60,6 +60,8 @@ modified: '2026-08-28'
 url: https://raw.githubusercontent.com/api-evangelist/x/refs/heads/main/apis.yml
 specificationVersion: '0.23'
 common:
+- type: AgentSkill
+  url: skills/x-x-skill.md
 - type: Website
   url: https://x.com/
 - type: OpenAPI
@@ -151,31 +153,10 @@ common:
 - type: Postman
   url: https://www.postman.com/xapidevelopers/x-api-public-workspace/collection/34902927-2efc5689-99c6-4ab6-8091-996f35c2fd80
 apis:
-- aid: x:x
-  name: X API v2
-  description: The complete X API v2 as X publishes it — 190 operations across 23 tags, harvested verbatim from
-    https://api.x.com/2/openapi.json (contract version 2.168). The per-tag documents below are mechanically split
-    from this one document.
-  humanURL: https://docs.x.com/x-api/introduction
-  baseURL: https://api.x.com
-  tags:
-  - X API v2
-  properties:
-  - type: OpenAPI
-    url: openapi/_original/x-api-v2-openapi.json
-  - type: Documentation
-    url: https://docs.x.com/x-api/introduction
-  - type: APIReference
-    url: https://docs.x.com/x-api/introduction
-  - type: MCPServer
-    url: mcp/x-mcp.yml
-  - type: AgentSkill
-    url: skills/x-x-skill.md
-  - type: LLMsTxt
-    url: llms/x-llms.txt
 - aid: x:x-account-activity-api
   name: X Account Activity API
-  description: Endpoints relating to retrieving, managing Account Activity subscriptions — 5 operation(s) in the
+  description: >-
+    Endpoints relating to retrieving, managing Account Activity subscriptions — 5 operation(s) in the
     X-published contract.
   humanURL: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
   baseURL: https://api.x.com
@@ -188,8 +169,9 @@ apis:
     url: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
 - aid: x:x-account-api
   name: X Account API
-  description: Endpoints for managing the authenticated user's X Developer Platform account — 2 operation(s) in
-    the X-published contract.
+  description: >-
+    Endpoints for managing the authenticated user's X Developer Platform account — 2 operation(s) in the
+    X-published contract.
   humanURL: https://docs.x.com/x-api/introduction
   baseURL: https://api.x.com
   tags:
@@ -201,7 +183,8 @@ apis:
     url: https://docs.x.com/x-api/introduction
 - aid: x:x-activity-api
   name: X Activity API
-  description: Endpoints relating to retrieving, managing activity subscriptions — 5 operation(s) in the X-published
+  description: >-
+    Endpoints relating to retrieving, managing activity subscriptions — 5 operation(s) in the X-published
     contract.
   humanURL: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
   baseURL: https://api.x.com
@@ -214,7 +197,8 @@ apis:
     url: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
 - aid: x:x-articles-api
   name: X Articles API
-  description: Endpoints related to retrieving, creating & modifying Articles — 2 operation(s) in the X-published
+  description: >-
+    Endpoints related to retrieving, creating & modifying Articles — 2 operation(s) in the X-published
     contract.
   humanURL: https://docs.x.com/x-api/articles/introduction
   baseURL: https://api.x.com
@@ -237,7 +221,8 @@ apis:
     url: openapi/x-bots-api-openapi.yml
 - aid: x:x-broadcasts-api
   name: X Broadcasts API
-  description: Endpoints related to live broadcasts and their chat — 13 operation(s) in the X-published contract.
+  description: >-
+    Endpoints related to live broadcasts and their chat — 13 operation(s) in the X-published contract.
   humanURL: https://developer.x.com/
   baseURL: https://api.x.com
   tags:
@@ -249,7 +234,8 @@ apis:
     url: https://developer.x.com/
 - aid: x:x-chat-api
   name: X Chat API
-  description: Endpoints related to Chat encrypted messaging — 16 operation(s) in the X-published contract.
+  description: >-
+    Endpoints related to Chat encrypted messaging — 16 operation(s) in the X-published contract.
   humanURL: https://developer.x.com/
   baseURL: https://api.x.com
   tags:
@@ -261,7 +247,8 @@ apis:
     url: https://developer.x.com/
 - aid: x:x-communities-api
   name: X Communities API
-  description: Endpoints related to retrieving and managing Communities — 2 operation(s) in the X-published contract.
+  description: >-
+    Endpoints related to retrieving and managing Communities — 2 operation(s) in the X-published contract.
   humanURL: https://docs.x.com/x-api/communities/introduction
   baseURL: https://api.x.com
   tags:
@@ -273,7 +260,8 @@ apis:
     url: https://docs.x.com/x-api/communities/introduction
 - aid: x:x-community-notes-api
   name: X Community Notes API
-  description: Endpoints related to retrieving, searching, and modifying Community Notes — 5 operation(s) in the
+  description: >-
+    Endpoints related to retrieving, searching, and modifying Community Notes — 5 operation(s) in the
     X-published contract.
   humanURL: https://docs.x.com/x-api/community-notes/introduction
   baseURL: https://api.x.com
@@ -286,7 +274,8 @@ apis:
     url: https://docs.x.com/x-api/community-notes/introduction
 - aid: x:x-compliance-api
   name: X Compliance API
-  description: Endpoints related to keeping X data in your systems compliant — 6 operation(s) in the X-published
+  description: >-
+    Endpoints related to keeping X data in your systems compliant — 6 operation(s) in the X-published
     contract.
   humanURL: https://docs.x.com/x-api/compliance/batch-compliance/introduction
   baseURL: https://api.x.com
@@ -311,7 +300,8 @@ apis:
     url: https://developer.x.com/en/docs/x-api/connections
 - aid: x:x-direct-messages-api
   name: X Direct Messages API
-  description: Endpoints related to retrieving, managing Direct Messages — 9 operation(s) in the X-published contract.
+  description: >-
+    Endpoints related to retrieving, managing Direct Messages — 9 operation(s) in the X-published contract.
   humanURL: https://docs.x.com/x-api/direct-messages/introduction
   baseURL: https://api.x.com
   tags:
@@ -323,7 +313,8 @@ apis:
     url: https://docs.x.com/x-api/direct-messages/introduction
 - aid: x:x-general-api
   name: X General API
-  description: Miscellaneous endpoints for general API functionality — 1 operation(s) in the X-published contract.
+  description: >-
+    Miscellaneous endpoints for general API functionality — 1 operation(s) in the X-published contract.
   humanURL: https://docs.x.com/x-api/introduction
   baseURL: https://api.x.com
   tags:
@@ -335,7 +326,8 @@ apis:
     url: https://docs.x.com/x-api/introduction
 - aid: x:x-lists-api
   name: X Lists API
-  description: Endpoints related to retrieving, managing Lists — 9 operation(s) in the X-published contract.
+  description: >-
+    Endpoints related to retrieving, managing Lists — 9 operation(s) in the X-published contract.
   humanURL: https://docs.x.com/x-api/lists/introduction
   baseURL: https://api.x.com
   tags:
@@ -347,7 +339,8 @@ apis:
     url: https://docs.x.com/x-api/lists/introduction
 - aid: x:x-media-api
   name: X Media API
-  description: Endpoints related to retrieving and uploading Media — 11 operation(s) in the X-published contract.
+  description: >-
+    Endpoints related to retrieving and uploading Media — 11 operation(s) in the X-published contract.
   humanURL: https://docs.x.com/x-api/media/introduction
   baseURL: https://api.x.com
   tags:
@@ -371,7 +364,8 @@ apis:
     url: https://developer.x.com/
 - aid: x:x-posts-api
   name: X Posts API
-  description: Endpoints related to retrieving, searching, and modifying Posts — 14 operation(s) in the X-published
+  description: >-
+    Endpoints related to retrieving, searching, and modifying Posts — 14 operation(s) in the X-published
     contract.
   humanURL: https://docs.x.com/x-api/posts/introduction
   baseURL: https://api.x.com
@@ -388,7 +382,8 @@ apis:
     url: collections/x-posts-api.postman_collection.json
 - aid: x:x-spaces-api
   name: X Spaces API
-  description: Endpoints related to retrieving, managing Spaces — 6 operation(s) in the X-published contract.
+  description: >-
+    Endpoints related to retrieving, managing Spaces — 6 operation(s) in the X-published contract.
   humanURL: https://docs.x.com/x-api/spaces/introduction
   baseURL: https://api.x.com
   tags:
@@ -440,7 +435,8 @@ apis:
     url: https://docs.x.com/x-api/usage/introduction
 - aid: x:x-users-api
   name: X Users API
-  description: Endpoints related to retrieving, managing relationships of Users — 42 operation(s) in the X-published
+  description: >-
+    Endpoints related to retrieving, managing relationships of Users — 42 operation(s) in the X-published
     contract.
   humanURL: https://docs.x.com/x-api/users/introduction
   baseURL: https://api.x.com
@@ -457,7 +453,8 @@ apis:
     url: collections/x-users-api.postman_collection.json
 - aid: x:x-webhooks-api
   name: X Webhooks API
-  description: Endpoints relating to retrieving, managing webhooks and webhook configs — 8 operation(s) in the X-published
+  description: >-
+    Endpoints relating to retrieving, managing webhooks and webhook configs — 8 operation(s) in the X-published
     contract.
   humanURL: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
   baseURL: https://api.x.com

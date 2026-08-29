@@ -1,8 +1,8 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: X API v2 Stream API
+  description: X API v2 core endpoints
   version: '2.168'
-  description: The Stream surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  title: X API v2 Stream API
   termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
   contact:
     name: X Developers
@@ -44,8 +44,7 @@ paths:
         style: form
       - name: start_time
         in: query
-        description: YYYY-MM-DDTHH:mm:ssZ. The earliest UTC timestamp from which the activities will be
-          provided.
+        description: YYYY-MM-DDTHH:mm:ssZ. The earliest UTC timestamp from which the activities will be provided.
         required: false
         schema:
           type: string
@@ -53,8 +52,7 @@ paths:
         style: form
       - name: end_time
         in: query
-        description: YYYY-MM-DDTHH:mm:ssZ. The latest UTC timestamp from which the activities will be
-          provided.
+        description: YYYY-MM-DDTHH:mm:ssZ. The latest UTC timestamp from which the activities will be provided.
         required: false
         schema:
           type: string
@@ -99,8 +97,7 @@ paths:
         style: form
       - name: start_time
         in: query
-        description: YYYY-MM-DDTHH:mm:ssZ. The earliest UTC timestamp from which the Likes Compliance
-          events will be provided.
+        description: YYYY-MM-DDTHH:mm:ssZ. The earliest UTC timestamp from which the Likes Compliance events will be provided.
         required: false
         schema:
           type: string
@@ -108,8 +105,7 @@ paths:
         style: form
       - name: end_time
         in: query
-        description: YYYY-MM-DDTHH:mm:ssZ. The latest UTC timestamp from which the Likes Compliance events
-          will be provided.
+        description: YYYY-MM-DDTHH:mm:ssZ. The latest UTC timestamp from which the Likes Compliance events will be provided.
         required: false
         schema:
           type: string
@@ -584,8 +580,7 @@ paths:
         style: form
       - name: start_time
         in: query
-        description: YYYY-MM-DDTHH:mm:ssZ. The earliest UTC timestamp from which the Post Compliance events
-          will be provided.
+        description: YYYY-MM-DDTHH:mm:ssZ. The earliest UTC timestamp from which the Post Compliance events will be provided.
         required: false
         schema:
           type: string
@@ -593,8 +588,7 @@ paths:
         style: form
       - name: end_time
         in: query
-        description: YYYY-MM-DDTHH:mm:ssZ. The latest UTC timestamp from which the Post Compliance events
-          will be provided.
+        description: YYYY-MM-DDTHH:mm:ssZ. The latest UTC timestamp from which the Post Compliance events will be provided.
         required: false
         schema:
           type: string
@@ -1844,8 +1838,7 @@ paths:
         style: form
       - name: start_time
         in: query
-        description: YYYY-MM-DDTHH:mm:ssZ. The earliest UTC timestamp from which the Post labels will
-          be provided.
+        description: YYYY-MM-DDTHH:mm:ssZ. The earliest UTC timestamp from which the Post labels will be provided.
         required: false
         schema:
           type: string
@@ -1853,8 +1846,7 @@ paths:
         style: form
       - name: end_time
         in: query
-        description: YYYY-MM-DDTHH:mm:ssZ. The latest UTC timestamp from which the Post labels will be
-          provided.
+        description: YYYY-MM-DDTHH:mm:ssZ. The latest UTC timestamp from which the Post labels will be provided.
         required: false
         schema:
           type: string
@@ -2575,8 +2567,7 @@ paths:
       tags:
       - Stream
       summary: Get filtered-stream rules
-      description: Returns the active filtered-stream rules for the authenticated app. Provide `ids` to
-        fetch specific rules; omit it to list all rules.
+      description: Returns the active filtered-stream rules for the authenticated app. Provide `ids` to fetch specific rules; omit it to list all rules.
       externalDocs:
         url: https://docs.x.com/x-api/posts/rules-lookup
       operationId: getRules
@@ -2633,9 +2624,7 @@ paths:
       tags:
       - Stream
       summary: Update stream rules
-      description: Adds or deletes rules from the active rule set for the filtered stream. Exactly one
-        of `add`, `delete`, or `?delete_all=true` must be specified. Use `?dry_run=true` to validate without
-        committing.
+      description: Adds or deletes rules from the active rule set for the filtered stream. Exactly one of `add`, `delete`, or `?delete_all=true` must be specified. Use `?dry_run=true` to validate without committing.
       externalDocs:
         url: https://docs.x.com/x-api/posts/filtered-stream/integrate/add-or-delete-rules
       operationId: updateRules
@@ -2737,8 +2726,7 @@ paths:
         style: form
       - name: start_time
         in: query
-        description: YYYY-MM-DDTHH:mm:ssZ. The earliest UTC timestamp from which the User Compliance events
-          will be provided.
+        description: YYYY-MM-DDTHH:mm:ssZ. The earliest UTC timestamp from which the User Compliance events will be provided.
         required: false
         schema:
           type: string
@@ -2746,8 +2734,7 @@ paths:
         style: form
       - name: end_time
         in: query
-        description: YYYY-MM-DDTHH:mm:ssZ. The latest UTC timestamp from which the User Compliance events
-          will be provided.
+        description: YYYY-MM-DDTHH:mm:ssZ. The latest UTC timestamp from which the User Compliance events will be provided.
         required: false
         schema:
           type: string
@@ -2772,16 +2759,59 @@ paths:
       x-twitter-streaming: true
 components:
   schemas:
-    InvalidRequestProblem:
+    StreamUsersComplianceResponse:
+      description: User compliance stream events.
+      oneOf:
+      - type: object
+        description: User compliance event.
+        required:
+        - data
+        properties:
+          data:
+            $ref: '#/components/schemas/UserComplianceData'
+      - type: object
+        required:
+        - errors
+        properties:
+          errors:
+            type: array
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/Problem'
+    LikeWithPostAuthor:
+      type: object
+      description: A Like event, with the tweet author user and the tweet being liked
+      properties:
+        created_at:
+          type: string
+          description: Creation time of the Tweet.
+          format: date-time
+          example: '2021-01-06T18:40:40.000Z'
+        id:
+          $ref: '#/components/schemas/LikeId'
+        liked_tweet_id:
+          $ref: '#/components/schemas/PostId'
+        timestamp_ms:
+          type: integer
+          description: Timestamp in milliseconds of creation.
+          format: int32
+        tweet_author_id:
+          $ref: '#/components/schemas/UserId'
+    FieldHydrationFailureProblem:
       type: object
       required:
       - type
       - title
       - detail
+      - field
       properties:
         detail:
           type: string
-        parameter:
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
           type: string
         status:
           type: integer
@@ -2790,105 +2820,508 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/invalid-request
-        value:
-          type: string
-    PostNoteRequestSuggestions:
-      type: array
-      description: Community-Notes request suggestions for this Post.
-      items:
-        type: object
-        description: A Community-Notes request suggestion for this Post.
+          - https://api.x.com/2/problems/field-hydration-failure
+    StreamPostsComplianceResponse:
+      description: Tweet compliance stream events.
+      oneOf:
+      - type: object
+        description: Compliance event.
+        required:
+        - data
         properties:
-          source_link:
-            type: string
-            description: A suggested source link supporting the note request.
-            nullable: true
-          suggestion:
-            type: string
-            description: The text of the note request suggestion.
-            nullable: true
-          suggestion_id:
-            type: string
-            description: The unique identifier of the note request suggestion.
-            nullable: true
-    ProfileUpdateActivityResponsePayload:
+          data:
+            $ref: '#/components/schemas/PostComplianceData'
+      - type: object
+        required:
+        - errors
+        properties:
+          errors:
+            type: array
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/Problem'
+    ActivityEventId:
+      type: string
+      description: The unique identifier of an Activity event.
+      pattern: ^[0-9]{1,19}$
+      example: '1146654567674912769'
+    StreamPostsFirehoseResponse:
       type: object
       properties:
-        after:
+        data:
+          $ref: '#/components/schemas/Post'
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    ActivitySubscriptionFilter:
+      type: object
+      description: An XAA subscription filter.
+      properties:
+        direction:
           type: string
-        before:
-          type: string
+          description: Optional direction filter for directional events.
+          enum:
+          - inbound
+          - outbound
+        keyword:
+          $ref: '#/components/schemas/Keyword'
+        user_id:
+          $ref: '#/components/schemas/UserId'
       additionalProperties: false
-    PostEditControls:
+    Keyword:
+      type: string
+      description: A keyword to filter on.
+      minLength: 1
+      maxLength: 150
+      example: The President
+    GetRuleCountsResponseData:
       type: object
-      description: Indicates how much longer (if at all) this Post can be edited.
+      required:
+      - cap_per_client_app
+      - cap_per_project
+      - project_rules_count
+      - client_app_rules_count
       properties:
-        editable_until:
+        all_project_client_apps:
+          type: array
+          description: Per-client-app rule counts across the project.
+          items:
+            $ref: '#/components/schemas/GetRuleCountsResponseDataAllProjectClientApps'
+        cap_per_client_app:
           type: string
-          description: The time until which this Post can be edited.
-          nullable: true
-        edits_remaining:
-          type: integer
-          description: Number of edits still allowed for this Post.
-          format: int64
-          nullable: true
-        is_edit_eligible:
-          type: boolean
-          description: Indicates whether this Post is eligible to be edited.
-          nullable: true
-    PostGeo:
+          description: Maximum number of rules allowed per client application.
+        cap_per_project:
+          type: string
+          description: Maximum number of rules allowed across the project.
+        client_app_rules_count:
+          description: The calling client application's own rule count.
+          $ref: '#/components/schemas/GetRuleCountsResponseDataClientAppRulesCount'
+        project_rules_count:
+          type: string
+          description: Number of rules across every client application in the project.
+    GetRulesResponse:
       type: object
-      description: The location tagged on the Post, if the user provided one.
       properties:
-        coordinates:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetRulesResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
           type: object
-          description: A GeoJSON Point geometry.
-          required:
-          - type
-          - coordinates
           properties:
-            coordinates:
-              type: array
-              description: '[longitude, latitude].'
-              minItems: 2
-              maxItems: 2
-              items:
-                type: number
-                format: double
-            type:
+            next_token:
               type: string
-              description: The GeoJSON geometry type.
-              enum:
-              - Point
-          nullable: true
-        place_id:
+              description: Pagination token for the next page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    Poll:
+      type: object
+      properties:
+        duration_minutes:
+          type: integer
+        end_datetime:
           type: string
-          description: The unique identifier of the tagged place.
-          nullable: true
-    PostWithheld:
+        id:
+          type: string
+        options:
+          $ref: '#/components/schemas/PollOptions'
+        voting_status:
+          type: string
+    UserWithheld:
       type: object
       description: Withholding details for withheld content.
-      required:
-      - copyright
-      - country_codes
       properties:
-        copyright:
-          type: boolean
-          description: Indicates whether this content is withheld due to a copyright claim.
         country_codes:
-          type: array
-          description: Uppercase ISO 3166-1 alpha-2 country codes where this content is withheld.
+          type:
+          - array
+          - 'null'
+          description: A list of countries (as ISO 3166-1 alpha-2 codes) where this content is withheld.
           items:
             type: string
         scope:
-          type: string
-          description: Whether the withholding applies to a Post or a User.
+          type:
+          - string
+          - 'null'
+          description: The scope of the withholding. Only present, with the value "user", when the entire User is withheld.
           enum:
-          - post
           - user
-          nullable: true
-    GetRuleCountsResponseDataAllProjectClientApps:
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    PostComplianceData:
+      description: Tweet compliance data.
+      oneOf:
+      - $ref: '#/components/schemas/PostDeleteComplianceSchema'
+      - $ref: '#/components/schemas/PostWithheldComplianceSchema'
+      - $ref: '#/components/schemas/PostDropComplianceSchema'
+      - $ref: '#/components/schemas/PostUndropComplianceSchema'
+      - $ref: '#/components/schemas/PostEditComplianceSchema'
+    UserEntities:
+      type: object
+      description: A list of metadata found in the User's profile description.
+      properties:
+        description:
+          type:
+          - object
+          - 'null'
+          description: Entities found in the User's bio.
+          properties:
+            cashtags:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A hashtag or cashtag entity.
+                required:
+                - start
+                - end
+                - tag
+                properties:
+                  end:
+                    type: integer
+                    description: End index in the text (exclusive).
+                    format: int64
+                  start:
+                    type: integer
+                    description: Start index in the text (inclusive).
+                    format: int64
+                  tag:
+                    type: string
+            hashtags:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A hashtag or cashtag entity.
+                required:
+                - start
+                - end
+                - tag
+                properties:
+                  end:
+                    type: integer
+                    description: End index in the text (exclusive).
+                    format: int64
+                  start:
+                    type: integer
+                    description: Start index in the text (inclusive).
+                    format: int64
+                  tag:
+                    type: string
+            mentions:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A user mention entity.
+                required:
+                - start
+                - end
+                - username
+                properties:
+                  end:
+                    type: integer
+                    format: int64
+                  id:
+                    type:
+                    - string
+                    - 'null'
+                  start:
+                    type: integer
+                    format: int64
+                  username:
+                    type: string
+            urls:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A URL entity found in profile text.
+                required:
+                - start
+                - end
+                - url
+                properties:
+                  description:
+                    type:
+                    - string
+                    - 'null'
+                    description: Description of the linked page, when available.
+                  display_url:
+                    type:
+                    - string
+                    - 'null'
+                    description: The URL as displayed in the Post text.
+                  end:
+                    type: integer
+                    format: int64
+                  expanded_url:
+                    type:
+                    - string
+                    - 'null'
+                    description: The fully resolved URL.
+                  images:
+                    type:
+                    - array
+                    - 'null'
+                    items:
+                      type: object
+                      description: A preview image for a linked page.
+                      properties:
+                        height:
+                          type:
+                          - integer
+                          - 'null'
+                          format: int64
+                        url:
+                          type:
+                          - string
+                          - 'null'
+                        width:
+                          type:
+                          - integer
+                          - 'null'
+                          format: int64
+                  media_key:
+                    type:
+                    - string
+                    - 'null'
+                  start:
+                    type: integer
+                    format: int64
+                  status:
+                    type:
+                    - integer
+                    - 'null'
+                    description: HTTP status from resolving the URL.
+                    format: int64
+                  title:
+                    type:
+                    - string
+                    - 'null'
+                    description: Title of the linked page, when available.
+                  unwound_url:
+                    type:
+                    - string
+                    - 'null'
+                    description: The final destination after following redirects.
+                  url:
+                    type: string
+                    description: The t.co shortened URL.
+        url:
+          type:
+          - object
+          - 'null'
+          description: Entities for the User's profile website URL.
+          properties:
+            urls:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A URL entity found in profile text.
+                required:
+                - start
+                - end
+                - url
+                properties:
+                  description:
+                    type:
+                    - string
+                    - 'null'
+                    description: Description of the linked page, when available.
+                  display_url:
+                    type:
+                    - string
+                    - 'null'
+                    description: The URL as displayed in the Post text.
+                  end:
+                    type: integer
+                    format: int64
+                  expanded_url:
+                    type:
+                    - string
+                    - 'null'
+                    description: The fully resolved URL.
+                  images:
+                    type:
+                    - array
+                    - 'null'
+                    items:
+                      type: object
+                      description: A preview image for a linked page.
+                      properties:
+                        height:
+                          type:
+                          - integer
+                          - 'null'
+                          format: int64
+                        url:
+                          type:
+                          - string
+                          - 'null'
+                        width:
+                          type:
+                          - integer
+                          - 'null'
+                          format: int64
+                  media_key:
+                    type:
+                    - string
+                    - 'null'
+                  start:
+                    type: integer
+                    format: int64
+                  status:
+                    type:
+                    - integer
+                    - 'null'
+                    description: HTTP status from resolving the URL.
+                    format: int64
+                  title:
+                    type:
+                    - string
+                    - 'null'
+                    description: Title of the linked page, when available.
+                  unwound_url:
+                    type:
+                    - string
+                    - 'null'
+                    description: The final destination after following redirects.
+                  url:
+                    type: string
+                    description: The t.co shortened URL.
+    PostNotice:
+      type: object
+      required:
+      - tweet
+      - event_type
+      - event_at
+      - application
+      properties:
+        application:
+          type: string
+          description: If the label is being applied or removed. Possible values are ‘apply’ or ‘remove’.
+          example: apply
+        details:
+          type: string
+          description: Information shown on the Tweet label
+        event_at:
+          type: string
+          description: Event time.
+          format: date-time
+          example: '2021-07-06T18:40:40.000Z'
+        event_type:
+          type: string
+          description: The type of label on the Tweet
+          example: misleading
+        extended_details_url:
+          type: string
+          description: Link to more information about this kind of label
+        label_title:
+          type: string
+          description: Title/header of the Tweet label
+        tweet:
+          type: object
+          required:
+          - id
+          - author_id
+          properties:
+            author_id:
+              $ref: '#/components/schemas/UserId'
+            id:
+              $ref: '#/components/schemas/PostId'
+    PostMediaMetadata:
+      type: array
+      description: Metadata for media attached to this Post.
+      items:
+        type: object
+        description: Metadata for one media item attached to this Post.
+        properties:
+          alt_text:
+            type:
+            - string
+            - 'null'
+            description: Alternative text describing the media for accessibility.
+          description:
+            type:
+            - string
+            - 'null'
+            description: Description of the media.
+          media_key:
+            type:
+            - string
+            - 'null'
+            description: The unique identifier of the media.
+          title:
+            type:
+            - string
+            - 'null'
+            description: Title of the media.
+    UpdateRulesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UpdateRulesResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            sent:
+              type: string
+            summary:
+              type: object
+    GetRuleCountsResponseDataClientAppRulesCount:
       type: object
       required:
       - rule_count
@@ -2900,53 +3333,474 @@ components:
           type: integer
           description: Number of rules configured for the client application.
       additionalProperties: false
-    PostContextAnnotations:
-      type: array
-      description: Annotations inferred about the Post (domain and entity context).
-      items:
-        type: object
-        description: A single inferred annotation about the Post (domain and entity context).
-        required:
-        - domain
-        - entity
-        properties:
-          domain:
-            description: The domain (broad category) this annotation belongs to.
-            oneOf:
-            - type: object
-              description: A domain or entity referenced by a context annotation.
-              properties:
-                description:
-                  type: string
-                  nullable: true
-                id:
-                  type: string
-                  nullable: true
-                name:
-                  type: string
-                  nullable: true
-          entity:
-            description: The specific entity recognized within the domain.
-            oneOf:
-            - type: object
-              description: A domain or entity referenced by a context annotation.
-              properties:
-                description:
-                  type: string
-                  nullable: true
-                id:
-                  type: string
-                  nullable: true
-                name:
-                  type: string
-                  nullable: true
-    PostWithheldComplianceSchema:
+    InternalErrorProblem:
       type: object
       required:
-      - withheld
+      - type
+      - title
+      - detail
       properties:
-        withheld:
-          $ref: '#/components/schemas/PostTakedownComplianceSchema'
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    PostEditComplianceSchema:
+      type: object
+      required:
+      - tweet_edit
+      properties:
+        tweet_edit:
+          $ref: '#/components/schemas/PostEditComplianceObjectSchema'
+    StreamPostsFirehosePtResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Post'
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    PostEditControls:
+      type: object
+      description: Indicates how much longer (if at all) this Post can be edited.
+      properties:
+        editable_until:
+          type:
+          - string
+          - 'null'
+          description: The time until which this Post can be edited.
+        edits_remaining:
+          type:
+          - integer
+          - 'null'
+          description: Number of edits still allowed for this Post.
+          format: int64
+        is_edit_eligible:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates whether this Post is eligible to be edited.
+    UserAffiliation:
+      type: object
+      description: Metadata about a user's affiliation.
+      properties:
+        badge_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the affiliation badge image shown on the User's profile.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Description of the affiliation.
+        url:
+          type:
+          - string
+          - 'null'
+          description: URL associated with the affiliation.
+        user_id:
+          type:
+          - array
+          - 'null'
+          description: A list of unique identifiers of the accounts this User is affiliated with.
+          items:
+            type: string
+    FollowActivityResponsePayload:
+      type: object
+      properties:
+        source:
+          $ref: '#/components/schemas/User'
+        target:
+          $ref: '#/components/schemas/User'
+      additionalProperties: false
+    Problem:
+      oneOf:
+      - $ref: '#/components/schemas/ResourceNotFoundProblem'
+      - $ref: '#/components/schemas/InvalidRequestProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
+      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
+      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
+      - $ref: '#/components/schemas/ResourceUnavailableProblem'
+      - $ref: '#/components/schemas/DisallowedResourceProblem'
+      - $ref: '#/components/schemas/InternalErrorProblem'
+      discriminator:
+        propertyName: type
+        mapping:
+          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
+          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
+          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
+          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
+          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
+          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
+          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
+          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
+          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    RuleId:
+      type: string
+      description: Unique identifier of this rule.
+      pattern: ^[0-9]{1,19}$
+      example: '120897978112909812'
+    UserSubscription:
+      type: object
+      description: The subscription relationship between this User and you.
+      required:
+      - subscribes_to_you
+      properties:
+        subscribes_to_you:
+          type: boolean
+          description: Indicates if this User subscribes to you.
+    UserDeleteComplianceSchema:
+      type: object
+      required:
+      - user_delete
+      properties:
+        user_delete:
+          $ref: '#/components/schemas/UserComplianceSchema'
+    PostUndropComplianceSchema:
+      type: object
+      required:
+      - undrop
+      properties:
+        undrop:
+          $ref: '#/components/schemas/PostComplianceSchema'
+    CountryCode:
+      type: string
+      description: A two-letter ISO 3166-1 alpha-2 country code.
+      pattern: ^[A-Z]{2}$
+      example: US
+    PostDropComplianceSchema:
+      type: object
+      required:
+      - drop
+      properties:
+        drop:
+          $ref: '#/components/schemas/PostComplianceSchema'
+    UserScrubGeoObjectSchema:
+      type: object
+      required:
+      - user
+      - up_to_tweet_id
+      - event_at
+      properties:
+        event_at:
+          type: string
+          description: Event time.
+          format: date-time
+          example: '2021-07-06T18:40:40.000Z'
+        up_to_tweet_id:
+          $ref: '#/components/schemas/PostId'
+        user:
+          type: object
+          required:
+          - id
+          properties:
+            id:
+              $ref: '#/components/schemas/UserId'
+    UserProfileModificationObjectSchema:
+      type: object
+      required:
+      - user
+      - profile_field
+      - new_value
+      - event_at
+      properties:
+        event_at:
+          type: string
+          description: Event time.
+          format: date-time
+          example: '2021-07-06T18:40:40.000Z'
+        new_value:
+          type: string
+        profile_field:
+          type: string
+        user:
+          type: object
+          required:
+          - id
+          properties:
+            id:
+              $ref: '#/components/schemas/UserId'
+    PostEditComplianceObjectSchema:
+      type: object
+      required:
+      - tweet
+      - event_at
+      - initial_tweet_id
+      - edit_tweet_ids
+      properties:
+        edit_tweet_ids:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PostId'
+        event_at:
+          type: string
+          description: Event time.
+          format: date-time
+          example: '2021-07-06T18:40:40.000Z'
+        initial_tweet_id:
+          $ref: '#/components/schemas/PostId'
+        tweet:
+          type: object
+          required:
+          - id
+          properties:
+            id:
+              $ref: '#/components/schemas/PostId'
+    StreamPostsFirehoseEnResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Post'
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    UserTakedownComplianceSchema:
+      type: object
+      required:
+      - user
+      - withheld_in_countries
+      - event_at
+      properties:
+        event_at:
+          type: string
+          description: Event time.
+          format: date-time
+          example: '2021-07-06T18:40:40.000Z'
+        user:
+          type: object
+          required:
+          - id
+          properties:
+            id:
+              $ref: '#/components/schemas/UserId'
+        withheld_in_countries:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CountryCode'
+    PostReferencedPosts:
+      type: array
+      description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes the referenced Post's type and ID.
+      items:
+        type: object
+        description: A reference from this Post to another Post (repost, quote, or reply).
+        required:
+        - type
+        - id
+        properties:
+          id:
+            type: string
+            description: Unique identifier of the referenced Post.
+          type:
+            description: How this Post references the other Post.
+            oneOf:
+            - type: string
+              description: The kind of Post-to-Post reference.
+              enum:
+              - retweeted
+              - quoted
+              - replied_to
+    PostComplianceSchema:
+      type: object
+      required:
+      - tweet
+      - event_at
+      properties:
+        event_at:
+          type: string
+          description: Event time.
+          format: date-time
+          example: '2021-07-06T18:40:40.000Z'
+        quote_tweet_id:
+          $ref: '#/components/schemas/PostId'
+        tweet:
+          type: object
+          required:
+          - id
+          - author_id
+          properties:
+            author_id:
+              $ref: '#/components/schemas/UserId'
+            id:
+              $ref: '#/components/schemas/PostId'
+    PostNotePost:
+      type: object
+      description: The full content of the Post, including text beyond 280 characters.
+      required:
+      - text
+      properties:
+        entities:
+          type:
+          - object
+          - 'null'
+          description: Metadata entities (hashtags, cashtags, mentions, URLs) found in the note Post text.
+          properties:
+            cashtags:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A hashtag or cashtag entity.
+                required:
+                - start
+                - end
+                - tag
+                properties:
+                  end:
+                    type: integer
+                    description: End index in the text (exclusive).
+                    format: int64
+                  start:
+                    type: integer
+                    description: Start index in the text (inclusive).
+                    format: int64
+                  tag:
+                    type: string
+            hashtags:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A hashtag or cashtag entity.
+                required:
+                - start
+                - end
+                - tag
+                properties:
+                  end:
+                    type: integer
+                    description: End index in the text (exclusive).
+                    format: int64
+                  start:
+                    type: integer
+                    description: Start index in the text (inclusive).
+                    format: int64
+                  tag:
+                    type: string
+            mentions:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A user mention entity.
+                required:
+                - start
+                - end
+                properties:
+                  end:
+                    type: integer
+                    format: int64
+                  id:
+                    type:
+                    - string
+                    - 'null'
+                  start:
+                    type: integer
+                    format: int64
+                  username:
+                    type:
+                    - string
+                    - 'null'
+            urls:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A URL entity found in note Post text.
+                required:
+                - start
+                - end
+                properties:
+                  display_url:
+                    type:
+                    - string
+                    - 'null'
+                  end:
+                    type: integer
+                    format: int64
+                  expanded_url:
+                    type:
+                    - string
+                    - 'null'
+                  start:
+                    type: integer
+                    format: int64
+                  url:
+                    type:
+                    - string
+                    - 'null'
+        text:
+          type: string
+          description: The full note text of the Post.
+    UserId:
+      type: string
+      description: Unique identifier of a User
+      pattern: ^[0-9]{1,19}$
+      example: '2244994945'
+    StreamPostsFirehoseJaResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Post'
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    PostScopes:
+      type: object
+      description: The scopes for this Post.
+      required:
+      - followers
+      properties:
+        followers:
+          type: boolean
+          description: Indicates whether visibility of this Post is limited to the author's followers.
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
     ActivityStreamResponse:
       type: object
       description: An activity event or error that can be returned by the x activity streaming API.
@@ -2971,108 +3825,81 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/Problem'
-    Keyword:
-      type: string
-      description: A keyword to filter on.
-      minLength: 1
-      maxLength: 150
-      example: The President
-    UserUndeleteComplianceSchema:
+    PostSuggestedSourceLinksWithCounts:
+      type: array
+      description: Suggested source URLs for this Post, each with the number of times it was suggested.
+      items:
+        type: object
+        description: A suggested source URL for this Post with the number of times it was suggested.
+        properties:
+          count:
+            type:
+            - integer
+            - 'null'
+            description: Number of times this source link was suggested.
+            format: int64
+          url:
+            type:
+            - string
+            - 'null'
+            description: The suggested source URL.
+    UpdateRulesResponseData:
       type: object
-      required:
-      - user_undelete
       properties:
-        user_undelete:
-          $ref: '#/components/schemas/UserComplianceSchema'
-    UpdateRulesDelete:
-      type: object
-      properties:
-        ids:
-          type: array
-          description: Rule ids (Snowflake external ids) to delete.
-          items:
-            type: string
-            pattern: ^[0-9]{1,19}$
-        values:
-          type: array
-          description: Rule values to delete.
-          items:
-            type: string
-      additionalProperties: false
-    UpdateRulesAdd:
-      type: object
-      required:
-      - value
-      properties:
+        id:
+          type: string
+          description: Unique identifier of the rule.
         tag:
           type: string
           description: Optional caller-defined label for the rule.
         value:
           type: string
-          description: Rule filter expression.
+          description: The rule's filter expression.
+    UpdateRulesRequest:
+      type: object
+      properties:
+        add:
+          type: array
+          description: Rules to add.
+          items:
+            $ref: '#/components/schemas/UpdateRulesAdd'
+        delete:
+          description: Rules to delete by id or by value.
+          $ref: '#/components/schemas/UpdateRulesDelete'
       additionalProperties: false
-    StreamPostsFirehoseEnResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-    Error:
+    PostNoticeSchema:
       type: object
       required:
-      - code
-      - message
+      - public_tweet_notice
       properties:
-        code:
-          type: integer
-          format: int32
-        message:
+        public_tweet_notice:
+          $ref: '#/components/schemas/PostNotice'
+    Topic:
+      type: object
+      properties:
+        description:
           type: string
-    UserDeleteComplianceSchema:
-      type: object
-      required:
-      - user_delete
-      properties:
-        user_delete:
-          $ref: '#/components/schemas/UserComplianceSchema'
-    StreamPostsFirehoseResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-    ActivityEventId:
+        id:
+          type: string
+        name:
+          type: string
+    LikeId:
       type: string
-      description: The unique identifier of an Activity event.
-      pattern: ^[0-9]{1,19}$
-      example: '1146654567674912769'
-    ActivitySubscriptionFilter:
+      description: The unique identifier of this Like.
+      pattern: ^[A-Za-z0-9_]{1,40}$
+      example: 8ba4f34e6235d905a46bac021d98e923
+    UserProfileModificationComplianceSchema:
       type: object
-      description: An XAA subscription filter.
+      required:
+      - user_profile_modification
       properties:
-        direction:
-          type: string
-          description: Optional direction filter for directional events.
-          enum:
-          - inbound
-          - outbound
-        keyword:
-          $ref: '#/components/schemas/Keyword'
-        user_id:
-          $ref: '#/components/schemas/UserId'
-      additionalProperties: false
+        user_profile_modification:
+          $ref: '#/components/schemas/UserProfileModificationObjectSchema'
+    PlaceContainedWithin:
+      type: array
+      description: A list of unique identifiers of the Places that contain this place.
+      items:
+        type: string
     PostDeleteComplianceSchema:
       type: object
       required:
@@ -3080,120 +3907,383 @@ components:
       properties:
         delete:
           $ref: '#/components/schemas/PostComplianceSchema'
-    PostAttachments:
+    MediaPublicMetrics:
       type: object
-      description: Specifies the type of attachments (if any) present in this Post.
+      description: Public engagement metrics for the media at the time of the request.
+      required:
+      - view_count
       properties:
-        media_keys:
-          type: array
-          description: Media keys of media attached to this Post.
-          items:
-            type: string
-          nullable: true
-        media_source_tweet_id:
-          type: array
-          description: IDs of the source Posts the attached media originated from.
-          items:
-            type: string
-          nullable: true
-        poll_ids:
-          type: array
-          description: IDs of polls attached to this Post.
-          items:
-            type: string
-          nullable: true
-    LikeComplianceSchema:
+        view_count:
+          type: integer
+          description: The number of times this video has been viewed.
+          format: int64
+    UserSuspendComplianceSchema:
       type: object
       required:
-      - delete
+      - user_suspend
       properties:
-        delete:
-          $ref: '#/components/schemas/UnlikeComplianceSchema'
-    User:
+        user_suspend:
+          $ref: '#/components/schemas/UserComplianceSchema'
+    StreamLabelsComplianceResponse:
+      description: Tweet label stream events.
+      oneOf:
+      - type: object
+        description: Tweet Label event.
+        required:
+        - data
+        properties:
+          data:
+            $ref: '#/components/schemas/PostLabelData'
+      - type: object
+        required:
+        - errors
+        properties:
+          errors:
+            type: array
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/Problem'
+    ActivityStreamingResponsePayload:
+      oneOf:
+      - $ref: '#/components/schemas/ProfileUpdateActivityResponsePayload'
+      - $ref: '#/components/schemas/NewsActivityResponsePayload'
+      - $ref: '#/components/schemas/FollowActivityResponsePayload'
+      - $ref: '#/components/schemas/Post'
+      - $ref: '#/components/schemas/PostDeleteActivityResponsePayload'
+      - $ref: '#/components/schemas/LikeWithPostAuthor'
+      discriminator:
+        propertyName: ../event_type
+        mapping:
+          follow.follow: '#/components/schemas/FollowActivityResponsePayload'
+          follow.unfollow: '#/components/schemas/FollowActivityResponsePayload'
+          like.create: '#/components/schemas/LikeWithPostAuthor'
+          news.new: '#/components/schemas/NewsActivityResponsePayload'
+          post.create: '#/components/schemas/Post'
+          post.delete: '#/components/schemas/PostDeleteActivityResponsePayload'
+          post.mention.create: '#/components/schemas/Post'
+          post.quote.create: '#/components/schemas/Post'
+          post.reply.create: '#/components/schemas/Post'
+          post.repost.create: '#/components/schemas/Post'
+          profile.update.affiliate_badge: '#/components/schemas/ProfileUpdateActivityResponsePayload'
+          profile.update.banner_picture: '#/components/schemas/ProfileUpdateActivityResponsePayload'
+          profile.update.bio: '#/components/schemas/ProfileUpdateActivityResponsePayload'
+          profile.update.geo: '#/components/schemas/ProfileUpdateActivityResponsePayload'
+          profile.update.handle: '#/components/schemas/ProfileUpdateActivityResponsePayload'
+          profile.update.profile_picture: '#/components/schemas/ProfileUpdateActivityResponsePayload'
+          profile.update.screenname: '#/components/schemas/ProfileUpdateActivityResponsePayload'
+          profile.update.url: '#/components/schemas/ProfileUpdateActivityResponsePayload'
+          profile.update.verified_badge: '#/components/schemas/ProfileUpdateActivityResponsePayload'
+    PostDisplayTextRange:
+      type: array
+      description: The inclusive start and exclusive end indices of the displayable content of the Post.
+      minItems: 2
+      maxItems: 2
+      items:
+        type: integer
+        format: int64
+    Expansions:
       type: object
       properties:
-        affiliation:
-          $ref: '#/components/schemas/UserAffiliation'
-        confirmed_email:
-          type: string
-        connection_status:
-          $ref: '#/components/schemas/UserConnectionStatus'
-        created_at:
-          type: string
-          description: Creation time of this User.
-          format: date-time
-        description:
-          type: string
-          description: The text of this User's profile description (also known as bio), if the User provided
-            one.
-        entities:
-          $ref: '#/components/schemas/UserEntities'
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        places:
+          type: array
+          items:
+            $ref: '#/components/schemas/Place'
+        polls:
+          type: array
+          items:
+            $ref: '#/components/schemas/Poll'
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        topics:
+          type: array
+          items:
+            $ref: '#/components/schemas/Topic'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    StreamPostsResponse:
+      type: object
+      description: A Tweet or error that can be returned by the streaming Tweet API. The values returned with a successful streamed Tweet includes the user provided rules that the Tweet matched.
+      properties:
+        data:
+          $ref: '#/components/schemas/Post'
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+        matching_rules:
+          type: array
+          description: The list of rules which matched the Tweet
+          items:
+            type: object
+            required:
+            - id
+            properties:
+              id:
+                $ref: '#/components/schemas/RuleId'
+              tag:
+                $ref: '#/components/schemas/RuleTag'
+    StreamLikesComplianceResponse:
+      description: Likes compliance stream events.
+      oneOf:
+      - type: object
+        description: Compliance event.
+        required:
+        - data
+        properties:
+          data:
+            $ref: '#/components/schemas/LikeComplianceSchema'
+      - type: object
+        required:
+        - errors
+        properties:
+          errors:
+            type: array
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/Problem'
+    GetRulesResponseData:
+      type: object
+      properties:
         id:
           type: string
-          description: Unique identifier of this User.
-        is_identity_verified:
-          type: boolean
-          description: Indicates if this User has completed identity verification.
-        location:
+          description: Unique identifier of the rule.
+        tag:
           type: string
-          description: The location specified in the User's profile, if the User provided one. As this
-            is a freeform value, it may not indicate a valid location.
-        most_recent_post_id:
+          description: Optional caller-defined label for the rule.
+        value:
           type: string
-          description: Unique identifier of this User's most recent Post.
-        name:
-          type: string
-          description: The friendly name of this User, as shown on their profile.
-        parody:
-          type: boolean
-          description: Indicates if this User is a parody account.
-        pinned_post_id:
-          type: string
-          description: Unique identifier of this User's pinned Post.
-        profile_banner_url:
-          type: string
-          description: The URL to the profile banner for this User.
-        profile_image_url:
-          type: string
-          description: The URL to the profile image for this User.
-        protected:
-          type: boolean
-          description: Indicates if this User has chosen to protect their Posts (in other words, if this
-            User's Posts are private).
-        public_metrics:
-          $ref: '#/components/schemas/UserPublicMetrics'
-        receives_your_dm:
-          type: boolean
-          description: Indicates if you can send a DM to this User.
-        subscriber_count:
-          type: integer
-          description: The number of Premium subscribers of this User.
-        subscribes_to_you:
-          type: boolean
-          description: Indicates if this User subscribes to you.
-        subscription:
-          $ref: '#/components/schemas/UserSubscription'
-        subscription_type:
-          type: string
-          description: 'The X Blue subscription type of the user, e.g.: Basic, Premium, PremiumPlus or
-            None.'
-        url:
-          type: string
-          description: The URL specified in the User's profile.
-        username:
-          type: string
-          description: The X handle (screen name) of this User.
-        verified:
-          type: boolean
-          description: Indicates if this User is a verified X User.
-        verified_followers_count:
-          type: integer
-          description: The number of verified followers of this User.
-        verified_type:
-          type: string
-          description: 'The X Blue verified type of the user, e.g.: blue, government, business or none.'
+          description: The rule's filter expression.
+    UserUnsuspendComplianceSchema:
+      type: object
+      required:
+      - user_unsuspend
+      properties:
+        user_unsuspend:
+          $ref: '#/components/schemas/UserComplianceSchema'
+    PostGeo:
+      type: object
+      description: The location tagged on the Post, if the user provided one.
+      properties:
+        coordinates:
+          type:
+          - object
+          - 'null'
+          description: A GeoJSON Point geometry.
+          required:
+          - type
+          - coordinates
+          properties:
+            coordinates:
+              type: array
+              description: '[longitude, latitude].'
+              minItems: 2
+              maxItems: 2
+              items:
+                type: number
+                format: double
+            type:
+              type: string
+              description: The GeoJSON geometry type.
+              enum:
+              - Point
+        place_id:
+          type:
+          - string
+          - 'null'
+          description: The unique identifier of the tagged place.
+    PostWithheldComplianceSchema:
+      type: object
+      required:
+      - withheld
+      properties:
         withheld:
-          $ref: '#/components/schemas/UserWithheld'
+          $ref: '#/components/schemas/PostTakedownComplianceSchema'
+    PostEntities:
+      type: object
+      description: A list of metadata entities (hashtags, mentions, URLs) found in the Post text.
+      properties:
+        cashtags:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            description: A hashtag or cashtag entity.
+            required:
+            - start
+            - end
+            - tag
+            properties:
+              end:
+                type: integer
+                description: End index in the text (exclusive).
+                format: int64
+              start:
+                type: integer
+                description: Start index in the text (inclusive).
+                format: int64
+              tag:
+                type: string
+        hashtags:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            description: A hashtag or cashtag entity.
+            required:
+            - start
+            - end
+            - tag
+            properties:
+              end:
+                type: integer
+                description: End index in the text (exclusive).
+                format: int64
+              start:
+                type: integer
+                description: Start index in the text (inclusive).
+                format: int64
+              tag:
+                type: string
+        mentions:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            description: A user mention entity.
+            required:
+            - start
+            - end
+            properties:
+              end:
+                type: integer
+                format: int64
+              id:
+                type:
+                - string
+                - 'null'
+              start:
+                type: integer
+                format: int64
+              username:
+                type:
+                - string
+                - 'null'
+        urls:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            description: A URL entity found in the Post text, enriched with link metadata.
+            required:
+            - start
+            - end
+            properties:
+              description:
+                type:
+                - string
+                - 'null'
+                description: Description of the linked page, when available.
+              display_url:
+                type:
+                - string
+                - 'null'
+                description: The URL as displayed in the Post text.
+              end:
+                type: integer
+                format: int64
+              expanded_url:
+                type:
+                - string
+                - 'null'
+                description: The fully resolved URL.
+              images:
+                type:
+                - array
+                - 'null'
+                items:
+                  type: object
+                  description: A preview image for a linked page.
+                  properties:
+                    height:
+                      type:
+                      - integer
+                      - 'null'
+                      format: int64
+                    url:
+                      type:
+                      - string
+                      - 'null'
+                    width:
+                      type:
+                      - integer
+                      - 'null'
+                      format: int64
+              media_key:
+                type:
+                - string
+                - 'null'
+              start:
+                type: integer
+                format: int64
+              status:
+                type:
+                - integer
+                - 'null'
+                description: HTTP status from resolving the URL.
+                format: int64
+              title:
+                type:
+                - string
+                - 'null'
+                description: Title of the linked page, when available.
+              unwound_url:
+                type:
+                - string
+                - 'null'
+                description: The final destination after following redirects.
+              url:
+                type:
+                - string
+                - 'null'
+                description: The t.co shortened URL.
+    MediaVariants:
+      type: array
+      description: Each media object may have multiple display or playback variants, with different resolutions or formats.
+      items:
+        type: object
+        description: A single playback or display variant of a media object.
+        properties:
+          bit_rate:
+            type:
+            - integer
+            - 'null'
+            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
+            format: int64
+          content_type:
+            type:
+            - string
+            - 'null'
+            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
+          url:
+            type:
+            - string
+            - 'null'
+            description: The URL to this media variant.
     NotAuthorizedForFieldProblem:
       type: object
       required:
@@ -3224,213 +4314,68 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
           type: string
-    PostComplianceSchema:
-      type: object
-      required:
-      - tweet
-      - event_at
-      properties:
-        event_at:
-          type: string
-          description: Event time.
-          format: date-time
-          example: '2021-07-06T18:40:40.000Z'
-        quote_tweet_id:
-          $ref: '#/components/schemas/PostId'
-        tweet:
-          type: object
-          required:
-          - id
-          - author_id
-          properties:
-            author_id:
-              $ref: '#/components/schemas/UserId'
-            id:
-              $ref: '#/components/schemas/PostId'
-    UpdateRulesResponseData:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the rule.
-        tag:
-          type: string
-          description: Optional caller-defined label for the rule.
-        value:
-          type: string
-          description: The rule's filter expression.
-    PostReferencedPosts:
+    PostNoteRequestSuggestions:
       type: array
-      description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes
-        the referenced Post's type and ID.
+      description: Community-Notes request suggestions for this Post.
       items:
         type: object
-        description: A reference from this Post to another Post (repost, quote, or reply).
-        required:
-        - type
-        - id
+        description: A Community-Notes request suggestion for this Post.
         properties:
-          id:
-            type: string
-            description: Unique identifier of the referenced Post.
+          source_link:
+            type:
+            - string
+            - 'null'
+            description: A suggested source link supporting the note request.
+          suggestion:
+            type:
+            - string
+            - 'null'
+            description: The text of the note request suggestion.
+          suggestion_id:
+            type:
+            - string
+            - 'null'
+            description: The unique identifier of the note request suggestion.
+    MediaPromotedMetrics:
+      type: object
+      description: Promoted nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
           type:
-            description: How this Post references the other Post.
-            oneOf:
-            - type: string
-              description: The kind of Post-to-Post reference.
-              enum:
-              - retweeted
-              - quoted
-              - replied_to
-    GetRuleCountsResponseData:
-      type: object
-      required:
-      - cap_per_client_app
-      - cap_per_project
-      - project_rules_count
-      - client_app_rules_count
-      properties:
-        all_project_client_apps:
-          type: array
-          description: Per-client-app rule counts across the project.
-          items:
-            $ref: '#/components/schemas/GetRuleCountsResponseDataAllProjectClientApps'
-        cap_per_client_app:
-          type: string
-          description: Maximum number of rules allowed per client application.
-        cap_per_project:
-          type: string
-          description: Maximum number of rules allowed across the project.
-        client_app_rules_count:
-          description: The calling client application's own rule count.
-          $ref: '#/components/schemas/GetRuleCountsResponseDataClientAppRulesCount'
-        project_rules_count:
-          type: string
-          description: Number of rules across every client application in the project.
-    StreamPostsSampleResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-    PostEditComplianceObjectSchema:
-      type: object
-      required:
-      - tweet
-      - event_at
-      - initial_tweet_id
-      - edit_tweet_ids
-      properties:
-        edit_tweet_ids:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/PostId'
-        event_at:
-          type: string
-          description: Event time.
-          format: date-time
-          example: '2021-07-06T18:40:40.000Z'
-        initial_tweet_id:
-          $ref: '#/components/schemas/PostId'
-        tweet:
-          type: object
-          required:
-          - id
-          properties:
-            id:
-              $ref: '#/components/schemas/PostId'
-    UserScrubGeoObjectSchema:
-      type: object
-      required:
-      - user
-      - up_to_tweet_id
-      - event_at
-      properties:
-        event_at:
-          type: string
-          description: Event time.
-          format: date-time
-          example: '2021-07-06T18:40:40.000Z'
-        up_to_tweet_id:
-          $ref: '#/components/schemas/PostId'
-        user:
-          type: object
-          required:
-          - id
-          properties:
-            id:
-              $ref: '#/components/schemas/UserId'
-    PostUndropComplianceSchema:
-      type: object
-      required:
-      - undrop
-      properties:
-        undrop:
-          $ref: '#/components/schemas/PostComplianceSchema'
-    MediaVariants:
-      type: array
-      description: Each media object may have multiple display or playback variants, with different resolutions
-        or formats.
-      items:
-        type: object
-        description: A single playback or display variant of a media object.
-        properties:
-          bit_rate:
-            type: integer
-            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
-            format: int64
-            nullable: true
-          content_type:
-            type: string
-            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
-            nullable: true
-          url:
-            type: string
-            description: The URL to this media variant.
-            nullable: true
-    UserTakedownComplianceSchema:
-      type: object
-      required:
-      - user
-      - withheld_in_countries
-      - event_at
-      properties:
-        event_at:
-          type: string
-          description: Event time.
-          format: date-time
-          example: '2021-07-06T18:40:40.000Z'
-        user:
-          type: object
-          required:
-          - id
-          properties:
-            id:
-              $ref: '#/components/schemas/UserId'
-        withheld_in_countries:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/CountryCode'
-    StreamPostsFirehoseKoResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+        view_count:
+          type:
+          - integer
+          - 'null'
+          description: The number of promoted views of this video. Null when the backend returns quartile data without a view count.
+          format: int64
     PostUnviewable:
       type: object
       required:
@@ -3457,472 +4402,166 @@ components:
               $ref: '#/components/schemas/UserId'
             id:
               $ref: '#/components/schemas/PostId'
-    PostMatchedMediaNotes:
-      type: array
-      description: Community-Notes media matches for this Post.
-      items:
-        type: object
-        description: A Community-Notes media match for this Post.
-        properties:
-          match_status:
-            type: string
-            description: The status of the media note match.
-            nullable: true
-          note_id:
-            type: string
-            description: The matched note's unique identifier.
-            nullable: true
-    PostNoticeSchema:
+    User:
       type: object
-      required:
-      - public_tweet_notice
       properties:
-        public_tweet_notice:
-          $ref: '#/components/schemas/PostNotice'
-    UserComplianceSchema:
-      type: object
-      required:
-      - user
-      - event_at
-      properties:
-        event_at:
+        affiliation:
+          $ref: '#/components/schemas/UserAffiliation'
+        confirmed_email:
           type: string
-          description: Event time.
+        connection_status:
+          $ref: '#/components/schemas/UserConnectionStatus'
+        created_at:
+          type: string
+          description: Creation time of this User.
           format: date-time
-          example: '2021-07-06T18:40:40.000Z'
-        user:
-          type: object
-          required:
-          - id
-          properties:
-            id:
-              $ref: '#/components/schemas/UserId'
-    UserEntities:
-      type: object
-      description: A list of metadata found in the User's profile description.
-      properties:
         description:
-          type: object
-          description: Entities found in the User's bio.
-          properties:
-            cashtags:
-              type: array
-              items:
-                type: object
-                description: A hashtag or cashtag entity.
-                required:
-                - start
-                - end
-                - tag
-                properties:
-                  end:
-                    type: integer
-                    description: End index in the text (exclusive).
-                    format: int64
-                  start:
-                    type: integer
-                    description: Start index in the text (inclusive).
-                    format: int64
-                  tag:
-                    type: string
-              nullable: true
-            hashtags:
-              type: array
-              items:
-                type: object
-                description: A hashtag or cashtag entity.
-                required:
-                - start
-                - end
-                - tag
-                properties:
-                  end:
-                    type: integer
-                    description: End index in the text (exclusive).
-                    format: int64
-                  start:
-                    type: integer
-                    description: Start index in the text (inclusive).
-                    format: int64
-                  tag:
-                    type: string
-              nullable: true
-            mentions:
-              type: array
-              items:
-                type: object
-                description: A user mention entity.
-                required:
-                - start
-                - end
-                - username
-                properties:
-                  end:
-                    type: integer
-                    format: int64
-                  id:
-                    type: string
-                    nullable: true
-                  start:
-                    type: integer
-                    format: int64
-                  username:
-                    type: string
-              nullable: true
-            urls:
-              type: array
-              items:
-                type: object
-                description: A URL entity found in profile text.
-                required:
-                - start
-                - end
-                - url
-                properties:
-                  description:
-                    type: string
-                    description: Description of the linked page, when available.
-                    nullable: true
-                  display_url:
-                    type: string
-                    description: The URL as displayed in the Post text.
-                    nullable: true
-                  end:
-                    type: integer
-                    format: int64
-                  expanded_url:
-                    type: string
-                    description: The fully resolved URL.
-                    nullable: true
-                  images:
-                    type: array
-                    items:
-                      type: object
-                      description: A preview image for a linked page.
-                      properties:
-                        height:
-                          type: integer
-                          format: int64
-                          nullable: true
-                        url:
-                          type: string
-                          nullable: true
-                        width:
-                          type: integer
-                          format: int64
-                          nullable: true
-                    nullable: true
-                  media_key:
-                    type: string
-                    nullable: true
-                  start:
-                    type: integer
-                    format: int64
-                  status:
-                    type: integer
-                    description: HTTP status from resolving the URL.
-                    format: int64
-                    nullable: true
-                  title:
-                    type: string
-                    description: Title of the linked page, when available.
-                    nullable: true
-                  unwound_url:
-                    type: string
-                    description: The final destination after following redirects.
-                    nullable: true
-                  url:
-                    type: string
-                    description: The t.co shortened URL.
-              nullable: true
-          nullable: true
-        url:
-          type: object
-          description: Entities for the User's profile website URL.
-          properties:
-            urls:
-              type: array
-              items:
-                type: object
-                description: A URL entity found in profile text.
-                required:
-                - start
-                - end
-                - url
-                properties:
-                  description:
-                    type: string
-                    description: Description of the linked page, when available.
-                    nullable: true
-                  display_url:
-                    type: string
-                    description: The URL as displayed in the Post text.
-                    nullable: true
-                  end:
-                    type: integer
-                    format: int64
-                  expanded_url:
-                    type: string
-                    description: The fully resolved URL.
-                    nullable: true
-                  images:
-                    type: array
-                    items:
-                      type: object
-                      description: A preview image for a linked page.
-                      properties:
-                        height:
-                          type: integer
-                          format: int64
-                          nullable: true
-                        url:
-                          type: string
-                          nullable: true
-                        width:
-                          type: integer
-                          format: int64
-                          nullable: true
-                    nullable: true
-                  media_key:
-                    type: string
-                    nullable: true
-                  start:
-                    type: integer
-                    format: int64
-                  status:
-                    type: integer
-                    description: HTTP status from resolving the URL.
-                    format: int64
-                    nullable: true
-                  title:
-                    type: string
-                    description: Title of the linked page, when available.
-                    nullable: true
-                  unwound_url:
-                    type: string
-                    description: The final destination after following redirects.
-                    nullable: true
-                  url:
-                    type: string
-                    description: The t.co shortened URL.
-              nullable: true
-          nullable: true
-    StreamPostsSample10Response:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-    StreamPostsFirehoseJaResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-    StreamUsersComplianceResponse:
-      description: User compliance stream events.
-      oneOf:
-      - type: object
-        description: User compliance event.
-        required:
-        - data
-        properties:
-          data:
-            $ref: '#/components/schemas/UserComplianceData'
-      - type: object
-        required:
-        - errors
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            items:
-              $ref: '#/components/schemas/Problem'
-    PostEntities:
-      type: object
-      description: A list of metadata entities (hashtags, mentions, URLs) found in the Post text.
-      properties:
-        cashtags:
-          type: array
-          items:
-            type: object
-            description: A hashtag or cashtag entity.
-            required:
-            - start
-            - end
-            - tag
-            properties:
-              end:
-                type: integer
-                description: End index in the text (exclusive).
-                format: int64
-              start:
-                type: integer
-                description: Start index in the text (inclusive).
-                format: int64
-              tag:
-                type: string
-          nullable: true
-        hashtags:
-          type: array
-          items:
-            type: object
-            description: A hashtag or cashtag entity.
-            required:
-            - start
-            - end
-            - tag
-            properties:
-              end:
-                type: integer
-                description: End index in the text (exclusive).
-                format: int64
-              start:
-                type: integer
-                description: Start index in the text (inclusive).
-                format: int64
-              tag:
-                type: string
-          nullable: true
-        mentions:
-          type: array
-          items:
-            type: object
-            description: A user mention entity.
-            required:
-            - start
-            - end
-            properties:
-              end:
-                type: integer
-                format: int64
-              id:
-                type: string
-                nullable: true
-              start:
-                type: integer
-                format: int64
-              username:
-                type: string
-                nullable: true
-          nullable: true
-        urls:
-          type: array
-          items:
-            type: object
-            description: A URL entity found in the Post text, enriched with link metadata.
-            required:
-            - start
-            - end
-            properties:
-              description:
-                type: string
-                description: Description of the linked page, when available.
-                nullable: true
-              display_url:
-                type: string
-                description: The URL as displayed in the Post text.
-                nullable: true
-              end:
-                type: integer
-                format: int64
-              expanded_url:
-                type: string
-                description: The fully resolved URL.
-                nullable: true
-              images:
-                type: array
-                items:
-                  type: object
-                  description: A preview image for a linked page.
-                  properties:
-                    height:
-                      type: integer
-                      format: int64
-                      nullable: true
-                    url:
-                      type: string
-                      nullable: true
-                    width:
-                      type: integer
-                      format: int64
-                      nullable: true
-                nullable: true
-              media_key:
-                type: string
-                nullable: true
-              start:
-                type: integer
-                format: int64
-              status:
-                type: integer
-                description: HTTP status from resolving the URL.
-                format: int64
-                nullable: true
-              title:
-                type: string
-                description: Title of the linked page, when available.
-                nullable: true
-              unwound_url:
-                type: string
-                description: The final destination after following redirects.
-                nullable: true
-              url:
-                type: string
-                description: The t.co shortened URL.
-                nullable: true
-          nullable: true
-    UserWithheld:
-      type: object
-      description: Withholding details for withheld content.
-      properties:
-        country_codes:
-          type: array
-          description: A list of countries (as ISO 3166-1 alpha-2 codes) where this content is withheld.
-          items:
-            type: string
-          nullable: true
-        scope:
           type: string
-          description: The scope of the withholding. Only present, with the value "user", when the entire
-            User is withheld.
-          enum:
-          - user
-          nullable: true
-    InternalErrorProblem:
+          description: The text of this User's profile description (also known as bio), if the User provided one.
+        entities:
+          $ref: '#/components/schemas/UserEntities'
+        id:
+          type: string
+          description: Unique identifier of this User.
+        is_identity_verified:
+          type: boolean
+          description: Indicates if this User has completed identity verification.
+        location:
+          type: string
+          description: The location specified in the User's profile, if the User provided one. As this is a freeform value, it may not indicate a valid location.
+        most_recent_post_id:
+          type: string
+          description: Unique identifier of this User's most recent Post.
+        name:
+          type: string
+          description: The friendly name of this User, as shown on their profile.
+        parody:
+          type: boolean
+          description: Indicates if this User is a parody account.
+        pinned_post_id:
+          type: string
+          description: Unique identifier of this User's pinned Post.
+        profile_banner_url:
+          type: string
+          description: The URL to the profile banner for this User.
+        profile_image_url:
+          type: string
+          description: The URL to the profile image for this User.
+        protected:
+          type: boolean
+          description: Indicates if this User has chosen to protect their Posts (in other words, if this User's Posts are private).
+        public_metrics:
+          $ref: '#/components/schemas/UserPublicMetrics'
+        receives_your_dm:
+          type: boolean
+          description: Indicates if you can send a DM to this User.
+        subscriber_count:
+          type: integer
+          description: The number of Premium subscribers of this User.
+        subscribes_to_you:
+          type: boolean
+          description: Indicates if this User subscribes to you.
+        subscription:
+          $ref: '#/components/schemas/UserSubscription'
+        subscription_type:
+          type: string
+          description: 'The X Blue subscription type of the user, e.g.: Basic, Premium, PremiumPlus or None.'
+        url:
+          type: string
+          description: The URL specified in the User's profile.
+        username:
+          type: string
+          description: The X handle (screen name) of this User.
+        verified:
+          type: boolean
+          description: Indicates if this User is a verified X User.
+        verified_followers_count:
+          type: integer
+          description: The number of verified followers of this User.
+        verified_type:
+          type: string
+          description: 'The X Blue verified type of the user, e.g.: blue, government, business or none.'
+        withheld:
+          $ref: '#/components/schemas/UserWithheld'
+    UserScrubGeoSchema:
       type: object
       required:
-      - type
-      - title
-      - detail
+      - scrub_geo
       properties:
-        detail:
-          type: string
-        status:
+        scrub_geo:
+          $ref: '#/components/schemas/UserScrubGeoObjectSchema'
+    RuleTag:
+      type: string
+      description: A tag meant for the labeling of user provided rules.
+      example: Non-retweeted coffee Posts
+    UserPublicMetrics:
+      type: object
+      description: A list of metrics for this User.
+      required:
+      - followers_count
+      - following_count
+      - post_count
+      - listed_count
+      properties:
+        followers_count:
           type: integer
-        title:
+          description: Number of Users who follow this User.
+          format: int64
+        following_count:
+          type: integer
+          description: Number of Users this User follows.
+          format: int64
+        like_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of Posts this User has liked.
+          format: int64
+        listed_count:
+          type: integer
+          description: Number of Lists that include this User.
+          format: int64
+        media_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of media items posted by this User.
+          format: int64
+        post_count:
+          type: integer
+          description: Number of Posts (including Reposts) created by this User.
+          format: int64
+    StreamLikesSample10Response:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LikeWithPostAuthor'
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    Place:
+      type: object
+      properties:
+        contained_within:
+          $ref: '#/components/schemas/PlaceContainedWithin'
+        country:
           type: string
-        type:
+        country_code:
           type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    PostLabelData:
-      description: Tweet label data.
-      oneOf:
-      - $ref: '#/components/schemas/PostNoticeSchema'
-      - $ref: '#/components/schemas/PostUnviewableSchema'
+        full_name:
+          type: string
+        geo:
+          $ref: '#/components/schemas/PlaceGeo'
+        id:
+          type: string
+        name:
+          type: string
+        place_type:
+          type: string
     UnlikeComplianceSchema:
       type: object
       required:
@@ -3944,6 +4583,300 @@ components:
               $ref: '#/components/schemas/PostId'
             user_id:
               $ref: '#/components/schemas/UserId'
+    GetRuleCountsResponseDataAllProjectClientApps:
+      type: object
+      required:
+      - rule_count
+      properties:
+        client_app_id:
+          type: string
+          description: Unique identifier of the client application.
+        rule_count:
+          type: integer
+          description: Number of rules configured for the client application.
+      additionalProperties: false
+    PostTakedownComplianceSchema:
+      type: object
+      required:
+      - tweet
+      - withheld_in_countries
+      - event_at
+      properties:
+        event_at:
+          type: string
+          description: Event time.
+          format: date-time
+          example: '2021-07-06T18:40:40.000Z'
+        quote_tweet_id:
+          $ref: '#/components/schemas/PostId'
+        tweet:
+          type: object
+          required:
+          - id
+          - author_id
+          properties:
+            author_id:
+              $ref: '#/components/schemas/UserId'
+            id:
+              $ref: '#/components/schemas/PostId'
+        withheld_in_countries:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CountryCode'
+    PostLabelData:
+      description: Tweet label data.
+      oneOf:
+      - $ref: '#/components/schemas/PostNoticeSchema'
+      - $ref: '#/components/schemas/PostUnviewableSchema'
+    PostPublicMetrics:
+      type: object
+      description: Engagement metrics for the Post at the time of the request.
+      required:
+      - repost_count
+      - reply_count
+      - like_count
+      - quote_count
+      - bookmark_count
+      - impression_count
+      properties:
+        bookmark_count:
+          type: integer
+          description: Number of times this Post has been bookmarked.
+          format: int64
+        impression_count:
+          type: integer
+          description: Number of times this Post has been viewed.
+          format: int64
+        like_count:
+          type: integer
+          description: Number of likes on this Post.
+          format: int64
+        quote_count:
+          type: integer
+          description: Number of quote Posts of this Post.
+          format: int64
+        reply_count:
+          type: integer
+          description: Number of replies to this Post.
+          format: int64
+        repost_count:
+          type: integer
+          description: Number of times this Post has been reposted.
+          format: int64
+    Media:
+      type: object
+      properties:
+        alt_text:
+          type: string
+        duration_ms:
+          type: integer
+        height:
+          type: integer
+        media_key:
+          type: string
+        non_public_metrics:
+          $ref: '#/components/schemas/MediaNonPublicMetrics'
+        organic_metrics:
+          $ref: '#/components/schemas/MediaOrganicMetrics'
+        preview_image_url:
+          type: string
+        promoted_metrics:
+          $ref: '#/components/schemas/MediaPromotedMetrics'
+        public_metrics:
+          $ref: '#/components/schemas/MediaPublicMetrics'
+        type:
+          type: string
+        url:
+          type: string
+        variants:
+          $ref: '#/components/schemas/MediaVariants'
+        width:
+          type: integer
+    UserUndeleteComplianceSchema:
+      type: object
+      required:
+      - user_undelete
+      properties:
+        user_undelete:
+          $ref: '#/components/schemas/UserComplianceSchema'
+    UserUnprotectComplianceSchema:
+      type: object
+      required:
+      - user_unprotect
+      properties:
+        user_unprotect:
+          $ref: '#/components/schemas/UserComplianceSchema'
+    StreamPostsSampleResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Post'
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    PostId:
+      type: string
+      description: Unique identifier of a Post
+      pattern: ^[0-9]{1,19}$
+      example: '1346889436626259968'
+    ProfileUpdateActivityResponsePayload:
+      type: object
+      properties:
+        after:
+          type: string
+        before:
+          type: string
+      additionalProperties: false
+    StreamLikesFirehoseResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LikeWithPostAuthor'
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    UserWithheldComplianceSchema:
+      type: object
+      required:
+      - user_withheld
+      properties:
+        user_withheld:
+          $ref: '#/components/schemas/UserTakedownComplianceSchema'
+    PostSuggestedSourceLinks:
+      type: array
+      description: URLs suggested as sources for this Post.
+      items:
+        type: string
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+    UpdateRulesDelete:
+      type: object
+      properties:
+        ids:
+          type: array
+          description: Rule ids (Snowflake external ids) to delete.
+          items:
+            type: string
+            pattern: ^[0-9]{1,19}$
+        values:
+          type: array
+          description: Rule values to delete.
+          items:
+            type: string
+      additionalProperties: false
+    StreamPostsSample10Response:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Post'
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    PostUnviewableSchema:
+      type: object
+      required:
+      - public_tweet_unviewable
+      properties:
+        public_tweet_unviewable:
+          $ref: '#/components/schemas/PostUnviewable'
+    StreamPostsFirehoseKoResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Post'
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    MediaNonPublicMetrics:
+      type: object
+      description: Nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+    UserConnectionStatus:
+      type: array
+      description: Returns detailed information about the relationship between two users.
+      items:
+        type: string
+        description: A connection between the authenticated User and this User.
+        enum:
+        - blocking
+        - follow_request_received
+        - follow_request_sent
+        - followed_by
+        - following
+        - muting
     Post:
       type: object
       properties:
@@ -4009,12 +4942,10 @@ components:
           description: Organic nonpublic engagement metrics for the Post at the time of the request.
         paid_partnership:
           type: boolean
-          description: Indicates if this Post is a paid partnership, i.e. it has been disclosed by the
-            author as containing paid promotion.
+          description: Indicates if this Post is a paid partnership, i.e. it has been disclosed by the author as containing paid promotion.
         possibly_sensitive:
           type: boolean
-          description: Indicates if this Post contains URLs marked as sensitive, for example content suitable
-            for mature audiences.
+          description: Indicates if this Post contains URLs marked as sensitive, for example content suitable for mature audiences.
         promoted_metrics:
           type: object
           description: Promoted nonpublic engagement metrics for the Post at the time of the request.
@@ -4041,77 +4972,136 @@ components:
           type: string
         withheld:
           $ref: '#/components/schemas/PostWithheld'
-    RuleId:
-      type: string
-      description: Unique identifier of this rule.
-      pattern: ^[0-9]{1,19}$
-      example: '120897978112909812'
-    StreamLikesComplianceResponse:
-      description: Likes compliance stream events.
-      oneOf:
-      - type: object
-        description: Compliance event.
-        required:
-        - data
-        properties:
-          data:
-            $ref: '#/components/schemas/LikeComplianceSchema'
-      - type: object
-        required:
-        - errors
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            items:
-              $ref: '#/components/schemas/Problem'
-    UserSuspendComplianceSchema:
+    InvalidRequestProblem:
       type: object
       required:
-      - user_suspend
+      - type
+      - title
+      - detail
       properties:
-        user_suspend:
-          $ref: '#/components/schemas/UserComplianceSchema'
-    PostNotice:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    PostAttachments:
+      type: object
+      description: Specifies the type of attachments (if any) present in this Post.
+      properties:
+        media_keys:
+          type:
+          - array
+          - 'null'
+          description: Media keys of media attached to this Post.
+          items:
+            type: string
+        media_source_tweet_id:
+          type:
+          - array
+          - 'null'
+          description: IDs of the source Posts the attached media originated from.
+          items:
+            type: string
+        poll_ids:
+          type:
+          - array
+          - 'null'
+          description: IDs of polls attached to this Post.
+          items:
+            type: string
+    PostContextAnnotations:
+      type: array
+      description: Annotations inferred about the Post (domain and entity context).
+      items:
+        type: object
+        description: A single inferred annotation about the Post (domain and entity context).
+        required:
+        - domain
+        - entity
+        properties:
+          domain:
+            description: The domain (broad category) this annotation belongs to.
+            oneOf:
+            - type: object
+              description: A domain or entity referenced by a context annotation.
+              properties:
+                description:
+                  type:
+                  - string
+                  - 'null'
+                id:
+                  type:
+                  - string
+                  - 'null'
+                name:
+                  type:
+                  - string
+                  - 'null'
+          entity:
+            description: The specific entity recognized within the domain.
+            oneOf:
+            - type: object
+              description: A domain or entity referenced by a context annotation.
+              properties:
+                description:
+                  type:
+                  - string
+                  - 'null'
+                id:
+                  type:
+                  - string
+                  - 'null'
+                name:
+                  type:
+                  - string
+                  - 'null'
+    GetRuleCountsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GetRuleCountsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    LikeComplianceSchema:
       type: object
       required:
-      - tweet
-      - event_type
-      - event_at
-      - application
+      - delete
       properties:
-        application:
-          type: string
-          description: If the label is being applied or removed. Possible values are ‘apply’ or ‘remove’.
-          example: apply
-        details:
-          type: string
-          description: Information shown on the Tweet label
-        event_at:
-          type: string
-          description: Event time.
-          format: date-time
-          example: '2021-07-06T18:40:40.000Z'
-        event_type:
-          type: string
-          description: The type of label on the Tweet
-          example: misleading
-        extended_details_url:
-          type: string
-          description: Link to more information about this kind of label
-        label_title:
-          type: string
-          description: Title/header of the Tweet label
-        tweet:
-          type: object
-          required:
-          - id
-          - author_id
-          properties:
-            author_id:
-              $ref: '#/components/schemas/UserId'
-            id:
-              $ref: '#/components/schemas/PostId'
+        delete:
+          $ref: '#/components/schemas/UnlikeComplianceSchema'
+    PollOptions:
+      type: array
+      description: The list of options (choices) available in this poll.
+      items:
+        type: object
+        description: A single option (choice) available in a poll.
+        required:
+        - position
+        - label
+        - votes
+        properties:
+          label:
+            type: string
+            description: The text label of this poll option.
+          position:
+            type: integer
+            description: The 1-based position of this option within the poll.
+            format: int64
+          votes:
+            type: integer
+            description: The number of votes this option has received.
+            format: int64
     PostDeleteActivityResponsePayload:
       type: object
       description: The identity of a deleted Post.
@@ -4124,165 +5114,6 @@ components:
         id:
           $ref: '#/components/schemas/PostId'
       additionalProperties: false
-    UserPublicMetrics:
-      type: object
-      description: A list of metrics for this User.
-      required:
-      - followers_count
-      - following_count
-      - post_count
-      - listed_count
-      properties:
-        followers_count:
-          type: integer
-          description: Number of Users who follow this User.
-          format: int64
-        following_count:
-          type: integer
-          description: Number of Users this User follows.
-          format: int64
-        like_count:
-          type: integer
-          description: Number of Posts this User has liked.
-          format: int64
-          nullable: true
-        listed_count:
-          type: integer
-          description: Number of Lists that include this User.
-          format: int64
-        media_count:
-          type: integer
-          description: Number of media items posted by this User.
-          format: int64
-          nullable: true
-        post_count:
-          type: integer
-          description: Number of Posts (including Reposts) created by this User.
-          format: int64
-    Media:
-      type: object
-      properties:
-        alt_text:
-          type: string
-        duration_ms:
-          type: integer
-        height:
-          type: integer
-        media_key:
-          type: string
-        non_public_metrics:
-          $ref: '#/components/schemas/MediaNonPublicMetrics'
-        organic_metrics:
-          $ref: '#/components/schemas/MediaOrganicMetrics'
-        preview_image_url:
-          type: string
-        promoted_metrics:
-          $ref: '#/components/schemas/MediaPromotedMetrics'
-        public_metrics:
-          $ref: '#/components/schemas/MediaPublicMetrics'
-        type:
-          type: string
-        url:
-          type: string
-        variants:
-          $ref: '#/components/schemas/MediaVariants'
-        width:
-          type: integer
-    PostComplianceData:
-      description: Tweet compliance data.
-      oneOf:
-      - $ref: '#/components/schemas/PostDeleteComplianceSchema'
-      - $ref: '#/components/schemas/PostWithheldComplianceSchema'
-      - $ref: '#/components/schemas/PostDropComplianceSchema'
-      - $ref: '#/components/schemas/PostUndropComplianceSchema'
-      - $ref: '#/components/schemas/PostEditComplianceSchema'
-    UserProfileModificationObjectSchema:
-      type: object
-      required:
-      - user
-      - profile_field
-      - new_value
-      - event_at
-      properties:
-        event_at:
-          type: string
-          description: Event time.
-          format: date-time
-          example: '2021-07-06T18:40:40.000Z'
-        new_value:
-          type: string
-        profile_field:
-          type: string
-        user:
-          type: object
-          required:
-          - id
-          properties:
-            id:
-              $ref: '#/components/schemas/UserId'
-    PostDropComplianceSchema:
-      type: object
-      required:
-      - drop
-      properties:
-        drop:
-          $ref: '#/components/schemas/PostComplianceSchema'
-    MediaOrganicMetrics:
-      type: object
-      description: Organic nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type: integer
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-          nullable: true
-        playback_100_count:
-          type: integer
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-          nullable: true
-        playback_25_count:
-          type: integer
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-          nullable: true
-        playback_50_count:
-          type: integer
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-          nullable: true
-        playback_75_count:
-          type: integer
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-          nullable: true
-        view_count:
-          type: integer
-          description: The number of organic views of this video. Null when the backend returns quartile
-            data without a view count.
-          format: int64
-          nullable: true
-    StreamPostsFirehosePtResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-    Topic:
-      type: object
-      properties:
-        description:
-          type: string
-        id:
-          type: string
-        name:
-          type: string
     PlaceGeo:
       type: object
       description: The geographic location of this place, expressed as a GeoJSON Feature.
@@ -4293,8 +5124,7 @@ components:
       properties:
         bbox:
           type: array
-          description: The bounding box as [southwest_longitude, southwest_latitude, northeast_longitude,
-            northeast_latitude].
+          description: The bounding box as [southwest_longitude, southwest_latitude, northeast_longitude, northeast_latitude].
           minItems: 4
           maxItems: 4
           items:
@@ -4309,68 +5139,81 @@ components:
           - type: string
             enum:
             - Feature
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    LikeWithPostAuthor:
-      type: object
-      description: A Like event, with the tweet author user and the tweet being liked
-      properties:
-        created_at:
-          type: string
-          description: Creation time of the Tweet.
-          format: date-time
-          example: '2021-01-06T18:40:40.000Z'
-        id:
-          $ref: '#/components/schemas/LikeId'
-        liked_tweet_id:
-          $ref: '#/components/schemas/PostId'
-        timestamp_ms:
-          type: integer
-          description: Timestamp in milliseconds of creation.
-          format: int32
-        tweet_author_id:
-          $ref: '#/components/schemas/UserId'
-    StreamLikesSample10Response:
+    NewsActivityResponsePayload:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/LikeWithPostAuthor'
-        errors:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-    FollowActivityResponsePayload:
-      type: object
-      properties:
-        source:
-          $ref: '#/components/schemas/User'
-        target:
-          $ref: '#/components/schemas/User'
+        category:
+          type: string
+        headline:
+          type: string
+        hook:
+          type: string
+        summary:
+          type: string
       additionalProperties: false
+    PostWithheld:
+      type: object
+      description: Withholding details for withheld content.
+      required:
+      - copyright
+      - country_codes
+      properties:
+        copyright:
+          type: boolean
+          description: Indicates whether this content is withheld due to a copyright claim.
+        country_codes:
+          type: array
+          description: Uppercase ISO 3166-1 alpha-2 country codes where this content is withheld.
+          items:
+            type: string
+        scope:
+          type:
+          - string
+          - 'null'
+          description: Whether the withholding applies to a Post or a User.
+          enum:
+          - post
+          - user
+    MediaOrganicMetrics:
+      type: object
+      description: Organic nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+        view_count:
+          type:
+          - integer
+          - 'null'
+          description: The number of organic views of this video. Null when the backend returns quartile data without a view count.
+          format: int64
     ResourceNotFoundProblem:
       type: object
       required:
@@ -4397,597 +5240,23 @@ components:
           - https://api.x.com/2/problems/resource-not-found
         value:
           type: string
-    GetRulesResponseData:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the rule.
-        tag:
-          type: string
-          description: Optional caller-defined label for the rule.
-        value:
-          type: string
-          description: The rule's filter expression.
-    PostSuggestedSourceLinks:
+    PostMatchedMediaNotes:
       type: array
-      description: URLs suggested as sources for this Post.
-      items:
-        type: string
-    PostEditComplianceSchema:
-      type: object
-      required:
-      - tweet_edit
-      properties:
-        tweet_edit:
-          $ref: '#/components/schemas/PostEditComplianceObjectSchema'
-    CountryCode:
-      type: string
-      description: A two-letter ISO 3166-1 alpha-2 country code.
-      pattern: ^[A-Z]{2}$
-      example: US
-    MediaPromotedMetrics:
-      type: object
-      description: Promoted nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type: integer
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-          nullable: true
-        playback_100_count:
-          type: integer
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-          nullable: true
-        playback_25_count:
-          type: integer
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-          nullable: true
-        playback_50_count:
-          type: integer
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-          nullable: true
-        playback_75_count:
-          type: integer
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-          nullable: true
-        view_count:
-          type: integer
-          description: The number of promoted views of this video. Null when the backend returns quartile
-            data without a view count.
-          format: int64
-          nullable: true
-    LikeId:
-      type: string
-      description: The unique identifier of this Like.
-      pattern: ^[A-Za-z0-9_]{1,40}$
-      example: 8ba4f34e6235d905a46bac021d98e923
-    UserSubscription:
-      type: object
-      description: The subscription relationship between this User and you.
-      required:
-      - subscribes_to_you
-      properties:
-        subscribes_to_you:
-          type: boolean
-          description: Indicates if this User subscribes to you.
-    PostScopes:
-      type: object
-      description: The scopes for this Post.
-      required:
-      - followers
-      properties:
-        followers:
-          type: boolean
-          description: Indicates whether visibility of this Post is limited to the author's followers.
-    PostSuggestedSourceLinksWithCounts:
-      type: array
-      description: Suggested source URLs for this Post, each with the number of times it was suggested.
+      description: Community-Notes media matches for this Post.
       items:
         type: object
-        description: A suggested source URL for this Post with the number of times it was suggested.
+        description: A Community-Notes media match for this Post.
         properties:
-          count:
-            type: integer
-            description: Number of times this source link was suggested.
-            format: int64
-            nullable: true
-          url:
-            type: string
-            description: The suggested source URL.
-            nullable: true
-    UserWithheldComplianceSchema:
-      type: object
-      required:
-      - user_withheld
-      properties:
-        user_withheld:
-          $ref: '#/components/schemas/UserTakedownComplianceSchema'
-    Problem:
-      oneOf:
-      - $ref: '#/components/schemas/ResourceNotFoundProblem'
-      - $ref: '#/components/schemas/InvalidRequestProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
-      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
-      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
-      - $ref: '#/components/schemas/ResourceUnavailableProblem'
-      - $ref: '#/components/schemas/DisallowedResourceProblem'
-      - $ref: '#/components/schemas/InternalErrorProblem'
-      discriminator:
-        propertyName: type
-        mapping:
-          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
-          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
-          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
-          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
-          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
-          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
-          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
-          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
-          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    StreamPostsComplianceResponse:
-      description: Tweet compliance stream events.
-      oneOf:
-      - type: object
-        description: Compliance event.
-        required:
-        - data
-        properties:
-          data:
-            $ref: '#/components/schemas/PostComplianceData'
-      - type: object
-        required:
-        - errors
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            items:
-              $ref: '#/components/schemas/Problem'
-    Place:
-      type: object
-      properties:
-        contained_within:
-          $ref: '#/components/schemas/PlaceContainedWithin'
-        country:
-          type: string
-        country_code:
-          type: string
-        full_name:
-          type: string
-        geo:
-          $ref: '#/components/schemas/PlaceGeo'
-        id:
-          type: string
-        name:
-          type: string
-        place_type:
-          type: string
-    MediaNonPublicMetrics:
-      type: object
-      description: Nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type: integer
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-          nullable: true
-        playback_100_count:
-          type: integer
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-          nullable: true
-        playback_25_count:
-          type: integer
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-          nullable: true
-        playback_50_count:
-          type: integer
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-          nullable: true
-        playback_75_count:
-          type: integer
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-          nullable: true
-    PollOptions:
-      type: array
-      description: The list of options (choices) available in this poll.
-      items:
-        type: object
-        description: A single option (choice) available in a poll.
-        required:
-        - position
-        - label
-        - votes
-        properties:
-          label:
-            type: string
-            description: The text label of this poll option.
-          position:
-            type: integer
-            description: The 1-based position of this option within the poll.
-            format: int64
-          votes:
-            type: integer
-            description: The number of votes this option has received.
-            format: int64
-    UserId:
-      type: string
-      description: Unique identifier of a User
-      pattern: ^[0-9]{1,19}$
-      example: '2244994945'
-    StreamLikesFirehoseResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/LikeWithPostAuthor'
-        errors:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-    PostPublicMetrics:
-      type: object
-      description: Engagement metrics for the Post at the time of the request.
-      required:
-      - repost_count
-      - reply_count
-      - like_count
-      - quote_count
-      - bookmark_count
-      - impression_count
-      properties:
-        bookmark_count:
-          type: integer
-          description: Number of times this Post has been bookmarked.
-          format: int64
-        impression_count:
-          type: integer
-          description: Number of times this Post has been viewed.
-          format: int64
-        like_count:
-          type: integer
-          description: Number of likes on this Post.
-          format: int64
-        quote_count:
-          type: integer
-          description: Number of quote Posts of this Post.
-          format: int64
-        reply_count:
-          type: integer
-          description: Number of replies to this Post.
-          format: int64
-        repost_count:
-          type: integer
-          description: Number of times this Post has been reposted.
-          format: int64
-    NewsActivityResponsePayload:
-      type: object
-      properties:
-        category:
-          type: string
-        headline:
-          type: string
-        hook:
-          type: string
-        summary:
-          type: string
-      additionalProperties: false
-    ActivityStreamingResponsePayload:
-      oneOf:
-      - $ref: '#/components/schemas/ProfileUpdateActivityResponsePayload'
-      - $ref: '#/components/schemas/NewsActivityResponsePayload'
-      - $ref: '#/components/schemas/FollowActivityResponsePayload'
-      - $ref: '#/components/schemas/Post'
-      - $ref: '#/components/schemas/PostDeleteActivityResponsePayload'
-      - $ref: '#/components/schemas/LikeWithPostAuthor'
-      discriminator:
-        propertyName: ../event_type
-        mapping:
-          follow.follow: '#/components/schemas/FollowActivityResponsePayload'
-          follow.unfollow: '#/components/schemas/FollowActivityResponsePayload'
-          like.create: '#/components/schemas/LikeWithPostAuthor'
-          news.new: '#/components/schemas/NewsActivityResponsePayload'
-          post.create: '#/components/schemas/Post'
-          post.delete: '#/components/schemas/PostDeleteActivityResponsePayload'
-          post.mention.create: '#/components/schemas/Post'
-          post.quote.create: '#/components/schemas/Post'
-          post.reply.create: '#/components/schemas/Post'
-          post.repost.create: '#/components/schemas/Post'
-          profile.update.affiliate_badge: '#/components/schemas/ProfileUpdateActivityResponsePayload'
-          profile.update.banner_picture: '#/components/schemas/ProfileUpdateActivityResponsePayload'
-          profile.update.bio: '#/components/schemas/ProfileUpdateActivityResponsePayload'
-          profile.update.geo: '#/components/schemas/ProfileUpdateActivityResponsePayload'
-          profile.update.handle: '#/components/schemas/ProfileUpdateActivityResponsePayload'
-          profile.update.profile_picture: '#/components/schemas/ProfileUpdateActivityResponsePayload'
-          profile.update.screenname: '#/components/schemas/ProfileUpdateActivityResponsePayload'
-          profile.update.url: '#/components/schemas/ProfileUpdateActivityResponsePayload'
-          profile.update.verified_badge: '#/components/schemas/ProfileUpdateActivityResponsePayload'
-    GetRulesResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/GetRulesResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    UserScrubGeoSchema:
-      type: object
-      required:
-      - scrub_geo
-      properties:
-        scrub_geo:
-          $ref: '#/components/schemas/UserScrubGeoObjectSchema'
-    Poll:
-      type: object
-      properties:
-        duration_minutes:
-          type: integer
-        end_datetime:
-          type: string
-        id:
-          type: string
-        options:
-          $ref: '#/components/schemas/PollOptions'
-        voting_status:
-          type: string
-    PostNotePost:
-      type: object
-      description: The full content of the Post, including text beyond 280 characters.
-      required:
-      - text
-      properties:
-        entities:
-          type: object
-          description: Metadata entities (hashtags, cashtags, mentions, URLs) found in the note Post text.
-          properties:
-            cashtags:
-              type: array
-              items:
-                type: object
-                description: A hashtag or cashtag entity.
-                required:
-                - start
-                - end
-                - tag
-                properties:
-                  end:
-                    type: integer
-                    description: End index in the text (exclusive).
-                    format: int64
-                  start:
-                    type: integer
-                    description: Start index in the text (inclusive).
-                    format: int64
-                  tag:
-                    type: string
-              nullable: true
-            hashtags:
-              type: array
-              items:
-                type: object
-                description: A hashtag or cashtag entity.
-                required:
-                - start
-                - end
-                - tag
-                properties:
-                  end:
-                    type: integer
-                    description: End index in the text (exclusive).
-                    format: int64
-                  start:
-                    type: integer
-                    description: Start index in the text (inclusive).
-                    format: int64
-                  tag:
-                    type: string
-              nullable: true
-            mentions:
-              type: array
-              items:
-                type: object
-                description: A user mention entity.
-                required:
-                - start
-                - end
-                properties:
-                  end:
-                    type: integer
-                    format: int64
-                  id:
-                    type: string
-                    nullable: true
-                  start:
-                    type: integer
-                    format: int64
-                  username:
-                    type: string
-                    nullable: true
-              nullable: true
-            urls:
-              type: array
-              items:
-                type: object
-                description: A URL entity found in note Post text.
-                required:
-                - start
-                - end
-                properties:
-                  display_url:
-                    type: string
-                    nullable: true
-                  end:
-                    type: integer
-                    format: int64
-                  expanded_url:
-                    type: string
-                    nullable: true
-                  start:
-                    type: integer
-                    format: int64
-                  url:
-                    type: string
-                    nullable: true
-              nullable: true
-          nullable: true
-        text:
-          type: string
-          description: The full note text of the Post.
-    NotAuthorizedForResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
-          type: string
-    UserConnectionStatus:
-      type: array
-      description: Returns detailed information about the relationship between two users.
-      items:
-        type: string
-        description: A connection between the authenticated User and this User.
-        enum:
-        - blocking
-        - follow_request_received
-        - follow_request_sent
-        - followed_by
-        - following
-        - muting
-    UserUnprotectComplianceSchema:
-      type: object
-      required:
-      - user_unprotect
-      properties:
-        user_unprotect:
-          $ref: '#/components/schemas/UserComplianceSchema'
-    UserProtectComplianceSchema:
-      type: object
-      required:
-      - user_protect
-      properties:
-        user_protect:
-          $ref: '#/components/schemas/UserComplianceSchema'
-    GetRuleCountsResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GetRuleCountsResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    StreamLabelsComplianceResponse:
-      description: Tweet label stream events.
-      oneOf:
-      - type: object
-        description: Tweet Label event.
-        required:
-        - data
-        properties:
-          data:
-            $ref: '#/components/schemas/PostLabelData'
-      - type: object
-        required:
-        - errors
-        properties:
-          errors:
-            type: array
-            minItems: 1
-            items:
-              $ref: '#/components/schemas/Problem'
-    RuleTag:
-      type: string
-      description: A tag meant for the labeling of user provided rules.
-      example: Non-retweeted coffee Posts
-    UserAffiliation:
-      type: object
-      description: Metadata about a user's affiliation.
-      properties:
-        badge_url:
-          type: string
-          description: URL of the affiliation badge image shown on the User's profile.
-          nullable: true
-        description:
-          type: string
-          description: Description of the affiliation.
-          nullable: true
-        url:
-          type: string
-          description: URL associated with the affiliation.
-          nullable: true
-        user_id:
-          type: array
-          description: A list of unique identifiers of the accounts this User is affiliated with.
-          items:
-            type: string
-          nullable: true
+          match_status:
+            type:
+            - string
+            - 'null'
+            description: The status of the media note match.
+          note_id:
+            type:
+            - string
+            - 'null'
+            description: The matched note's unique identifier.
     UserComplianceData:
       description: User compliance data.
       oneOf:
@@ -5000,189 +5269,10 @@ components:
       - $ref: '#/components/schemas/UserWithheldComplianceSchema'
       - $ref: '#/components/schemas/UserScrubGeoSchema'
       - $ref: '#/components/schemas/UserProfileModificationComplianceSchema'
-    StreamPostsResponse:
-      type: object
-      description: A Tweet or error that can be returned by the streaming Tweet API. The values returned
-        with a successful streamed Tweet includes the user provided rules that the Tweet matched.
-      properties:
-        data:
-          $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        matching_rules:
-          type: array
-          description: The list of rules which matched the Tweet
-          items:
-            type: object
-            required:
-            - id
-            properties:
-              id:
-                $ref: '#/components/schemas/RuleId'
-              tag:
-                $ref: '#/components/schemas/RuleTag'
-    Expansions:
-      type: object
-      properties:
-        media:
-          type: array
-          items:
-            $ref: '#/components/schemas/Media'
-        places:
-          type: array
-          items:
-            $ref: '#/components/schemas/Place'
-        polls:
-          type: array
-          items:
-            $ref: '#/components/schemas/Poll'
-        posts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        topics:
-          type: array
-          items:
-            $ref: '#/components/schemas/Topic'
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-    PostId:
-      type: string
-      description: Unique identifier of a Post
-      pattern: ^[0-9]{1,19}$
-      example: '1346889436626259968'
-    UpdateRulesResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/UpdateRulesResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        meta:
-          type: object
-          properties:
-            sent:
-              type: string
-            summary:
-              type: object
-    PostMediaMetadata:
-      type: array
-      description: Metadata for media attached to this Post.
-      items:
-        type: object
-        description: Metadata for one media item attached to this Post.
-        properties:
-          alt_text:
-            type: string
-            description: Alternative text describing the media for accessibility.
-            nullable: true
-          description:
-            type: string
-            description: Description of the media.
-            nullable: true
-          media_key:
-            type: string
-            description: The unique identifier of the media.
-            nullable: true
-          title:
-            type: string
-            description: Title of the media.
-            nullable: true
-    GetRuleCountsResponseDataClientAppRulesCount:
+    UserComplianceSchema:
       type: object
       required:
-      - rule_count
-      properties:
-        client_app_id:
-          type: string
-          description: Unique identifier of the client application.
-        rule_count:
-          type: integer
-          description: Number of rules configured for the client application.
-      additionalProperties: false
-    PostUnviewableSchema:
-      type: object
-      required:
-      - public_tweet_unviewable
-      properties:
-        public_tweet_unviewable:
-          $ref: '#/components/schemas/PostUnviewable'
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    MediaPublicMetrics:
-      type: object
-      description: Public engagement metrics for the media at the time of the request.
-      required:
-      - view_count
-      properties:
-        view_count:
-          type: integer
-          description: The number of times this video has been viewed.
-          format: int64
-    UserProfileModificationComplianceSchema:
-      type: object
-      required:
-      - user_profile_modification
-      properties:
-        user_profile_modification:
-          $ref: '#/components/schemas/UserProfileModificationObjectSchema'
-    UserUnsuspendComplianceSchema:
-      type: object
-      required:
-      - user_unsuspend
-      properties:
-        user_unsuspend:
-          $ref: '#/components/schemas/UserComplianceSchema'
-    UpdateRulesRequest:
-      type: object
-      properties:
-        add:
-          type: array
-          description: Rules to add.
-          items:
-            $ref: '#/components/schemas/UpdateRulesAdd'
-        delete:
-          description: Rules to delete by id or by value.
-          $ref: '#/components/schemas/UpdateRulesDelete'
-      additionalProperties: false
-    PostTakedownComplianceSchema:
-      type: object
-      required:
-      - tweet
-      - withheld_in_countries
+      - user
       - event_at
       properties:
         event_at:
@@ -5190,36 +5280,13 @@ components:
           description: Event time.
           format: date-time
           example: '2021-07-06T18:40:40.000Z'
-        quote_tweet_id:
-          $ref: '#/components/schemas/PostId'
-        tweet:
+        user:
           type: object
           required:
           - id
-          - author_id
           properties:
-            author_id:
-              $ref: '#/components/schemas/UserId'
             id:
-              $ref: '#/components/schemas/PostId'
-        withheld_in_countries:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/CountryCode'
-    PlaceContainedWithin:
-      type: array
-      description: A list of unique identifiers of the Places that contain this place.
-      items:
-        type: string
-    PostDisplayTextRange:
-      type: array
-      description: The inclusive start and exclusive end indices of the displayable content of the Post.
-      minItems: 2
-      maxItems: 2
-      items:
-        type: integer
-        format: int64
+              $ref: '#/components/schemas/UserId'
     FieldUnauthorizedProblem:
       type: object
       required:
@@ -5244,7 +5311,62 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
+    UserProtectComplianceSchema:
+      type: object
+      required:
+      - user_protect
+      properties:
+        user_protect:
+          $ref: '#/components/schemas/UserComplianceSchema'
+    UpdateRulesAdd:
+      type: object
+      required:
+      - value
+      properties:
+        tag:
+          type: string
+          description: Optional caller-defined label for the rule.
+        value:
+          type: string
+          description: Rule filter expression.
+      additionalProperties: false
   securitySchemes:
     BearerToken:
       type: http
       scheme: bearer
+    OAuth2UserToken:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.x.com/2/oauth2/authorize
+          tokenUrl: https://api.x.com/2/oauth2/token
+          scopes:
+            block.read: View accounts you have blocked.
+            block.write: Block and unblock accounts on your behalf.
+            bookmark.read: Read your bookmarked Posts.
+            bookmark.write: Create and delete your bookmarks.
+            broadcast.read: View your live broadcasts and their chat.
+            broadcast.write: Manage your live broadcasts and send chat messages on your behalf.
+            developer.read: View your developer accounts, apps, and settings.
+            developer.write: Create and manage your X Developer Platform account.
+            dm.read: Read all your Direct Messages.
+            dm.write: Send and manage your Direct Messages.
+            follows.read: View accounts you follow and accounts following you.
+            follows.write: Follow and unfollow accounts on your behalf.
+            like.read: View Posts you have liked and likes you can see.
+            like.write: Like and unlike Posts on your behalf.
+            list.read: View Lists, members, and followers of Lists you created or are a member of, including private Lists.
+            list.write: Create and manage Lists on your behalf.
+            media.write: Upload media, such as photos and videos, on your behalf.
+            mute.read: View accounts you have muted.
+            mute.write: Mute and unmute accounts on your behalf.
+            offline.access: Request a refresh token for the app.
+            space.read: View all Spaces you have access to.
+            timeline.read: View all Custom Timelines you can see.
+            tweet.moderate.write: Hide and unhide replies to your posts.
+            tweet.read: View all posts you can see, including those from protected accounts.
+            tweet.write: Create and repost on your behalf.
+            users.read: View any account you can see, including protected accounts.
+    UserToken:
+      type: http
+      scheme: OAuth

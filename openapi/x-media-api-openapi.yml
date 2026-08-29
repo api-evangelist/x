@@ -1,8 +1,8 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: X API v2 Media API
+  description: X API v2 core endpoints
   version: '2.168'
-  description: The Media surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  title: X API v2 Media API
   termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
   contact:
     name: X Developers
@@ -162,40 +162,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
   /2/media/subtitles:
-    post:
-      security:
-      - OAuth2UserToken:
-        - media.write
-      - UserToken: []
-      tags:
-      - Media
-      summary: Create Media subtitles
-      description: Creates subtitles for a specific Media file.
-      externalDocs:
-        url: https://docs.x.com/x-api/media/media-subtitles-create
-      operationId: createMediaSubtitles
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateMediaSubtitlesRequest'
-        required: true
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateMediaSubtitlesResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
     delete:
       security:
       - OAuth2UserToken:
@@ -221,6 +187,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeleteMediaSubtitlesResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      security:
+      - OAuth2UserToken:
+        - media.write
+      - UserToken: []
+      tags:
+      - Media
+      summary: Create Media subtitles
+      description: Creates subtitles for a specific Media file.
+      externalDocs:
+        url: https://docs.x.com/x-api/media/media-subtitles-create
+      operationId: createMediaSubtitles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMediaSubtitlesRequest'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateMediaSubtitlesResponse'
         default:
           description: The request has failed.
           content:
@@ -281,13 +281,8 @@ paths:
       - UserToken: []
       tags:
       - Media
-      summary: Upload a media file and get back its identifiers, including a media_key. The media field
-        carries the file content base64-encoded in JSON bodies (raw bytes in multipart bodies); media_category
-        is tweet_image, tweet_video, or tweet_gif for posts and ads, dm_image/dm_video/dm_gif for DMs,
-        or subtitles. For X Ads accounts, register the returned media_key via create_media_library_item
-        to add it to the account's media library and use it in campaigns.
-      description: Uploads a media file for use in posts, direct messages, or ads. The response carries
-        the media identifiers, including the media_key used to reference the asset in later calls.
+      summary: Upload a media file and get back its identifiers, including a media_key. The media field carries the file content base64-encoded in JSON bodies (raw bytes in multipart bodies); media_category is tweet_image, tweet_video, or tweet_gif for posts and ads, dm_image/dm_video/dm_gif for DMs, or subtitles. For X Ads accounts, register the returned media_key via create_media_library_item to add it to the account's media library and use it in campaigns.
+      description: Uploads a media file for use in posts, direct messages, or ads. The response carries the media identifiers, including the media_key used to reference the asset in later calls.
       externalDocs:
         url: https://docs.x.com/x-api/media/media-upload
       operationId: mediaUpload
@@ -469,273 +464,6 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    NotAuthorizedForFieldProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-field
-        value:
-          type: string
-    GetMediaByMediaKeyResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Media'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    InitializeMediaUploadResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/InitializeMediaUploadResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    MediaId:
-      type: string
-      description: Unique identifier of a Media
-      pattern: ^[0-9]{1,19}$
-    InvalidRequestProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/invalid-request
-        value:
-          type: string
-    FinalizeMediaUploadResponseDataVideo:
-      type: object
-      properties:
-        video_type:
-          type: string
-          description: MIME type of the processed video.
-      additionalProperties: false
-    MediaUploadResponseDataProcessingInfo:
-      type: object
-      properties:
-        check_after_secs:
-          type: integer
-          description: Seconds to wait before polling status again.
-        progress_percent:
-          type: integer
-          description: Processing completion percentage.
-        state:
-          type: string
-          description: Processing state (pending, in_progress, failed, succeeded).
-      additionalProperties: false
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    GetMediaByMediaKeysResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Media'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    DeleteMediaSubtitlesResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteMediaSubtitlesResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    MediaAnalyticsTimestampedMetrics:
-      type: array
-      description: Time-bucketed video metrics for the media, one entry per granularity bucket.
-      items:
-        type: object
-        properties:
-          metrics:
-            type: object
-            description: Video metric counts for this bucket. Counters are integers when the backend value
-              parses as a number, otherwise the original string is preserved.
-            properties:
-              cta_url_clicks:
-                description: 'A video metric counter: an integer when the backend value parses as a number,
-                  otherwise the original string.'
-                oneOf:
-                - type: integer
-                  format: int64
-                - type: string
-                nullable: true
-              cta_watch_clicks:
-                description: 'A video metric counter: an integer when the backend value parses as a number,
-                  otherwise the original string.'
-                oneOf:
-                - type: integer
-                  format: int64
-                - type: string
-                nullable: true
-              play_from_tap:
-                description: 'A video metric counter: an integer when the backend value parses as a number,
-                  otherwise the original string.'
-                oneOf:
-                - type: integer
-                  format: int64
-                - type: string
-                nullable: true
-              playback25:
-                description: 'A video metric counter: an integer when the backend value parses as a number,
-                  otherwise the original string.'
-                oneOf:
-                - type: integer
-                  format: int64
-                - type: string
-                nullable: true
-              playback50:
-                description: 'A video metric counter: an integer when the backend value parses as a number,
-                  otherwise the original string.'
-                oneOf:
-                - type: integer
-                  format: int64
-                - type: string
-                nullable: true
-              playback75:
-                description: 'A video metric counter: an integer when the backend value parses as a number,
-                  otherwise the original string.'
-                oneOf:
-                - type: integer
-                  format: int64
-                - type: string
-                nullable: true
-              playback_complete:
-                description: 'A video metric counter: an integer when the backend value parses as a number,
-                  otherwise the original string.'
-                oneOf:
-                - type: integer
-                  format: int64
-                - type: string
-                nullable: true
-              playback_start:
-                description: 'A video metric counter: an integer when the backend value parses as a number,
-                  otherwise the original string.'
-                oneOf:
-                - type: integer
-                  format: int64
-                - type: string
-                nullable: true
-              video_views:
-                description: 'A video metric counter: an integer when the backend value parses as a number,
-                  otherwise the original string.'
-                oneOf:
-                - type: integer
-                  format: int64
-                - type: string
-                nullable: true
-              watch_time_ms:
-                description: 'A video metric counter: an integer when the backend value parses as a number,
-                  otherwise the original string.'
-                oneOf:
-                - type: integer
-                  format: int64
-                - type: string
-                nullable: true
-            nullable: true
-          timestamp:
-            type: string
-            description: Start of the metrics bucket, as an ISO 8601 date-time.
-            nullable: true
-    CreateMediaMetadataMetadataAllowDownloadStatus:
-      type: object
-      properties:
-        allow_download:
-          type: boolean
-    CreateMediaMetadataMetadataDomainRestrictions:
-      type: object
-      required:
-      - whitelist
-      properties:
-        whitelist:
-          type: array
-          items:
-            type: string
-    CreateMediaMetadataResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateMediaMetadataResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    GetMediaUploadStatusResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GetMediaUploadStatusResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
     CreateMediaMetadataMetadataPreviewImage:
       type: object
       required:
@@ -743,131 +471,6 @@ components:
       properties:
         media_key:
           type: object
-    GetMediaUploadStatusResponseData:
-      type: object
-      required:
-      - id
-      properties:
-        expires_after_secs:
-          type: integer
-          description: Seconds until the upload session expires.
-        id:
-          type: string
-          description: Unique identifier of the media.
-        image:
-          $ref: '#/components/schemas/GetMediaUploadStatusResponseDataImage'
-        media_key:
-          type: string
-          description: The media key for the uploaded media.
-        processing_info:
-          $ref: '#/components/schemas/GetMediaUploadStatusResponseDataProcessingInfo'
-        size:
-          type: integer
-          description: Total size of the media in bytes.
-        video:
-          $ref: '#/components/schemas/GetMediaUploadStatusResponseDataVideo'
-    CreateMediaSubtitlesRequest:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The media id of the video the subtitles belong to.
-          pattern: ^[0-9]{1,19}$
-        media_category:
-          type: string
-          description: The media category of the target media.
-          enum:
-          - AmplifyVideo
-          - TweetVideo
-        subtitles:
-          description: The subtitle tracks to associate with the media.
-          $ref: '#/components/schemas/CreateMediaSubtitlesSubtitles'
-    MediaPromotedMetrics:
-      type: object
-      description: Promoted nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type: integer
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-          nullable: true
-        playback_100_count:
-          type: integer
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-          nullable: true
-        playback_25_count:
-          type: integer
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-          nullable: true
-        playback_50_count:
-          type: integer
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-          nullable: true
-        playback_75_count:
-          type: integer
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-          nullable: true
-        view_count:
-          type: integer
-          description: The number of promoted views of this video. Null when the backend returns quartile
-            data without a view count.
-          format: int64
-          nullable: true
-    FinalizeMediaUploadResponseDataImage:
-      type: object
-      properties:
-        h:
-          type: integer
-          description: Height in pixels.
-        image_type:
-          type: string
-          description: MIME type of the uploaded image.
-        w:
-          type: integer
-          description: Width in pixels.
-      additionalProperties: false
-    CreateMediaMetadataMetadataAltText:
-      type: object
-      required:
-      - text
-      properties:
-        text:
-          type: string
-          maxLength: 1000
-    FinalizeMediaUploadResponseData:
-      type: object
-      required:
-      - id
-      properties:
-        expires_after_secs:
-          type: integer
-          description: Seconds until the upload session expires.
-        id:
-          type: string
-          description: Unique identifier of the media.
-        image:
-          $ref: '#/components/schemas/FinalizeMediaUploadResponseDataImage'
-        media_key:
-          type: string
-          description: The media key for the uploaded media.
-        processing_info:
-          $ref: '#/components/schemas/FinalizeMediaUploadResponseDataProcessingInfo'
-        size:
-          type: integer
-          description: Total size of the media in bytes.
-        video:
-          $ref: '#/components/schemas/FinalizeMediaUploadResponseDataVideo'
-    CreateMediaMetadataMetadataUploadSource:
-      type: object
-      required:
-      - upload_source
-      properties:
-        upload_source:
-          type: string
     MediaUploadRequest:
       type: object
       required:
@@ -883,8 +486,7 @@ components:
             format: binary
           - type: string
             format: byte
-          description: 'The media file to upload: base64-encoded in JSON bodies, raw bytes in multipart
-            bodies.'
+          description: 'The media file to upload: base64-encoded in JSON bodies, raw bytes in multipart bodies.'
         media_category:
           type: string
           description: The category of the media being uploaded.
@@ -897,255 +499,13 @@ components:
           - dm_gif
           - subtitles
       additionalProperties: false
-    CreateMediaMetadataMetadataContentExpiration:
+    CreateMediaMetadataMetadataUploadSource:
       type: object
       required:
-      - timestamp_sec
+      - upload_source
       properties:
-        timestamp_sec:
-          type: number
-    GetMediaUploadStatusResponseDataImage:
-      type: object
-      properties:
-        h:
-          type: integer
-          description: Height in pixels.
-        image_type:
+        upload_source:
           type: string
-          description: MIME type of the uploaded image.
-        w:
-          type: integer
-          description: Width in pixels.
-      additionalProperties: false
-    MediaVariants:
-      type: array
-      description: Each media object may have multiple display or playback variants, with different resolutions
-        or formats.
-      items:
-        type: object
-        description: A single playback or display variant of a media object.
-        properties:
-          bit_rate:
-            type: integer
-            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
-            format: int64
-            nullable: true
-          content_type:
-            type: string
-            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
-            nullable: true
-          url:
-            type: string
-            description: The URL to this media variant.
-            nullable: true
-    Problem:
-      oneOf:
-      - $ref: '#/components/schemas/ResourceNotFoundProblem'
-      - $ref: '#/components/schemas/InvalidRequestProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
-      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
-      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
-      - $ref: '#/components/schemas/ResourceUnavailableProblem'
-      - $ref: '#/components/schemas/DisallowedResourceProblem'
-      - $ref: '#/components/schemas/InternalErrorProblem'
-      discriminator:
-        propertyName: type
-        mapping:
-          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
-          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
-          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
-          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
-          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
-          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
-          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
-          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
-          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    DeleteMediaSubtitlesResponseData:
-      type: object
-      required:
-      - deleted
-      properties:
-        deleted:
-          type: boolean
-          description: Indicates whether the subtitles were deleted.
-    MediaNonPublicMetrics:
-      type: object
-      description: Nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type: integer
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-          nullable: true
-        playback_100_count:
-          type: integer
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-          nullable: true
-        playback_25_count:
-          type: integer
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-          nullable: true
-        playback_50_count:
-          type: integer
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-          nullable: true
-        playback_75_count:
-          type: integer
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-          nullable: true
-    CreateMediaMetadataMetadataSharedInfo:
-      type: object
-      required:
-      - shared
-      properties:
-        shared:
-          type: boolean
-    GetMediaAnalyticsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/MediaAnalytics'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    MediaUploadResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/MediaUploadResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    MediaPublicMetrics:
-      type: object
-      description: Public engagement metrics for the media at the time of the request.
-      required:
-      - view_count
-      properties:
-        view_count:
-          type: integer
-          description: The number of times this video has been viewed.
-          format: int64
-    CreateMediaSubtitlesSubtitles:
-      type: object
-      properties:
-        display_name:
-          type: string
-          description: Language name in a human readable form.
-        id:
-          type: string
-          description: The media id of the subtitle track.
-          pattern: ^[0-9]{1,19}$
-        language_code:
-          type: string
-          description: BCP47 language code of the subtitle track.
-          pattern: ^[A-Z]{2}$
-    AppendMediaUploadResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/AppendMediaUploadResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    InternalErrorProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    MediaUploadResponseDataVideo:
-      type: object
-      properties:
-        video_type:
-          type: string
-          description: MIME type of the processed video.
-      additionalProperties: false
-    CreateMediaMetadataResponseData:
-      type: object
-      required:
-      - id
-      properties:
-        associated_metadata:
-          type: object
-          description: The metadata now associated with the media.
-        id:
-          type: string
-          description: The media id the metadata was attached to.
-    FinalizeMediaUploadResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/FinalizeMediaUploadResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    CreateMediaSubtitlesResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateMediaSubtitlesResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
     Media:
       type: object
       properties:
@@ -1175,18 +535,18 @@ components:
           $ref: '#/components/schemas/MediaVariants'
         width:
           type: integer
-    MediaUploadResponseDataImage:
+    FinalizeMediaUploadResponseDataProcessingInfo:
       type: object
       properties:
-        h:
+        check_after_secs:
           type: integer
-          description: Height in pixels.
-        image_type:
+          description: Seconds to wait before polling status again.
+        progress_percent:
+          type: integer
+          description: Processing completion percentage.
+        state:
           type: string
-          description: MIME type of the uploaded image.
-        w:
-          type: integer
-          description: Width in pixels.
+          description: Processing state (pending, in_progress, failed, succeeded).
       additionalProperties: false
     MediaAnalytics:
       type: object
@@ -1217,6 +577,12 @@ components:
           type: integer
         watch_time_ms:
           type: integer
+    AppendMediaUploadResponseData:
+      type: object
+      properties:
+        expires_at:
+          type: integer
+          description: Epoch seconds when the upload session expires.
     CreateMediaSubtitlesResponseData:
       type: object
       properties:
@@ -1229,41 +595,57 @@ components:
         media_category:
           type: string
           description: The media category.
-    CreateMediaMetadataRequest:
+    InitializeMediaUploadResponseData:
       type: object
       required:
       - id
       properties:
+        expires_after_secs:
+          type: integer
+          description: Seconds until the upload session expires.
         id:
           type: string
-          description: The media id the metadata is attached to.
-          pattern: ^[0-9]{1,19}$
-        metadata:
-          description: User-defined metadata to associate with the media.
-          $ref: '#/components/schemas/CreateMediaMetadataMetadata'
-    CreateMediaMetadataMetadataManagementInfo:
+          description: Unique identifier of the upload session.
+        media_key:
+          type: string
+          description: The media key for the uploaded media.
+    MediaId:
+      type: string
+      description: Unique identifier of a Media
+      pattern: ^[0-9]{1,19}$
+    GetMediaByMediaKeyResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Media'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    FieldHydrationFailureProblem:
       type: object
       required:
-      - managed
+      - type
+      - title
+      - detail
+      - field
       properties:
-        managed:
-          type: boolean
-    DeleteMediaSubtitlesRequest:
-      type: object
-      required:
-      - id
-      - media_category
-      - language_code
-      properties:
-        id:
+        detail:
           type: string
-          description: The media id of the video the subtitles belong to.
-        language_code:
+        field:
           type: string
-          description: The language code of the subtitles to delete.
-        media_category:
+        resource_type:
           type: string
-          description: The media category of the target media.
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
     MediaUploadResponseData:
       type: object
       required:
@@ -1287,31 +669,415 @@ components:
           description: Total size of the media in bytes.
         video:
           $ref: '#/components/schemas/MediaUploadResponseDataVideo'
-    AppendMediaUploadResponseData:
+    CreateMediaSubtitlesSubtitles:
       type: object
       properties:
-        expires_at:
-          type: integer
-          description: Epoch seconds when the upload session expires.
-    AppendMediaUploadRequest:
+        display_name:
+          type: string
+          description: Language name in a human readable form.
+        id:
+          type: string
+          description: The media id of the subtitle track.
+          pattern: ^[0-9]{1,19}$
+        language_code:
+          type: string
+          description: BCP47 language code of the subtitle track.
+          pattern: ^[A-Z]{2}$
+    NotAuthorizedForResourceProblem:
       type: object
       required:
-      - media
-      - segment_index
+      - type
+      - title
+      - detail
+      - resource_type
       properties:
-        media:
-          anyOf:
-          - type: string
-            format: binary
-          - type: string
-            format: byte
-          description: The media chunk to upload.
-        segment_index:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
           type: integer
-          description: The index of this segment in the upload sequence.
-          minimum: 0
-          maximum: 999
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+    MediaUploadResponseDataVideo:
+      type: object
+      properties:
+        video_type:
+          type: string
+          description: MIME type of the processed video.
       additionalProperties: false
+    GetMediaUploadStatusResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GetMediaUploadStatusResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    MediaVariants:
+      type: array
+      description: Each media object may have multiple display or playback variants, with different resolutions or formats.
+      items:
+        type: object
+        description: A single playback or display variant of a media object.
+        properties:
+          bit_rate:
+            type:
+            - integer
+            - 'null'
+            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
+            format: int64
+          content_type:
+            type:
+            - string
+            - 'null'
+            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
+          url:
+            type:
+            - string
+            - 'null'
+            description: The URL to this media variant.
+    FinalizeMediaUploadResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/FinalizeMediaUploadResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    CreateMediaMetadataResponseData:
+      type: object
+      required:
+      - id
+      properties:
+        associated_metadata:
+          type: object
+          description: The metadata now associated with the media.
+        id:
+          type: string
+          description: The media id the metadata was attached to.
+    MediaNonPublicMetrics:
+      type: object
+      description: Nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+    GetMediaAnalyticsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaAnalytics'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    CreateMediaMetadataRequest:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          description: The media id the metadata is attached to.
+          pattern: ^[0-9]{1,19}$
+        metadata:
+          description: User-defined metadata to associate with the media.
+          $ref: '#/components/schemas/CreateMediaMetadataMetadata'
+    CreateMediaMetadataMetadataStickerInfoStickers:
+      type: object
+      properties: {}
+    NotAuthorizedForFieldProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
+          type: string
+    FinalizeMediaUploadResponseDataImage:
+      type: object
+      properties:
+        h:
+          type: integer
+          description: Height in pixels.
+        image_type:
+          type: string
+          description: MIME type of the uploaded image.
+        w:
+          type: integer
+          description: Width in pixels.
+      additionalProperties: false
+    MediaUploadResponseDataProcessingInfo:
+      type: object
+      properties:
+        check_after_secs:
+          type: integer
+          description: Seconds to wait before polling status again.
+        progress_percent:
+          type: integer
+          description: Processing completion percentage.
+        state:
+          type: string
+          description: Processing state (pending, in_progress, failed, succeeded).
+      additionalProperties: false
+    CreateMediaMetadataMetadataStickerInfo:
+      type: object
+      required:
+      - stickers
+      properties:
+        stickers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateMediaMetadataMetadataStickerInfoStickers'
+    MediaPromotedMetrics:
+      type: object
+      description: Promoted nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+        view_count:
+          type:
+          - integer
+          - 'null'
+          description: The number of promoted views of this video. Null when the backend returns quartile data without a view count.
+          format: int64
+    CreateMediaSubtitlesResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateMediaSubtitlesResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    InvalidRequestProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    DeleteMediaSubtitlesRequest:
+      type: object
+      required:
+      - id
+      - media_category
+      - language_code
+      properties:
+        id:
+          type: string
+          description: The media id of the video the subtitles belong to.
+        language_code:
+          type: string
+          description: The language code of the subtitles to delete.
+        media_category:
+          type: string
+          description: The media category of the target media.
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    AppendMediaUploadResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AppendMediaUploadResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    InitializeMediaUploadResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InitializeMediaUploadResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    FinalizeMediaUploadResponseData:
+      type: object
+      required:
+      - id
+      properties:
+        expires_after_secs:
+          type: integer
+          description: Seconds until the upload session expires.
+        id:
+          type: string
+          description: Unique identifier of the media.
+        image:
+          $ref: '#/components/schemas/FinalizeMediaUploadResponseDataImage'
+        media_key:
+          type: string
+          description: The media key for the uploaded media.
+        processing_info:
+          $ref: '#/components/schemas/FinalizeMediaUploadResponseDataProcessingInfo'
+        size:
+          type: integer
+          description: Total size of the media in bytes.
+        video:
+          $ref: '#/components/schemas/FinalizeMediaUploadResponseDataVideo'
     CreateMediaMetadataMetadata:
       type: object
       properties:
@@ -1341,72 +1107,13 @@ components:
           $ref: '#/components/schemas/CreateMediaMetadataMetadataStickerInfo'
         upload_source:
           $ref: '#/components/schemas/CreateMediaMetadataMetadataUploadSource'
-    CreateMediaMetadataMetadataStickerInfo:
+    CreateMediaMetadataMetadataContentExpiration:
       type: object
       required:
-      - stickers
+      - timestamp_sec
       properties:
-        stickers:
-          type: array
-          items:
-            $ref: '#/components/schemas/CreateMediaMetadataMetadataStickerInfoStickers'
-    MediaOrganicMetrics:
-      type: object
-      description: Organic nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type: integer
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-          nullable: true
-        playback_100_count:
-          type: integer
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-          nullable: true
-        playback_25_count:
-          type: integer
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-          nullable: true
-        playback_50_count:
-          type: integer
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-          nullable: true
-        playback_75_count:
-          type: integer
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-          nullable: true
-        view_count:
-          type: integer
-          description: The number of organic views of this video. Null when the backend returns quartile
-            data without a view count.
-          format: int64
-          nullable: true
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
+        timestamp_sec:
+          type: number
     CreateMediaMetadataMetadataFoundMediaOrigin:
       type: object
       required:
@@ -1417,6 +1124,139 @@ components:
           type: string
         provider:
           type: string
+    GetMediaUploadStatusResponseData:
+      type: object
+      required:
+      - id
+      properties:
+        expires_after_secs:
+          type: integer
+          description: Seconds until the upload session expires.
+        id:
+          type: string
+          description: Unique identifier of the media.
+        image:
+          $ref: '#/components/schemas/GetMediaUploadStatusResponseDataImage'
+        media_key:
+          type: string
+          description: The media key for the uploaded media.
+        processing_info:
+          $ref: '#/components/schemas/GetMediaUploadStatusResponseDataProcessingInfo'
+        size:
+          type: integer
+          description: Total size of the media in bytes.
+        video:
+          $ref: '#/components/schemas/GetMediaUploadStatusResponseDataVideo'
+    CreateMediaMetadataMetadataAllowDownloadStatus:
+      type: object
+      properties:
+        allow_download:
+          type: boolean
+    CreateMediaMetadataMetadataAltText:
+      type: object
+      required:
+      - text
+      properties:
+        text:
+          type: string
+          maxLength: 1000
+    GetMediaByMediaKeysResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetMediaUploadStatusResponseDataImage:
+      type: object
+      properties:
+        h:
+          type: integer
+          description: Height in pixels.
+        image_type:
+          type: string
+          description: MIME type of the uploaded image.
+        w:
+          type: integer
+          description: Width in pixels.
+      additionalProperties: false
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    GetMediaUploadStatusResponseDataVideo:
+      type: object
+      properties:
+        video_type:
+          type: string
+          description: MIME type of the processed video.
+      additionalProperties: false
+    CreateMediaMetadataMetadataManagementInfo:
+      type: object
+      required:
+      - managed
+      properties:
+        managed:
+          type: boolean
+    AppendMediaUploadRequest:
+      type: object
+      required:
+      - media
+      - segment_index
+      properties:
+        media:
+          anyOf:
+          - type: string
+            format: binary
+          - type: string
+            format: byte
+          description: The media chunk to upload.
+        segment_index:
+          type: integer
+          description: The index of this segment in the upload sequence.
+          minimum: 0
+          maximum: 999
+      additionalProperties: false
+    CreateMediaMetadataMetadataSharedInfo:
+      type: object
+      required:
+      - shared
+      properties:
+        shared:
+          type: boolean
+    FinalizeMediaUploadResponseDataVideo:
+      type: object
+      properties:
+        video_type:
+          type: string
+          description: MIME type of the processed video.
+      additionalProperties: false
+    CreateMediaMetadataResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateMediaMetadataResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     InitializeMediaUploadRequest:
       type: object
       properties:
@@ -1466,13 +1306,160 @@ components:
           minimum: 0
           maximum: 17179869184
       additionalProperties: false
-    GetMediaUploadStatusResponseDataVideo:
+    DeleteMediaSubtitlesResponseData:
+      type: object
+      required:
+      - deleted
+      properties:
+        deleted:
+          type: boolean
+          description: Indicates whether the subtitles were deleted.
+    MediaUploadResponse:
       type: object
       properties:
-        video_type:
+        data:
+          $ref: '#/components/schemas/MediaUploadResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    Problem:
+      oneOf:
+      - $ref: '#/components/schemas/ResourceNotFoundProblem'
+      - $ref: '#/components/schemas/InvalidRequestProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
+      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
+      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
+      - $ref: '#/components/schemas/ResourceUnavailableProblem'
+      - $ref: '#/components/schemas/DisallowedResourceProblem'
+      - $ref: '#/components/schemas/InternalErrorProblem'
+      discriminator:
+        propertyName: type
+        mapping:
+          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
+          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
+          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
+          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
+          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
+          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
+          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
+          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
+          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    MediaUploadResponseDataImage:
+      type: object
+      properties:
+        h:
+          type: integer
+          description: Height in pixels.
+        image_type:
           type: string
-          description: MIME type of the processed video.
+          description: MIME type of the uploaded image.
+        w:
+          type: integer
+          description: Width in pixels.
       additionalProperties: false
+    MediaOrganicMetrics:
+      type: object
+      description: Organic nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+        view_count:
+          type:
+          - integer
+          - 'null'
+          description: The number of organic views of this video. Null when the backend returns quartile data without a view count.
+          format: int64
+    ResourceNotFoundProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    CreateMediaMetadataMetadataDomainRestrictions:
+      type: object
+      required:
+      - whitelist
+      properties:
+        whitelist:
+          type: array
+          items:
+            type: string
+    CreateMediaSubtitlesRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The media id of the video the subtitles belong to.
+          pattern: ^[0-9]{1,19}$
+        media_category:
+          type: string
+          description: The media category of the target media.
+          enum:
+          - AmplifyVideo
+          - TweetVideo
+        subtitles:
+          description: The subtitle tracks to associate with the media.
+          $ref: '#/components/schemas/CreateMediaSubtitlesSubtitles'
+    MediaPublicMetrics:
+      type: object
+      description: Public engagement metrics for the media at the time of the request.
+      required:
+      - view_count
+      properties:
+        view_count:
+          type: integer
+          description: The number of times this video has been viewed.
+          format: int64
     FieldUnauthorizedProblem:
       type: object
       required:
@@ -1497,56 +1484,6 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    InitializeMediaUploadResponseData:
-      type: object
-      required:
-      - id
-      properties:
-        expires_after_secs:
-          type: integer
-          description: Seconds until the upload session expires.
-        id:
-          type: string
-          description: Unique identifier of the upload session.
-        media_key:
-          type: string
-          description: The media key for the uploaded media.
-    FinalizeMediaUploadResponseDataProcessingInfo:
-      type: object
-      properties:
-        check_after_secs:
-          type: integer
-          description: Seconds to wait before polling status again.
-        progress_percent:
-          type: integer
-          description: Processing completion percentage.
-        state:
-          type: string
-          description: Processing state (pending, in_progress, failed, succeeded).
-      additionalProperties: false
     GetMediaUploadStatusResponseDataProcessingInfo:
       type: object
       properties:
@@ -1560,37 +1497,92 @@ components:
           type: string
           description: Processing state (pending, in_progress, failed, succeeded).
       additionalProperties: false
-    CreateMediaMetadataMetadataStickerInfoStickers:
+    MediaAnalyticsTimestampedMetrics:
+      type: array
+      description: Time-bucketed video metrics for the media, one entry per granularity bucket.
+      items:
+        type: object
+        properties:
+          metrics:
+            type:
+            - object
+            - 'null'
+            description: Video metric counts for this bucket. Counters are integers when the backend value parses as a number, otherwise the original string is preserved.
+            properties:
+              cta_url_clicks:
+                description: 'A video metric counter: an integer when the backend value parses as a number, otherwise the original string.'
+                oneOf:
+                - type: integer
+                  format: int64
+                - type: string
+              cta_watch_clicks:
+                description: 'A video metric counter: an integer when the backend value parses as a number, otherwise the original string.'
+                oneOf:
+                - type: integer
+                  format: int64
+                - type: string
+              play_from_tap:
+                description: 'A video metric counter: an integer when the backend value parses as a number, otherwise the original string.'
+                oneOf:
+                - type: integer
+                  format: int64
+                - type: string
+              playback25:
+                description: 'A video metric counter: an integer when the backend value parses as a number, otherwise the original string.'
+                oneOf:
+                - type: integer
+                  format: int64
+                - type: string
+              playback50:
+                description: 'A video metric counter: an integer when the backend value parses as a number, otherwise the original string.'
+                oneOf:
+                - type: integer
+                  format: int64
+                - type: string
+              playback75:
+                description: 'A video metric counter: an integer when the backend value parses as a number, otherwise the original string.'
+                oneOf:
+                - type: integer
+                  format: int64
+                - type: string
+              playback_complete:
+                description: 'A video metric counter: an integer when the backend value parses as a number, otherwise the original string.'
+                oneOf:
+                - type: integer
+                  format: int64
+                - type: string
+              playback_start:
+                description: 'A video metric counter: an integer when the backend value parses as a number, otherwise the original string.'
+                oneOf:
+                - type: integer
+                  format: int64
+                - type: string
+              video_views:
+                description: 'A video metric counter: an integer when the backend value parses as a number, otherwise the original string.'
+                oneOf:
+                - type: integer
+                  format: int64
+                - type: string
+              watch_time_ms:
+                description: 'A video metric counter: an integer when the backend value parses as a number, otherwise the original string.'
+                oneOf:
+                - type: integer
+                  format: int64
+                - type: string
+          timestamp:
+            type:
+            - string
+            - 'null'
+            description: Start of the metrics bucket, as an ISO 8601 date-time.
+    DeleteMediaSubtitlesResponse:
       type: object
-      properties: {}
-    NotAuthorizedForResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
       properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
-          type: string
+        data:
+          $ref: '#/components/schemas/DeleteMediaSubtitlesResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
   parameters:
     MediaAnalyticsFieldsParameter:
       name: media_analytics.fields
@@ -1649,6 +1641,9 @@ components:
       explode: false
       style: form
   securitySchemes:
+    BearerToken:
+      type: http
+      scheme: bearer
     OAuth2UserToken:
       type: oauth2
       flows:
@@ -1670,8 +1665,7 @@ components:
             follows.write: Follow and unfollow accounts on your behalf.
             like.read: View Posts you have liked and likes you can see.
             like.write: Like and unlike Posts on your behalf.
-            list.read: View Lists, members, and followers of Lists you created or are a member of, including
-              private Lists.
+            list.read: View Lists, members, and followers of Lists you created or are a member of, including private Lists.
             list.write: Create and manage Lists on your behalf.
             media.write: Upload media, such as photos and videos, on your behalf.
             mute.read: View accounts you have muted.
@@ -1683,9 +1677,6 @@ components:
             tweet.read: View all posts you can see, including those from protected accounts.
             tweet.write: Create and repost on your behalf.
             users.read: View any account you can see, including protected accounts.
-    BearerToken:
-      type: http
-      scheme: bearer
     UserToken:
       type: http
       scheme: OAuth

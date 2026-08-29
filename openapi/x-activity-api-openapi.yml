@@ -1,8 +1,8 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: X API v2 Activity API
+  description: X API v2 core endpoints
   version: '2.168'
-  description: The Activity surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  title: X API v2 Activity API
   termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
   contact:
     name: X Developers
@@ -21,6 +21,45 @@ tags:
     url: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
 paths:
   /2/activity/subscriptions:
+    delete:
+      security:
+      - BearerToken: []
+      tags:
+      - Activity
+      summary: Delete X activity subscriptions by IDs
+      description: Deletes multiple subscriptions for X activity events by their IDs
+      externalDocs:
+        url: https://docs.x.com/x-api/activity/delete-x-activity-subscriptions-by-ids
+      operationId: deleteActivitySubscriptionsByIds
+      parameters:
+      - name: ids
+        in: query
+        required: true
+        schema:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+            pattern: ^[0-9]{1,19}$
+        explode: false
+        style: form
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteActivitySubscriptionsByIdsResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
     get:
       security:
       - OAuth2UserToken:
@@ -78,12 +117,7 @@ paths:
       tags:
       - Activity
       summary: Create X activity subscription
-      description: 'Creates a subscription for an X activity event. OAuth2 user-context tokens must hold
-        the scope matching the requested event_type: dm.read for chat.* and dm.* events, like.read for
-        like.* events, mute.read for mute.* events, block.read for block.* events, and tweet.read for
-        all other event types. Mute and block subscriptions are actor-only: filter.user_id must identify
-        the authenticated user and direction is not supported. Optional filter.qualifiers further narrow
-        supported chat, follow, unfollow, and like events.'
+      description: 'Creates a subscription for an X activity event. OAuth2 user-context tokens must hold the scope matching the requested event_type: dm.read for chat.* and dm.* events, like.read for like.* events, mute.read for mute.* events, block.read for block.* events, and tweet.read for all other event types. Mute and block subscriptions are actor-only: filter.user_id must identify the authenticated user and direction is not supported. Optional filter.qualifiers further narrow supported chat, follow, unfollow, and like events.'
       externalDocs:
         url: https://docs.x.com/x-api/activity/create-x-activity-subscription
       operationId: createActivitySubscription
@@ -109,36 +143,32 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+  /2/activity/subscriptions/{subscription_id}:
     delete:
       security:
       - BearerToken: []
       tags:
       - Activity
-      summary: Delete X activity subscriptions by IDs
-      description: Deletes multiple subscriptions for X activity events by their IDs
+      summary: Deletes X activity subscription
+      description: Deletes a subscription for an X activity event
       externalDocs:
-        url: https://docs.x.com/x-api/activity/delete-x-activity-subscriptions-by-ids
-      operationId: deleteActivitySubscriptionsByIds
+        url: https://docs.x.com/x-api/activity/deletes-x-activity-subscription
+      operationId: deleteActivitySubscription
       parameters:
-      - name: ids
-        in: query
+      - name: subscription_id
+        in: path
         required: true
         schema:
-          type: array
-          minItems: 1
-          maxItems: 100
-          items:
-            type: string
-            pattern: ^[0-9]{1,19}$
-        explode: false
-        style: form
+          type: string
+          pattern: ^[0-9]{1,19}$
+        style: simple
       responses:
         '200':
           description: The request has succeeded.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeleteActivitySubscriptionsByIdsResponse'
+                $ref: '#/components/schemas/DeleteActivitySubscriptionResponse'
         default:
           description: The request has failed.
           content:
@@ -148,7 +178,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-  /2/activity/subscriptions/{subscription_id}:
     put:
       security:
       - BearerToken: []
@@ -189,42 +218,416 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-    delete:
-      security:
-      - BearerToken: []
-      tags:
-      - Activity
-      summary: Deletes X activity subscription
-      description: Deletes a subscription for an X activity event
-      externalDocs:
-        url: https://docs.x.com/x-api/activity/deletes-x-activity-subscription
-      operationId: deleteActivitySubscription
-      parameters:
-      - name: subscription_id
-        in: path
-        required: true
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: simple
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeleteActivitySubscriptionResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
 components:
   schemas:
+    UpdateActivitySubscriptionResponseData:
+      type: object
+      properties:
+        subscription:
+          $ref: '#/components/schemas/UpdateActivitySubscriptionResponseDataSubscription'
+        total_subscriptions:
+          type: integer
+          description: Total active subscriptions for the instance.
+    UpdateActivitySubscriptionResponseDataSubscriptionFilter:
+      type: object
+      properties:
+        direction:
+          type: string
+          description: Optional direction filter for directional events. Not present for mute.* or block.* events.
+        keyword:
+          type: string
+          description: Optional keyword filter.
+        qualifiers:
+          type: object
+          description: Event-specific string predicates applied to the subscription.
+        user_id:
+          type: string
+          description: User the subscription is scoped to.
+      additionalProperties: false
+    UpdateActivitySubscriptionResponseDataSubscription:
+      type: object
+      properties:
+        created_at:
+          type: string
+          description: Subscription creation time.
+        event_type:
+          type: string
+          description: Activity event type in dot notation.
+        filter:
+          description: Subscription filter.
+          $ref: '#/components/schemas/UpdateActivitySubscriptionResponseDataSubscriptionFilter'
+        subscription_id:
+          type: string
+          description: Unique identifier of the subscription.
+        tag:
+          type: string
+          description: Optional caller-defined tag.
+        updated_at:
+          type: string
+          description: Subscription last-update time.
+        webhook_id:
+          type: string
+          description: Webhook receiving the subscription events.
+      additionalProperties: false
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+    GetActivitySubscriptionsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetActivitySubscriptionsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    DeleteActivitySubscriptionsByIdsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              deleted:
+                type: boolean
+                description: Whether the subscription was deleted.
+              subscription_id:
+                type: string
+                description: Id of the deleted subscription.
+        errors:
+          type: array
+          description: Per-id failures; deletion continues for the remaining ids.
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+                description: Human-readable failure detail.
+              reason:
+                type: string
+                description: Machine-readable failure reason.
+              subscription_id:
+                type: string
+                description: Id the failure applies to.
+        meta:
+          type: object
+          properties:
+            total_subscriptions:
+              type: integer
+              description: Subscriptions remaining after deletion.
+              format: int32
+    CreateActivitySubscriptionResponseData:
+      type: object
+      properties:
+        subscription:
+          $ref: '#/components/schemas/CreateActivitySubscriptionResponseDataSubscription'
+    NotAuthorizedForFieldProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
+          type: string
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    InvalidRequestProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    CreateActivitySubscriptionFilter:
+      type: object
+      properties:
+        direction:
+          type: string
+          description: Optional direction filter for directional events. Not supported for mute.* or block.* events.
+          enum:
+          - inbound
+          - outbound
+        keyword:
+          type: string
+          description: Optional keyword filter.
+        qualifiers:
+          type: object
+          description: Optional event-specific string predicates.
+        user_id:
+          type: string
+          description: User the subscription is scoped to. For mute.* and block.* events, this must be the authenticated source user.
+      additionalProperties: false
+    UpdateActivitySubscriptionRequest:
+      type: object
+      properties:
+        tag:
+          type: string
+          description: Optional caller-defined tag.
+          minLength: 1
+          maxLength: 200
+        webhook_id:
+          type: string
+          description: Webhook to deliver the subscription events to.
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
+    CreateActivitySubscriptionResponseDataSubscriptionFilter:
+      type: object
+      properties:
+        direction:
+          type: string
+          description: Optional direction filter for directional events. Not present for mute.* or block.* events.
+        keyword:
+          type: string
+          description: Optional keyword filter.
+        qualifiers:
+          type: object
+          description: Event-specific string predicates applied to the subscription.
+        user_id:
+          type: string
+          description: User the subscription is scoped to.
+      additionalProperties: false
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    CreateActivitySubscriptionResponseDataSubscription:
+      type: object
+      properties:
+        created_at:
+          type: string
+          description: Subscription creation time.
+        event_type:
+          type: string
+          description: Activity event type in dot notation.
+        filter:
+          description: Subscription filter.
+          $ref: '#/components/schemas/CreateActivitySubscriptionResponseDataSubscriptionFilter'
+        subscription_id:
+          type: string
+          description: Unique identifier of the subscription.
+        tag:
+          type: string
+          description: Optional caller-defined tag.
+        updated_at:
+          type: string
+          description: Subscription last-update time.
+        webhook_id:
+          type: string
+          description: Webhook receiving the subscription events.
+      additionalProperties: false
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    Problem:
+      oneOf:
+      - $ref: '#/components/schemas/ResourceNotFoundProblem'
+      - $ref: '#/components/schemas/InvalidRequestProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
+      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
+      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
+      - $ref: '#/components/schemas/ResourceUnavailableProblem'
+      - $ref: '#/components/schemas/DisallowedResourceProblem'
+      - $ref: '#/components/schemas/InternalErrorProblem'
+      discriminator:
+        propertyName: type
+        mapping:
+          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
+          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
+          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
+          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
+          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
+          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
+          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
+          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
+          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    UpdateActivitySubscriptionResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UpdateActivitySubscriptionResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    ResourceNotFoundProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
     CreateActivitySubscriptionRequest:
       type: object
       required:
@@ -233,8 +636,7 @@ components:
       properties:
         event_type:
           type: string
-          description: Activity event type in dot notation. `chat.conversation_join` is a deprecated alias
-            of `chat.conversation.join`; responses always use the canonical name.
+          description: Activity event type in dot notation. `chat.conversation_join` is a deprecated alias of `chat.conversation.join`; responses always use the canonical name.
           enum:
           - profile.update.bio
           - profile.update.profile_picture
@@ -291,171 +693,12 @@ components:
           description: Webhook to deliver the subscription events to.
           pattern: ^[0-9]{1,19}$
       additionalProperties: false
-    DeleteActivitySubscriptionsByIdsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            type: object
-            properties:
-              deleted:
-                type: boolean
-                description: Whether the subscription was deleted.
-              subscription_id:
-                type: string
-                description: Id of the deleted subscription.
-        errors:
-          type: array
-          description: Per-id failures; deletion continues for the remaining ids.
-          items:
-            type: object
-            properties:
-              message:
-                type: string
-                description: Human-readable failure detail.
-              reason:
-                type: string
-                description: Machine-readable failure reason.
-              subscription_id:
-                type: string
-                description: Id the failure applies to.
-        meta:
-          type: object
-          properties:
-            total_subscriptions:
-              type: integer
-              description: Subscriptions remaining after deletion.
-              format: int32
-    NotAuthorizedForFieldProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-field
-        value:
-          type: string
-    InvalidRequestProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/invalid-request
-        value:
-          type: string
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    GetActivitySubscriptionsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/GetActivitySubscriptionsResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    CreateActivitySubscriptionResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateActivitySubscriptionResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    CreateActivitySubscriptionResponseDataSubscription:
-      type: object
-      properties:
-        created_at:
-          type: string
-          description: Subscription creation time.
-        event_type:
-          type: string
-          description: Activity event type in dot notation.
-        filter:
-          description: Subscription filter.
-          $ref: '#/components/schemas/CreateActivitySubscriptionResponseDataSubscriptionFilter'
-        subscription_id:
-          type: string
-          description: Unique identifier of the subscription.
-        tag:
-          type: string
-          description: Optional caller-defined tag.
-        updated_at:
-          type: string
-          description: Subscription last-update time.
-        webhook_id:
-          type: string
-          description: Webhook receiving the subscription events.
-      additionalProperties: false
     GetActivitySubscriptionsResponseDataFilter:
       type: object
       properties:
         direction:
           type: string
-          description: Optional direction filter for directional events. Not present for mute.* or block.*
-            events.
+          description: Optional direction filter for directional events. Not present for mute.* or block.* events.
         keyword:
           type: string
           description: Optional keyword filter.
@@ -466,258 +709,6 @@ components:
           type: string
           description: User the subscription is scoped to.
       additionalProperties: false
-    UpdateActivitySubscriptionRequest:
-      type: object
-      properties:
-        tag:
-          type: string
-          description: Optional caller-defined tag.
-          minLength: 1
-          maxLength: 200
-        webhook_id:
-          type: string
-          description: Webhook to deliver the subscription events to.
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
-    Problem:
-      oneOf:
-      - $ref: '#/components/schemas/ResourceNotFoundProblem'
-      - $ref: '#/components/schemas/InvalidRequestProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
-      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
-      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
-      - $ref: '#/components/schemas/ResourceUnavailableProblem'
-      - $ref: '#/components/schemas/DisallowedResourceProblem'
-      - $ref: '#/components/schemas/InternalErrorProblem'
-      discriminator:
-        propertyName: type
-        mapping:
-          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
-          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
-          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
-          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
-          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
-          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
-          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
-          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
-          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    CreateActivitySubscriptionResponseData:
-      type: object
-      properties:
-        subscription:
-          $ref: '#/components/schemas/CreateActivitySubscriptionResponseDataSubscription'
-    UpdateActivitySubscriptionResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/UpdateActivitySubscriptionResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    DeleteActivitySubscriptionResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteActivitySubscriptionResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    CreateActivitySubscriptionResponseDataSubscriptionFilter:
-      type: object
-      properties:
-        direction:
-          type: string
-          description: Optional direction filter for directional events. Not present for mute.* or block.*
-            events.
-        keyword:
-          type: string
-          description: Optional keyword filter.
-        qualifiers:
-          type: object
-          description: Event-specific string predicates applied to the subscription.
-        user_id:
-          type: string
-          description: User the subscription is scoped to.
-      additionalProperties: false
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    DeleteActivitySubscriptionResponseData:
-      type: object
-      required:
-      - deleted
-      properties:
-        deleted:
-          type: boolean
-          description: Whether the subscription was deleted.
-    UpdateActivitySubscriptionResponseDataSubscription:
-      type: object
-      properties:
-        created_at:
-          type: string
-          description: Subscription creation time.
-        event_type:
-          type: string
-          description: Activity event type in dot notation.
-        filter:
-          description: Subscription filter.
-          $ref: '#/components/schemas/UpdateActivitySubscriptionResponseDataSubscriptionFilter'
-        subscription_id:
-          type: string
-          description: Unique identifier of the subscription.
-        tag:
-          type: string
-          description: Optional caller-defined tag.
-        updated_at:
-          type: string
-          description: Subscription last-update time.
-        webhook_id:
-          type: string
-          description: Webhook receiving the subscription events.
-      additionalProperties: false
-    InternalErrorProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    GetActivitySubscriptionsResponseData:
-      type: object
-      properties:
-        created_at:
-          type: string
-          description: Subscription creation time.
-        event_type:
-          type: string
-          description: Activity event type in dot notation.
-        filter:
-          $ref: '#/components/schemas/GetActivitySubscriptionsResponseDataFilter'
-        subscription_id:
-          type: string
-          description: Unique identifier of the subscription.
-        tag:
-          type: string
-          description: Optional caller-defined tag.
-        updated_at:
-          type: string
-          description: Subscription last-update time.
-        webhook_id:
-          type: string
-          description: Webhook receiving the subscription events.
-    CreateActivitySubscriptionFilter:
-      type: object
-      properties:
-        direction:
-          type: string
-          description: Optional direction filter for directional events. Not supported for mute.* or block.*
-            events.
-          enum:
-          - inbound
-          - outbound
-        keyword:
-          type: string
-          description: Optional keyword filter.
-        qualifiers:
-          type: object
-          description: Optional event-specific string predicates.
-        user_id:
-          type: string
-          description: User the subscription is scoped to. For mute.* and block.* events, this must be
-            the authenticated source user.
-      additionalProperties: false
-    UpdateActivitySubscriptionResponseDataSubscriptionFilter:
-      type: object
-      properties:
-        direction:
-          type: string
-          description: Optional direction filter for directional events. Not present for mute.* or block.*
-            events.
-        keyword:
-          type: string
-          description: Optional keyword filter.
-        qualifiers:
-          type: object
-          description: Event-specific string predicates applied to the subscription.
-        user_id:
-          type: string
-          description: User the subscription is scoped to.
-      additionalProperties: false
-    UpdateActivitySubscriptionResponseData:
-      type: object
-      properties:
-        subscription:
-          $ref: '#/components/schemas/UpdateActivitySubscriptionResponseDataSubscription'
-        total_subscriptions:
-          type: integer
-          description: Total active subscriptions for the instance.
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
     FieldUnauthorizedProblem:
       type: object
       required:
@@ -742,58 +733,59 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
-    DisallowedResourceProblem:
+    CreateActivitySubscriptionResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateActivitySubscriptionResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    DeleteActivitySubscriptionResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteActivitySubscriptionResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetActivitySubscriptionsResponseData:
+      type: object
+      properties:
+        created_at:
+          type: string
+          description: Subscription creation time.
+        event_type:
+          type: string
+          description: Activity event type in dot notation.
+        filter:
+          $ref: '#/components/schemas/GetActivitySubscriptionsResponseDataFilter'
+        subscription_id:
+          type: string
+          description: Unique identifier of the subscription.
+        tag:
+          type: string
+          description: Optional caller-defined tag.
+        updated_at:
+          type: string
+          description: Subscription last-update time.
+        webhook_id:
+          type: string
+          description: Webhook receiving the subscription events.
+    DeleteActivitySubscriptionResponseData:
       type: object
       required:
-      - type
-      - title
-      - detail
+      - deleted
       properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    NotAuthorizedForResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
-          type: string
+        deleted:
+          type: boolean
+          description: Whether the subscription was deleted.
   securitySchemes:
+    BearerToken:
+      type: http
+      scheme: bearer
     OAuth2UserToken:
       type: oauth2
       flows:
@@ -815,8 +807,7 @@ components:
             follows.write: Follow and unfollow accounts on your behalf.
             like.read: View Posts you have liked and likes you can see.
             like.write: Like and unlike Posts on your behalf.
-            list.read: View Lists, members, and followers of Lists you created or are a member of, including
-              private Lists.
+            list.read: View Lists, members, and followers of Lists you created or are a member of, including private Lists.
             list.write: Create and manage Lists on your behalf.
             media.write: Upload media, such as photos and videos, on your behalf.
             mute.read: View accounts you have muted.
@@ -828,9 +819,6 @@ components:
             tweet.read: View all posts you can see, including those from protected accounts.
             tweet.write: Create and repost on your behalf.
             users.read: View any account you can see, including protected accounts.
-    BearerToken:
-      type: http
-      scheme: bearer
     UserToken:
       type: http
       scheme: OAuth

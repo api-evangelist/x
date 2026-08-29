@@ -1,8 +1,8 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: X API v2 Webhooks API
+  description: X API v2 core endpoints
   version: '2.168'
-  description: The Webhooks surface of the X API v2, split by tag from the X-published OpenAPI at https://api.x.com/2/openapi.json.
+  title: X API v2 Webhooks API
   termsOfService: https://developer.x.com/en/developer-terms/agreement-and-policy.html
   contact:
     name: X Developers
@@ -48,40 +48,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
   /2/tweets/search/webhooks/{webhook_id}:
-    post:
-      security:
-      - BearerToken: []
-      tags:
-      - Webhooks
-      summary: Create stream link
-      description: Creates a link to deliver FilteredStream events to the given webhook.
-      externalDocs:
-        url: https://docs.x.com/x-api/webhooks/introduction
-      operationId: createWebhooksStreamLink
-      parameters:
-      - name: webhook_id
-        in: path
-        required: true
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: simple
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateWebhooksStreamLinkResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
     delete:
       security:
       - BearerToken: []
@@ -107,6 +73,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeleteWebhooksStreamLinkResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+    post:
+      security:
+      - BearerToken: []
+      tags:
+      - Webhooks
+      summary: Create stream link
+      description: Creates a link to deliver FilteredStream events to the given webhook.
+      externalDocs:
+        url: https://docs.x.com/x-api/webhooks/introduction
+      operationId: createWebhooksStreamLink
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{1,19}$
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWebhooksStreamLinkResponse'
         default:
           description: The request has failed.
           content:
@@ -185,8 +185,7 @@ paths:
       tags:
       - Webhooks
       summary: Create replay job for webhook
-      description: Creates a replay job to retrieve events from up to the past 24 hours for all events
-        delivered or attempted to be delivered to the webhook.
+      description: Creates a replay job to retrieve events from up to the past 24 hours for all events delivered or attempted to be delivered to the webhook.
       externalDocs:
         url: https://docs.x.com/x-api/webhooks/introduction
       operationId: createWebhookReplayJob
@@ -213,41 +212,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
   /2/webhooks/{webhook_id}:
-    put:
-      security:
-      - UserToken: []
-      - BearerToken: []
-      tags:
-      - Webhooks
-      summary: Validate webhook
-      description: Triggers a CRC check for a given webhook.
-      externalDocs:
-        url: https://docs.x.com/x-api/webhooks/introduction
-      operationId: validateWebhooks
-      parameters:
-      - name: webhook_id
-        in: path
-        required: true
-        schema:
-          type: string
-          pattern: ^[0-9]{1,19}$
-        style: simple
-      responses:
-        '200':
-          description: The request has succeeded.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidateWebhooksResponse'
-        default:
-          description: The request has failed.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
     delete:
       security:
       - UserToken: []
@@ -283,6 +247,41 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+    put:
+      security:
+      - UserToken: []
+      - BearerToken: []
+      tags:
+      - Webhooks
+      summary: Validate webhook
+      description: Triggers a CRC check for a given webhook.
+      externalDocs:
+        url: https://docs.x.com/x-api/webhooks/introduction
+      operationId: validateWebhooks
+      parameters:
+      - name: webhook_id
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^[0-9]{1,19}$
+        style: simple
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateWebhooksResponse'
+        default:
+          description: The request has failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
 components:
   schemas:
     CreateWebhookReplayJobResponse:
@@ -294,6 +293,136 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    CreateWebhooksStreamLinkResponseData:
+      type: object
+      required:
+      - provisioned
+      properties:
+        provisioned:
+          type: boolean
+          description: Indicates whether the stream link was provisioned.
+    WebhookConfig:
+      type: object
+      properties:
+        created_at:
+          type: string
+        id:
+          type: string
+        url:
+          type: string
+        valid:
+          type: boolean
+    CreateWebhooksRequest:
+      type: object
+      required:
+      - url
+      properties:
+        url:
+          type: string
+          description: The URL the webhook delivers events to.
+          minLength: 1
+          maxLength: 200
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+    GetWebhooksResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookConfig'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    GetWebhooksStreamLinksResponseData:
+      type: object
+      properties:
+        application_id:
+          type: string
+          description: The application ID
+        business_user_id:
+          type: string
+          description: The user ID
+        created_at:
+          type: string
+          description: The datetime the webhook was linked to the stream
+        fields:
+          type: array
+          description: Requested fields to be rendered
+          items:
+            type: string
+        instance_id:
+          type: string
+          description: The stream ID associated with the FilteredStream instance
+        webhook_id:
+          type: string
+          description: The unique identifier for the webhook
+    ValidateWebhooksResponseData:
+      type: object
+      required:
+      - valid
+      properties:
+        valid:
+          type: boolean
+          description: Indicates whether the CRC validation check was triggered.
     NotAuthorizedForFieldProblem:
       type: object
       required:
@@ -324,6 +453,17 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
           type: string
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
     InvalidRequestProblem:
       type: object
       required:
@@ -345,36 +485,7 @@ components:
           - https://api.x.com/2/problems/invalid-request
         value:
           type: string
-    WebhookConfig:
-      type: object
-      properties:
-        created_at:
-          type: string
-        id:
-          type: string
-        url:
-          type: string
-        valid:
-          type: boolean
-    CreateWebhooksRequest:
-      type: object
-      required:
-      - url
-      properties:
-        url:
-          type: string
-          description: The URL the webhook delivers events to.
-          minLength: 1
-          maxLength: 200
-    DeleteWebhooksResponseData:
-      type: object
-      required:
-      - deleted
-      properties:
-        deleted:
-          type: boolean
-          description: Indicates whether the webhook configuration was deleted.
-    ResourceNotFoundProblem:
+    ResourceUnavailableProblem:
       type: object
       required:
       - type
@@ -383,8 +494,6 @@ components:
       - resource_type
       properties:
         detail:
-          type: string
-        parameter:
           type: string
         resource_id:
           type: string
@@ -397,9 +506,39 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
+          - https://api.x.com/2/problems/resource-unavailable
+    CreateWebhooksStreamLinkResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateWebhooksStreamLinkResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
           type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
     CreateWebhookReplayJobRequest:
       type: object
       required:
@@ -409,27 +548,61 @@ components:
       properties:
         from_date:
           type: string
-          description: The oldest (inclusive) UTC timestamp from which events are replayed, in yyyymmddhhmm
-            format.
+          description: The oldest (inclusive) UTC timestamp from which events are replayed, in yyyymmddhhmm format.
           pattern: ^[0-9]{12}$
         to_date:
           type: string
-          description: The newest (inclusive) UTC timestamp up to which events are replayed, in yyyymmddhhmm
-            format.
+          description: The newest (inclusive) UTC timestamp up to which events are replayed, in yyyymmddhhmm format.
           pattern: ^[0-9]{12}$
         webhook_id:
           type: string
           description: The ID of the webhook to replay events to.
           pattern: ^[0-9]{1,19}$
-    CreateWebhooksResponse:
+    CreateWebhooksResponseData:
       type: object
+      required:
+      - id
+      - url
+      - valid
+      - created_at
       properties:
-        data:
-          $ref: '#/components/schemas/CreateWebhooksResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
+        created_at:
+          type: string
+          description: Creation time of the webhook configuration.
+        id:
+          type: string
+          description: Unique identifier of the webhook configuration.
+        url:
+          type: string
+          description: The URL the webhook delivers events to.
+        valid:
+          type: boolean
+          description: Indicates whether the webhook URL passed validation.
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    DeleteWebhooksStreamLinkResponseData:
+      type: object
+      required:
+      - deleted
+      properties:
+        deleted:
+          type: boolean
+          description: Indicates whether the stream link was deleted.
     CreateWebhookReplayJobResponseData:
       type: object
       required:
@@ -442,34 +615,20 @@ components:
         job_id:
           type: string
           description: The unique identifier for the initiated replay job.
-    GetWebhooksStreamLinksResponseData:
-      type: object
-      properties:
-        application_id:
-          type: string
-          description: The application ID
-        business_user_id:
-          type: string
-          description: The user ID
-        created_at:
-          type: string
-          description: The datetime the webhook was linked to the stream
-        fields:
-          type: array
-          description: Requested fields to be rendered
-          items:
-            type: string
-        instance_id:
-          type: string
-          description: The stream ID associated with the FilteredStream instance
-        webhook_id:
-          type: string
-          description: The unique identifier for the webhook
     ValidateWebhooksResponse:
       type: object
       properties:
         data:
           $ref: '#/components/schemas/ValidateWebhooksResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    DeleteWebhooksResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteWebhooksResponseData'
         errors:
           type: array
           items:
@@ -497,142 +656,7 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    GetWebhooksResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/WebhookConfig'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        meta:
-          type: object
-          properties:
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    DeleteWebhooksResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteWebhooksResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    GetWebhooksStreamLinksResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/GetWebhooksStreamLinksResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    DeleteWebhooksStreamLinkResponseData:
-      type: object
-      required:
-      - deleted
-      properties:
-        deleted:
-          type: boolean
-          description: Indicates whether the stream link was deleted.
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    ValidateWebhooksResponseData:
-      type: object
-      required:
-      - valid
-      properties:
-        valid:
-          type: boolean
-          description: Indicates whether the CRC validation check was triggered.
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    DeleteWebhooksStreamLinkResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteWebhooksStreamLinkResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    InternalErrorProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    CreateWebhooksResponseData:
-      type: object
-      required:
-      - id
-      - url
-      - valid
-      - created_at
-      properties:
-        created_at:
-          type: string
-          description: Creation time of the webhook configuration.
-        id:
-          type: string
-          description: Unique identifier of the webhook configuration.
-        url:
-          type: string
-          description: The URL the webhook delivers events to.
-        valid:
-          type: boolean
-          description: Indicates whether the webhook URL passed validation.
-    ResourceUnavailableProblem:
+    ResourceNotFoundProblem:
       type: object
       required:
       - type
@@ -641,6 +665,8 @@ components:
       - resource_type
       properties:
         detail:
+          type: string
+        parameter:
           type: string
         resource_id:
           type: string
@@ -653,7 +679,29 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/resource-unavailable
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    GetWebhooksStreamLinksResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetWebhooksStreamLinksResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    CreateWebhooksResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateWebhooksResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     FieldUnauthorizedProblem:
       type: object
       required:
@@ -678,74 +726,23 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    CreateWebhooksStreamLinkResponse:
+    DeleteWebhooksStreamLinkResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/CreateWebhooksStreamLinkResponseData'
+          $ref: '#/components/schemas/DeleteWebhooksStreamLinkResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    CreateWebhooksStreamLinkResponseData:
+    DeleteWebhooksResponseData:
       type: object
       required:
-      - provisioned
+      - deleted
       properties:
-        provisioned:
+        deleted:
           type: boolean
-          description: Indicates whether the stream link was provisioned.
-    NotAuthorizedForResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
-          type: string
+          description: Indicates whether the webhook configuration was deleted.
   parameters:
     WebhookConfigFieldsParameter:
       name: webhook_config.fields
@@ -770,6 +767,39 @@ components:
     BearerToken:
       type: http
       scheme: bearer
+    OAuth2UserToken:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.x.com/2/oauth2/authorize
+          tokenUrl: https://api.x.com/2/oauth2/token
+          scopes:
+            block.read: View accounts you have blocked.
+            block.write: Block and unblock accounts on your behalf.
+            bookmark.read: Read your bookmarked Posts.
+            bookmark.write: Create and delete your bookmarks.
+            broadcast.read: View your live broadcasts and their chat.
+            broadcast.write: Manage your live broadcasts and send chat messages on your behalf.
+            developer.read: View your developer accounts, apps, and settings.
+            developer.write: Create and manage your X Developer Platform account.
+            dm.read: Read all your Direct Messages.
+            dm.write: Send and manage your Direct Messages.
+            follows.read: View accounts you follow and accounts following you.
+            follows.write: Follow and unfollow accounts on your behalf.
+            like.read: View Posts you have liked and likes you can see.
+            like.write: Like and unlike Posts on your behalf.
+            list.read: View Lists, members, and followers of Lists you created or are a member of, including private Lists.
+            list.write: Create and manage Lists on your behalf.
+            media.write: Upload media, such as photos and videos, on your behalf.
+            mute.read: View accounts you have muted.
+            mute.write: Mute and unmute accounts on your behalf.
+            offline.access: Request a refresh token for the app.
+            space.read: View all Spaces you have access to.
+            timeline.read: View all Custom Timelines you can see.
+            tweet.moderate.write: Hide and unhide replies to your posts.
+            tweet.read: View all posts you can see, including those from protected accounts.
+            tweet.write: Create and repost on your behalf.
+            users.read: View any account you can see, including protected accounts.
     UserToken:
       type: http
       scheme: OAuth
