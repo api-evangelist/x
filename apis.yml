@@ -41,6 +41,22 @@ access: 3rd-Party
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/x.png
 tags:
 - Social
+- Social-Media
+- Posts
+- User
+- Direct Messages
+- Streaming
+- Webhook
+- Real-Time
+- Trends
+- Media
+- Spaces
+- Content
+- Conversation
+- Agents
+- MCP
+tags_raw:
+- Social
 - Social Media
 - Posts
 - Users
@@ -317,7 +333,8 @@ apis:
     Miscellaneous endpoints for general API functionality — 1 operation(s) in the X-published contract.
   humanURL: https://docs.x.com/x-api/introduction
   baseURL: https://api.x.com
-  tags:
+  tags: []
+  tags_raw:
   - General
   properties:
   - type: OpenAPI
@@ -331,6 +348,8 @@ apis:
   humanURL: https://docs.x.com/x-api/lists/introduction
   baseURL: https://api.x.com
   tags:
+  - List
+  tags_raw:
   - Lists
   properties:
   - type: OpenAPI
@@ -441,6 +460,8 @@ apis:
   humanURL: https://docs.x.com/x-api/users/introduction
   baseURL: https://api.x.com
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI
@@ -459,6 +480,8 @@ apis:
   humanURL: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
   baseURL: https://api.x.com
   tags:
+  - Webhook
+  tags_raw:
   - Webhooks
   properties:
   - type: OpenAPI
