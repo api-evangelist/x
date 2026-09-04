@@ -36,7 +36,7 @@ accessModel:
   note: X publishes no free tier for the X API v2. Access is prepaid credits consumed per resource read and per
     write request; the previous freemium classification came from a scaffolded plans file that has since been replaced
     with X's published pricing.
-position: Consumer
+position: Consuming
 access: 3rd-Party
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/x.png
 tags:
