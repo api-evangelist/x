@@ -1,16 +1,16 @@
 ---
 kin_checks:
   slug: x
-  schema_version: 0.18.2
-  scored_at: '2026-09-04'
-  run_ts: 2026-09-04T062714
+  schema_version: 0.21.0
+  scored_at: '2026-09-12'
+  run_ts: 2026-09-12T080032
   note: Actionable checks only (missed + partial). earned/na are every other check
-    in rubric/scoring-0.18.2.yml; counts below let you verify that.
+    in rubric/scoring-0.21.0.yml; counts below let you verify that.
   counts:
-    total: 132
-    earned: 58
+    total: 136
+    earned: 60
     partial: 13
-    missed: 36
+    missed: 38
     na: 25
   checks:
   - id: multiple_apis
@@ -69,9 +69,6 @@ kin_checks:
     detail: pointer liveness 0.0
   - id: sdk_count_3
     status: missed
-  - id: postman_present
-    status: missed
-    detail: pointer liveness 0.0
   - id: blog_present
     status: missed
   - id: plans_multiple
@@ -81,6 +78,12 @@ kin_checks:
   - id: trust_center
     status: missed
   - id: reg_compliance_published
+    status: missed
+  - id: upsert_alternate_key
+    status: missed
+  - id: upsert_named
+    status: missed
+  - id: upsert_declared_conflict
     status: missed
   - id: openapi_examples
     status: missed
@@ -115,6 +118,10 @@ kin_checks:
     status: partial
     earned: 1.0
     detail: pointer liveness 0.5
+  - id: postman_present
+    status: partial
+    earned: 1.0
+    detail: pointer liveness 0.5
   - id: agentic_access
     status: partial
     earned: 2.5
@@ -122,10 +129,6 @@ kin_checks:
   - id: reversibility_documented
     status: partial
     earned: 2.4
-    detail: 'grade: documented'
-  - id: mcp_server
-    status: partial
-    earned: 4.8
     detail: 'grade: documented'
   - id: auth_clarity
     status: partial
