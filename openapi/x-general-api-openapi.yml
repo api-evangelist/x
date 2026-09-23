@@ -24,7 +24,7 @@ paths:
     get:
       tags:
       - General
-      summary: Get OpenAPI Spec.
+      summary: Get OpenAPI Spec
       description: Retrieves the full OpenAPI Specification in JSON format. (See https://github.com/OAI/OpenAPI-Specification/blob/master/README.md)
       operationId: getOpenApiSpec
       parameters: []

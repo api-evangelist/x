@@ -2248,15 +2248,46 @@ paths:
       description: X API v2 production server
 components:
   schemas:
-    RepostPostResponse:
+    MediaOrganicMetrics:
       type: object
+      description: Organic nonpublic engagement metrics for the media at the time of the request.
       properties:
-        data:
-          $ref: '#/components/schemas/RepostPostResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+        view_count:
+          type:
+          - integer
+          - 'null'
+          description: The number of organic views of this video. Null when the backend returns quartile data without a view count.
+          format: int64
     FieldHydrationFailureProblem:
       type: object
       required:
@@ -2281,89 +2312,262 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-hydration-failure
-    CreateUsersBookmarkResponseData:
+    GetUsersPublicKeysResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicKey'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    RepostPostRequest:
       type: object
       required:
-      - bookmarked
+      - tweet_id
       properties:
-        bookmarked:
-          type: boolean
-          description: Indicates whether the Post is bookmarked by the user.
-    DeleteUsersBookmarkResponseData:
-      type: object
-      required:
-      - bookmarked
-      properties:
-        bookmarked:
-          type: boolean
-          description: Whether the Post is bookmarked.
-    UnfollowListResponseData:
-      type: object
-      required:
-      - following
-      properties:
-        following:
-          type: boolean
-          description: Indicates whether the user is following the List.
-    PinListResponseData:
-      type: object
-      required:
-      - pinned
-      properties:
-        pinned:
-          type: boolean
-          description: Indicates whether the List is pinned by the authenticated user.
-    Poll:
-      type: object
-      properties:
-        duration_minutes:
-          type: integer
-        end_datetime:
+        tweet_id:
           type: string
-        id:
-          type: string
-        options:
-          $ref: '#/components/schemas/PollOptions'
-        voting_status:
-          type: string
-    UnblockUsersDmsResponseData:
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
+    PublicKeyId:
+      type: string
+      description: Unique identifier of a PublicKey
+      pattern: ^[0-9]{1,19}$
+    GetUsersPublicKeyResponse:
       type: object
-      required:
-      - blocked
       properties:
-        blocked:
-          type: boolean
-          description: Indicates whether the target user is DM-blocked.
-    UserWithheld:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicKey'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    PostEntities:
       type: object
-      description: Withholding details for withheld content.
+      description: A list of metadata entities (hashtags, mentions, URLs) found in the Post text.
       properties:
-        country_codes:
+        cashtags:
           type:
           - array
           - 'null'
-          description: A list of countries (as ISO 3166-1 alpha-2 codes) where this content is withheld.
           items:
-            type: string
-        scope:
+            type: object
+            description: A hashtag or cashtag entity.
+            required:
+            - start
+            - end
+            - tag
+            properties:
+              end:
+                type: integer
+                description: End index in the text (exclusive).
+                format: int64
+              start:
+                type: integer
+                description: Start index in the text (inclusive).
+                format: int64
+              tag:
+                type: string
+        hashtags:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            description: A hashtag or cashtag entity.
+            required:
+            - start
+            - end
+            - tag
+            properties:
+              end:
+                type: integer
+                description: End index in the text (exclusive).
+                format: int64
+              start:
+                type: integer
+                description: Start index in the text (inclusive).
+                format: int64
+              tag:
+                type: string
+        mentions:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            description: A user mention entity.
+            required:
+            - start
+            - end
+            properties:
+              end:
+                type: integer
+                format: int64
+              id:
+                type:
+                - string
+                - 'null'
+              start:
+                type: integer
+                format: int64
+              username:
+                type:
+                - string
+                - 'null'
+        urls:
+          type:
+          - array
+          - 'null'
+          items:
+            type: object
+            description: A URL entity found in the Post text, enriched with link metadata.
+            required:
+            - start
+            - end
+            properties:
+              description:
+                type:
+                - string
+                - 'null'
+                description: Description of the linked page, when available.
+              display_url:
+                type:
+                - string
+                - 'null'
+                description: The URL as displayed in the Post text.
+              end:
+                type: integer
+                format: int64
+              expanded_url:
+                type:
+                - string
+                - 'null'
+                description: The fully resolved URL.
+              images:
+                type:
+                - array
+                - 'null'
+                items:
+                  type: object
+                  description: A preview image for a linked page.
+                  properties:
+                    height:
+                      type:
+                      - integer
+                      - 'null'
+                      format: int64
+                    url:
+                      type:
+                      - string
+                      - 'null'
+                    width:
+                      type:
+                      - integer
+                      - 'null'
+                      format: int64
+              media_key:
+                type:
+                - string
+                - 'null'
+              start:
+                type: integer
+                format: int64
+              status:
+                type:
+                - integer
+                - 'null'
+                description: HTTP status from resolving the URL.
+                format: int64
+              title:
+                type:
+                - string
+                - 'null'
+                description: Title of the linked page, when available.
+              unwound_url:
+                type:
+                - string
+                - 'null'
+                description: The final destination after following redirects.
+              url:
+                type:
+                - string
+                - 'null'
+                description: The t.co shortened URL.
+    PostGeo:
+      type: object
+      description: The location tagged on the Post, if the user provided one.
+      properties:
+        coordinates:
+          type:
+          - object
+          - 'null'
+          description: A GeoJSON Point geometry.
+          required:
+          - type
+          - coordinates
+          properties:
+            coordinates:
+              type: array
+              description: '[longitude, latitude].'
+              minItems: 2
+              maxItems: 2
+              items:
+                type: number
+                format: double
+            type:
+              type: string
+              description: The GeoJSON geometry type.
+              enum:
+              - Point
+        place_id:
           type:
           - string
           - 'null'
-          description: The scope of the withholding. Only present, with the value "user", when the entire User is withheld.
-          enum:
-          - user
-    Error:
+          description: The unique identifier of the tagged place.
+    UnmuteUserResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UnmuteUserResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    FollowUserResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/FollowUserResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    PinListRequest:
       type: object
       required:
-      - code
-      - message
+      - list_id
       properties:
-        code:
-          type: integer
-          format: int32
-        message:
+        list_id:
           type: string
-    GetUsersFollowersResponse:
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
+    MediaPublicMetrics:
+      type: object
+      description: Public engagement metrics for the media at the time of the request.
+      required:
+      - view_count
+      properties:
+        view_count:
+          type: integer
+          description: The number of times this video has been viewed.
+          format: int64
+    GetUsersAffiliatesResponse:
       type: object
       properties:
         data:
@@ -2389,7 +2593,49 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
-    ResourceUnavailableProblem:
+    UnlikePostResponseData:
+      type: object
+      required:
+      - liked
+      properties:
+        liked:
+          type: boolean
+          description: Whether the Post is liked.
+    MediaNonPublicMetrics:
+      type: object
+      description: Nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+    ResourceNotFoundProblem:
       type: object
       required:
       - type
@@ -2398,6 +2644,8 @@ components:
       - resource_type
       properties:
         detail:
+          type: string
+        parameter:
           type: string
         resource_id:
           type: string
@@ -2410,7 +2658,438 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/resource-unavailable
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    Topic:
+      type: object
+      properties:
+        description:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+    GetUsersBookmarkFoldersResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetUsersBookmarkFoldersResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    CreateUsersBookmarkRequest:
+      type: object
+      required:
+      - tweet_id
+      properties:
+        folder_id:
+          type: string
+          description: Optional ID of the Bookmark folder to add the Post to. When omitted, the Post is added to the user's top-level Bookmarks only.
+          pattern: ^[0-9]{1,19}$
+        tweet_id:
+          type: string
+          description: The ID of the Post to add to the user's Bookmarks.
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
+    CreateUsersBookmarkResponseData:
+      type: object
+      required:
+      - bookmarked
+      properties:
+        bookmarked:
+          type: boolean
+          description: Indicates whether the Post is bookmarked by the user.
+    NotAuthorizedForFieldProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
+          type: string
+    PostMatchedMediaNotes:
+      type: array
+      description: Community-Notes media matches for this Post.
+      items:
+        type: object
+        description: A Community-Notes media match for this Post.
+        properties:
+          match_status:
+            type:
+            - string
+            - 'null'
+            description: The status of the media note match.
+          note_id:
+            type:
+            - string
+            - 'null'
+            description: The matched note's unique identifier.
+    MuteUserResponseData:
+      type: object
+      required:
+      - muting
+      properties:
+        muting:
+          type: boolean
+          description: Whether the source User is muting the target User.
+    DeleteUsersBookmarkResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteUsersBookmarkResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    BlockUsersDmsResponseData:
+      type: object
+      required:
+      - blocked
+      properties:
+        blocked:
+          type: boolean
+          description: Indicates whether the target user is DM-blocked.
+    UnmuteUserResponseData:
+      type: object
+      required:
+      - muting
+      properties:
+        muting:
+          type: boolean
+          description: Whether the user is muted.
+    GetUsersMentionsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+        meta:
+          type: object
+          properties:
+            newest_id:
+              type: string
+              description: Most recent ID in the data array.
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            oldest_id:
+              type: string
+              description: Oldest ID in the data array.
+            previous_token:
+              type: string
+              description: Pagination token for the previous page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    UserWithheld:
+      type: object
+      description: Withholding details for withheld content.
+      properties:
+        country_codes:
+          type:
+          - array
+          - 'null'
+          description: A list of countries (as ISO 3166-1 alpha-2 codes) where this content is withheld.
+          items:
+            type: string
+        scope:
+          type:
+          - string
+          - 'null'
+          description: The scope of the withholding. Only present, with the value "user", when the entire User is withheld.
+          enum:
+          - user
+    SearchUsersResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            previous_token:
+              type: string
+              description: Pagination token for the previous page of results.
+    GetUsersBookmarksByFolderIdResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          description: The Posts in this bookmark folder, by ID.
+          items:
+            type: object
+            required:
+            - id
+            properties:
+              id:
+                $ref: '#/components/schemas/PostId'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    UnpinListResponseData:
+      type: object
+      required:
+      - pinned
+      properties:
+        pinned:
+          type: boolean
+          description: Indicates whether the List is pinned by the authenticated user.
+    GetUsersPostsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+        meta:
+          type: object
+          properties:
+            newest_id:
+              type: string
+              description: Most recent ID in the data array.
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            oldest_id:
+              type: string
+              description: Oldest ID in the data array.
+            previous_token:
+              type: string
+              description: Pagination token for the previous page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    UnblockUsersDmsResponseData:
+      type: object
+      required:
+      - blocked
+      properties:
+        blocked:
+          type: boolean
+          description: Indicates whether the target user is DM-blocked.
+    Post:
+      type: object
+      properties:
+        article:
+          type: object
+        article_title:
+          type: object
+          description: Metadata about the long-form Article attached to this Post, if any.
+        attachments:
+          $ref: '#/components/schemas/PostAttachments'
+        author_id:
+          type: string
+          description: Unique identifier of the author of this Post.
+        card_uri:
+          type: string
+        community_id:
+          type: string
+          description: The unique identifier of the Community this Post belongs to, if any.
+        context_annotations:
+          $ref: '#/components/schemas/PostContextAnnotations'
+        conversation_id:
+          type: string
+          description: The ID of the conversation this Post belongs to (matches the root Post's ID).
+        created_at:
+          type: string
+          description: Creation time of the Post.
+          format: date-time
+        display_text_range:
+          $ref: '#/components/schemas/PostDisplayTextRange'
+        edit_controls:
+          $ref: '#/components/schemas/PostEditControls'
+        edit_history_post_ids:
+          type: array
+          description: A list of Post IDs in this Post's edit history chain.
+          items:
+            type: string
+        entities:
+          $ref: '#/components/schemas/PostEntities'
+        geo:
+          $ref: '#/components/schemas/PostGeo'
+        id:
+          type: string
+          description: Unique identifier of this Post.
+        in_reply_to_user_id:
+          type: string
+          description: Unique identifier of the User this Post is replying to.
+        lang:
+          type: string
+          description: Language of the Post, if detected by X. Returned as a BCP47 language tag.
+        matched_media_notes:
+          $ref: '#/components/schemas/PostMatchedMediaNotes'
+        media_metadata:
+          $ref: '#/components/schemas/PostMediaMetadata'
+        non_public_metrics:
+          type: object
+          description: Nonpublic engagement metrics for the Post at the time of the request.
+        note_post:
+          $ref: '#/components/schemas/PostNotePost'
+        note_request_suggestions:
+          $ref: '#/components/schemas/PostNoteRequestSuggestions'
+        organic_metrics:
+          type: object
+          description: Organic nonpublic engagement metrics for the Post at the time of the request.
+        paid_partnership:
+          type: boolean
+          description: Indicates if this Post is a paid partnership, i.e. it has been disclosed by the author as containing paid promotion.
+        possibly_sensitive:
+          type: boolean
+          description: Indicates if this Post contains URLs marked as sensitive, for example content suitable for mature audiences.
+        promoted_metrics:
+          type: object
+          description: Promoted nonpublic engagement metrics for the Post at the time of the request.
+        public_metrics:
+          $ref: '#/components/schemas/PostPublicMetrics'
+        referenced_posts:
+          $ref: '#/components/schemas/PostReferencedPosts'
+        reply_settings:
+          type: string
+          description: Shows who can reply to this Post.
+        scopes:
+          $ref: '#/components/schemas/PostScopes'
+        source:
+          type: string
+          description: The name of the app the user posted from. This is deprecated.
+        suggested_source_links:
+          $ref: '#/components/schemas/PostSuggestedSourceLinks'
+        suggested_source_links_with_counts:
+          $ref: '#/components/schemas/PostSuggestedSourceLinksWithCounts'
+        text:
+          type: string
+          description: The content of the Post.
+        username:
+          type: string
+        withheld:
+          $ref: '#/components/schemas/PostWithheld'
+    LikePostRequest:
+      type: object
+      required:
+      - tweet_id
+      properties:
+        tweet_id:
+          type: string
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
+    Media:
+      type: object
+      properties:
+        alt_text:
+          type: string
+        duration_ms:
+          type: integer
+        height:
+          type: integer
+        media_key:
+          type: string
+        non_public_metrics:
+          $ref: '#/components/schemas/MediaNonPublicMetrics'
+        organic_metrics:
+          $ref: '#/components/schemas/MediaOrganicMetrics'
+        preview_image_url:
+          type: string
+        promoted_metrics:
+          $ref: '#/components/schemas/MediaPromotedMetrics'
+        public_metrics:
+          $ref: '#/components/schemas/MediaPublicMetrics'
+        type:
+          type: string
+        url:
+          type: string
+        variants:
+          $ref: '#/components/schemas/MediaVariants'
+        width:
+          type: integer
+    UserPublicMetrics:
+      type: object
+      description: A list of metrics for this User.
+      required:
+      - followers_count
+      - following_count
+      - post_count
+      - listed_count
+      properties:
+        followers_count:
+          type: integer
+          description: Number of Users who follow this User.
+          format: int64
+        following_count:
+          type: integer
+          description: Number of Users this User follows.
+          format: int64
+        like_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of Posts this User has liked.
+          format: int64
+        listed_count:
+          type: integer
+          description: Number of Lists that include this User.
+          format: int64
+        media_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of media items posted by this User.
+          format: int64
+        post_count:
+          type: integer
+          description: Number of Posts (including Reposts) created by this User.
+          format: int64
     UserEntities:
       type: object
       description: A list of metadata found in the User's profile description.
@@ -2651,201 +3330,78 @@ components:
                   url:
                     type: string
                     description: The t.co shortened URL.
-    UnrepostPostResponseData:
+    List:
       type: object
-      required:
-      - retweeted
       properties:
-        retweeted:
+        created_at:
+          type: string
+        description:
+          type: string
+        follower_count:
+          $ref: '#/components/schemas/ListFollowerCount'
+        id:
+          type: string
+        member_count:
+          $ref: '#/components/schemas/ListMemberCount'
+        name:
+          type: string
+        owner_id:
+          type: string
+        private:
           type: boolean
-          description: Whether the Post is reposted.
-    CreateUsersBookmarkRequest:
-      type: object
-      required:
-      - tweet_id
-      properties:
-        folder_id:
-          type: string
-          description: Optional ID of the Bookmark folder to add the Post to. When omitted, the Post is added to the user's top-level Bookmarks only.
-          pattern: ^[0-9]{1,19}$
-        tweet_id:
-          type: string
-          description: The ID of the Post to add to the user's Bookmarks.
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
-    PostMediaMetadata:
+    PostDisplayTextRange:
       type: array
-      description: Metadata for media attached to this Post.
+      description: The inclusive start and exclusive end indices of the displayable content of the Post.
+      minItems: 2
+      maxItems: 2
+      items:
+        type: integer
+        format: int64
+    MediaVariants:
+      type: array
+      description: Each media object may have multiple display or playback variants, with different resolutions or formats.
       items:
         type: object
-        description: Metadata for one media item attached to this Post.
+        description: A single playback or display variant of a media object.
         properties:
-          alt_text:
+          bit_rate:
+            type:
+            - integer
+            - 'null'
+            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
+            format: int64
+          content_type:
             type:
             - string
             - 'null'
-            description: Alternative text describing the media for accessibility.
-          description:
+            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
+          url:
             type:
             - string
             - 'null'
-            description: Description of the media.
-          media_key:
+            description: The URL to this media variant.
+    PostNoteRequestSuggestions:
+      type: array
+      description: Community-Notes request suggestions for this Post.
+      items:
+        type: object
+        description: A Community-Notes request suggestion for this Post.
+        properties:
+          source_link:
             type:
             - string
             - 'null'
-            description: The unique identifier of the media.
-          title:
+            description: A suggested source link supporting the note request.
+          suggestion:
             type:
             - string
             - 'null'
-            description: Title of the media.
-    InternalErrorProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    SearchUsersResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-    RepostPostRequest:
-      type: object
-      required:
-      - tweet_id
-      properties:
-        tweet_id:
-          type: string
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
-    PostEditControls:
-      type: object
-      description: Indicates how much longer (if at all) this Post can be edited.
-      properties:
-        editable_until:
-          type:
-          - string
-          - 'null'
-          description: The time until which this Post can be edited.
-        edits_remaining:
-          type:
-          - integer
-          - 'null'
-          description: Number of edits still allowed for this Post.
-          format: int64
-        is_edit_eligible:
-          type:
-          - boolean
-          - 'null'
-          description: Indicates whether this Post is eligible to be edited.
-    UserAffiliation:
-      type: object
-      description: Metadata about a user's affiliation.
-      properties:
-        badge_url:
-          type:
-          - string
-          - 'null'
-          description: URL of the affiliation badge image shown on the User's profile.
-        description:
-          type:
-          - string
-          - 'null'
-          description: Description of the affiliation.
-        url:
-          type:
-          - string
-          - 'null'
-          description: URL associated with the affiliation.
-        user_id:
-          type:
-          - array
-          - 'null'
-          description: A list of unique identifiers of the accounts this User is affiliated with.
-          items:
-            type: string
-    Problem:
-      oneOf:
-      - $ref: '#/components/schemas/ResourceNotFoundProblem'
-      - $ref: '#/components/schemas/InvalidRequestProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
-      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
-      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
-      - $ref: '#/components/schemas/ResourceUnavailableProblem'
-      - $ref: '#/components/schemas/DisallowedResourceProblem'
-      - $ref: '#/components/schemas/InternalErrorProblem'
-      discriminator:
-        propertyName: type
-        mapping:
-          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
-          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
-          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
-          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
-          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
-          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
-          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
-          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
-          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    UnfollowUserResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/UnfollowUserResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    UserSubscription:
-      type: object
-      description: The subscription relationship between this User and you.
-      required:
-      - subscribes_to_you
-      properties:
-        subscribes_to_you:
-          type: boolean
-          description: Indicates if this User subscribes to you.
-    GetUsersByUsernameResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/User'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
+            description: The text of the note request suggestion.
+          suggestion_id:
+            type:
+            - string
+            - 'null'
+            description: The unique identifier of the note request suggestion.
     GetUsersTimelineResponse:
       type: object
       properties:
@@ -2878,13 +3434,13 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
-    GetUsersFollowingResponse:
+    GetUsersRepostsOfMeResponse:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/User'
+            $ref: '#/components/schemas/Post'
         errors:
           type: array
           items:
@@ -2904,28 +3460,15 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
-    GetUsersByIdsResponse:
+    MuteUserRequest:
       type: object
+      required:
+      - target_user_id
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-    UnrepostPostResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/UnrepostPostResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
+        target_user_id:
+          type: string
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
     GetUsersOwnedListsResponse:
       type: object
       properties:
@@ -2952,44 +3495,13 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
-    PostReferencedPosts:
-      type: array
-      description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes the referenced Post's type and ID.
-      items:
-        type: object
-        description: A reference from this Post to another Post (repost, quote, or reply).
-        required:
-        - type
-        - id
-        properties:
-          id:
-            type: string
-            description: Unique identifier of the referenced Post.
-          type:
-            description: How this Post references the other Post.
-            oneOf:
-            - type: string
-              description: The kind of Post-to-Post reference.
-              enum:
-              - retweeted
-              - quoted
-              - replied_to
-    BlockUsersDmsResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/BlockUsersDmsResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    GetUsersBookmarksResponse:
+    GetUsersMutingResponse:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Post'
+            $ref: '#/components/schemas/User'
         errors:
           type: array
           items:
@@ -3009,15 +3521,76 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
-    UnblockUsersDmsResponse:
+    DeleteUsersBookmarkResponseData:
+      type: object
+      required:
+      - bookmarked
+      properties:
+        bookmarked:
+          type: boolean
+          description: Whether the Post is bookmarked.
+    GetUsersFollowersResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/UnblockUsersDmsResponseData'
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            previous_token:
+              type: string
+              description: Pagination token for the previous page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    UnpinListResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UnpinListResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    UserId:
+      type: string
+      description: Unique identifier of a User
+      pattern: ^[0-9]{1,19}$
+      example: '2244994945'
     PostNotePost:
       type: object
       description: The full content of the Post, including text beyond 280 characters.
@@ -3131,55 +3704,7 @@ components:
         text:
           type: string
           description: The full note text of the Post.
-    UserId:
-      type: string
-      description: Unique identifier of a User
-      pattern: ^[0-9]{1,19}$
-      example: '2244994945'
-    GetUsersRepostsOfMeResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    PostScopes:
-      type: object
-      description: The scopes for this Post.
-      required:
-      - followers
-      properties:
-        followers:
-          type: boolean
-          description: Indicates whether visibility of this Post is limited to the author's followers.
-    LikePostResponseData:
-      type: object
-      required:
-      - liked
-      properties:
-        liked:
-          type: boolean
-          description: Whether the User likes the Post.
-    DisallowedResourceProblem:
+    InvalidRequestProblem:
       type: object
       required:
       - type
@@ -3188,11 +3713,7 @@ components:
       properties:
         detail:
           type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
+        parameter:
           type: string
         status:
           type: integer
@@ -3201,140 +3722,35 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    PostSuggestedSourceLinksWithCounts:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    PostId:
+      type: string
+      description: Unique identifier of a Post
+      pattern: ^[0-9]{1,19}$
+      example: '1346889436626259968'
+    UserConnectionStatus:
       type: array
-      description: Suggested source URLs for this Post, each with the number of times it was suggested.
-      items:
-        type: object
-        description: A suggested source URL for this Post with the number of times it was suggested.
-        properties:
-          count:
-            type:
-            - integer
-            - 'null'
-            description: Number of times this source link was suggested.
-            format: int64
-          url:
-            type:
-            - string
-            - 'null'
-            description: The suggested source URL.
-    GetUsersFollowedListsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/List'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    GetUsersPublicKeysResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PublicKey'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    GetUsersBookmarksByFolderIdResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          description: The Posts in this bookmark folder, by ID.
-          items:
-            type: object
-            required:
-            - id
-            properties:
-              id:
-                $ref: '#/components/schemas/PostId'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    Topic:
-      type: object
-      properties:
-        description:
-          type: string
-        id:
-          type: string
-        name:
-          type: string
-    UnmuteUserResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/UnmuteUserResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    MuteUserResponseData:
-      type: object
-      required:
-      - muting
-      properties:
-        muting:
-          type: boolean
-          description: Whether the source User is muting the target User.
-    PlaceContainedWithin:
-      type: array
-      description: A list of unique identifiers of the Places that contain this place.
+      description: Returns detailed information about the relationship between two users.
       items:
         type: string
-    MediaPublicMetrics:
+        description: A connection between the authenticated User and this User.
+        enum:
+        - blocking
+        - follow_request_received
+        - follow_request_sent
+        - followed_by
+        - following
+        - muting
+    LikePostResponseData:
       type: object
-      description: Public engagement metrics for the media at the time of the request.
       required:
-      - view_count
+      - liked
       properties:
-        view_count:
-          type: integer
-          description: The number of times this video has been viewed.
-          format: int64
-    ListMemberCount:
-      type: integer
-      description: The number of members in this List.
-      format: int64
-    ListFollowerCount:
-      type: integer
-      description: The number of users who follow this List.
-      format: int64
-    PublicKeyId:
-      type: string
-      description: Unique identifier of a PublicKey
-      pattern: ^[0-9]{1,19}$
-    PostDisplayTextRange:
-      type: array
-      description: The inclusive start and exclusive end indices of the displayable content of the Post.
-      minItems: 2
-      maxItems: 2
-      items:
-        type: integer
-        format: int64
+        liked:
+          type: boolean
+          description: Whether the User likes the Post.
     Expansions:
       type: object
       properties:
@@ -3362,13 +3778,133 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
-    GetUsersListMembershipsResponse:
+    PostScopes:
+      type: object
+      description: The scopes for this Post.
+      required:
+      - followers
+      properties:
+        followers:
+          type: boolean
+          description: Indicates whether visibility of this Post is limited to the author's followers.
+    Place:
+      type: object
+      properties:
+        contained_within:
+          $ref: '#/components/schemas/PlaceContainedWithin'
+        country:
+          type: string
+        country_code:
+          type: string
+        full_name:
+          type: string
+        geo:
+          $ref: '#/components/schemas/PlaceGeo'
+        id:
+          type: string
+        name:
+          type: string
+        place_type:
+          type: string
+    GetUsersBookmarkFoldersResponseData:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the bookmark folder.
+        name:
+          type: string
+          description: Display name of the bookmark folder.
+    CreateUsersBookmarkFolderResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateUsersBookmarkFolderResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    FollowUserRequest:
+      type: object
+      required:
+      - target_user_id
+      properties:
+        target_user_id:
+          type: string
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
+    PostContextAnnotations:
+      type: array
+      description: Annotations inferred about the Post (domain and entity context).
+      items:
+        type: object
+        description: A single inferred annotation about the Post (domain and entity context).
+        required:
+        - domain
+        - entity
+        properties:
+          domain:
+            description: The domain (broad category) this annotation belongs to.
+            oneOf:
+            - type: object
+              description: A domain or entity referenced by a context annotation.
+              properties:
+                description:
+                  type:
+                  - string
+                  - 'null'
+                id:
+                  type:
+                  - string
+                  - 'null'
+                name:
+                  type:
+                  - string
+                  - 'null'
+          entity:
+            description: The specific entity recognized within the domain.
+            oneOf:
+            - type: object
+              description: A domain or entity referenced by a context annotation.
+              properties:
+                description:
+                  type:
+                  - string
+                  - 'null'
+                id:
+                  type:
+                  - string
+                  - 'null'
+                name:
+                  type:
+                  - string
+                  - 'null'
+    CreateUsersBookmarkFolderRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: Name of the Bookmark folder (1-25 characters).
+          minLength: 1
+          maxLength: 25
+      additionalProperties: false
+    PostSuggestedSourceLinks:
+      type: array
+      description: URLs suggested as sources for this Post.
+      items:
+        type: string
+    GetUsersFollowingResponse:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/List'
+            $ref: '#/components/schemas/User'
         errors:
           type: array
           items:
@@ -3388,42 +3924,6 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
-    ListId:
-      type: string
-      description: Unique identifier of a List
-      pattern: ^[0-9]{1,19}$
-      example: '1146654567674912769'
-    PostGeo:
-      type: object
-      description: The location tagged on the Post, if the user provided one.
-      properties:
-        coordinates:
-          type:
-          - object
-          - 'null'
-          description: A GeoJSON Point geometry.
-          required:
-          - type
-          - coordinates
-          properties:
-            coordinates:
-              type: array
-              description: '[longitude, latitude].'
-              minItems: 2
-              maxItems: 2
-              items:
-                type: number
-                format: double
-            type:
-              type: string
-              description: The GeoJSON geometry type.
-              enum:
-              - Point
-        place_id:
-          type:
-          - string
-          - 'null'
-          description: The unique identifier of the tagged place.
     LikePostResponse:
       type: object
       properties:
@@ -3433,340 +3933,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    List:
-      type: object
-      properties:
-        created_at:
-          type: string
-        description:
-          type: string
-        follower_count:
-          $ref: '#/components/schemas/ListFollowerCount'
-        id:
-          type: string
-        member_count:
-          $ref: '#/components/schemas/ListMemberCount'
-        name:
-          type: string
-        owner_id:
-          type: string
-        private:
-          type: boolean
-    FollowListRequest:
-      type: object
-      required:
-      - list_id
-      properties:
-        list_id:
-          type: string
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
-    GetUsersPublicKeyResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PublicKey'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    PostEntities:
-      type: object
-      description: A list of metadata entities (hashtags, mentions, URLs) found in the Post text.
-      properties:
-        cashtags:
-          type:
-          - array
-          - 'null'
-          items:
-            type: object
-            description: A hashtag or cashtag entity.
-            required:
-            - start
-            - end
-            - tag
-            properties:
-              end:
-                type: integer
-                description: End index in the text (exclusive).
-                format: int64
-              start:
-                type: integer
-                description: Start index in the text (inclusive).
-                format: int64
-              tag:
-                type: string
-        hashtags:
-          type:
-          - array
-          - 'null'
-          items:
-            type: object
-            description: A hashtag or cashtag entity.
-            required:
-            - start
-            - end
-            - tag
-            properties:
-              end:
-                type: integer
-                description: End index in the text (exclusive).
-                format: int64
-              start:
-                type: integer
-                description: Start index in the text (inclusive).
-                format: int64
-              tag:
-                type: string
-        mentions:
-          type:
-          - array
-          - 'null'
-          items:
-            type: object
-            description: A user mention entity.
-            required:
-            - start
-            - end
-            properties:
-              end:
-                type: integer
-                format: int64
-              id:
-                type:
-                - string
-                - 'null'
-              start:
-                type: integer
-                format: int64
-              username:
-                type:
-                - string
-                - 'null'
-        urls:
-          type:
-          - array
-          - 'null'
-          items:
-            type: object
-            description: A URL entity found in the Post text, enriched with link metadata.
-            required:
-            - start
-            - end
-            properties:
-              description:
-                type:
-                - string
-                - 'null'
-                description: Description of the linked page, when available.
-              display_url:
-                type:
-                - string
-                - 'null'
-                description: The URL as displayed in the Post text.
-              end:
-                type: integer
-                format: int64
-              expanded_url:
-                type:
-                - string
-                - 'null'
-                description: The fully resolved URL.
-              images:
-                type:
-                - array
-                - 'null'
-                items:
-                  type: object
-                  description: A preview image for a linked page.
-                  properties:
-                    height:
-                      type:
-                      - integer
-                      - 'null'
-                      format: int64
-                    url:
-                      type:
-                      - string
-                      - 'null'
-                    width:
-                      type:
-                      - integer
-                      - 'null'
-                      format: int64
-              media_key:
-                type:
-                - string
-                - 'null'
-              start:
-                type: integer
-                format: int64
-              status:
-                type:
-                - integer
-                - 'null'
-                description: HTTP status from resolving the URL.
-                format: int64
-              title:
-                type:
-                - string
-                - 'null'
-                description: Title of the linked page, when available.
-              unwound_url:
-                type:
-                - string
-                - 'null'
-                description: The final destination after following redirects.
-              url:
-                type:
-                - string
-                - 'null'
-                description: The t.co shortened URL.
-    MediaVariants:
-      type: array
-      description: Each media object may have multiple display or playback variants, with different resolutions or formats.
-      items:
-        type: object
-        description: A single playback or display variant of a media object.
-        properties:
-          bit_rate:
-            type:
-            - integer
-            - 'null'
-            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
-            format: int64
-          content_type:
-            type:
-            - string
-            - 'null'
-            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
-          url:
-            type:
-            - string
-            - 'null'
-            description: The URL to this media variant.
-    UnfollowUserResponseData:
-      type: object
-      required:
-      - following
-      properties:
-        following:
-          type: boolean
-          description: Whether the user is followed.
-    CreateUsersBookmarkResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateUsersBookmarkResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    NotAuthorizedForFieldProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-field
-        value:
-          type: string
-    PostNoteRequestSuggestions:
-      type: array
-      description: Community-Notes request suggestions for this Post.
-      items:
-        type: object
-        description: A Community-Notes request suggestion for this Post.
-        properties:
-          source_link:
-            type:
-            - string
-            - 'null'
-            description: A suggested source link supporting the note request.
-          suggestion:
-            type:
-            - string
-            - 'null'
-            description: The text of the note request suggestion.
-          suggestion_id:
-            type:
-            - string
-            - 'null'
-            description: The unique identifier of the note request suggestion.
-    MediaPromotedMetrics:
-      type: object
-      description: Promoted nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-        playback_100_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-        playback_25_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-        playback_50_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-        playback_75_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-        view_count:
-          type:
-          - integer
-          - 'null'
-          description: The number of promoted views of this video. Null when the backend returns quartile data without a view count.
-          format: int64
-    GetUsersMeResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/User'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
     GetUsersPinnedListsResponse:
       type: object
       properties:
@@ -3787,6 +3953,18 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
+    CreateUsersBookmarkFolderResponseData:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the created Bookmark folder.
+        name:
+          type: string
+          description: The name of the created Bookmark folder.
     User:
       type: object
       properties:
@@ -3868,156 +4046,114 @@ components:
           description: 'The X Blue verified type of the user, e.g.: blue, government, business or none.'
         withheld:
           $ref: '#/components/schemas/UserWithheld'
-    FollowListResponse:
+    UnfollowUserResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/FollowListResponseData'
+          $ref: '#/components/schemas/UnfollowUserResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    UserPublicMetrics:
+    PostWithheld:
       type: object
-      description: A list of metrics for this User.
+      description: Withholding details for withheld content.
       required:
-      - followers_count
-      - following_count
-      - post_count
-      - listed_count
+      - copyright
+      - country_codes
       properties:
-        followers_count:
-          type: integer
-          description: Number of Users who follow this User.
-          format: int64
-        following_count:
-          type: integer
-          description: Number of Users this User follows.
-          format: int64
-        like_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of Posts this User has liked.
-          format: int64
-        listed_count:
-          type: integer
-          description: Number of Lists that include this User.
-          format: int64
-        media_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of media items posted by this User.
-          format: int64
-        post_count:
-          type: integer
-          description: Number of Posts (including Reposts) created by this User.
-          format: int64
-    UnmuteUserResponseData:
-      type: object
-      required:
-      - muting
-      properties:
-        muting:
+        copyright:
           type: boolean
-          description: Whether the user is muted.
-    Place:
-      type: object
-      properties:
-        contained_within:
-          $ref: '#/components/schemas/PlaceContainedWithin'
-        country:
-          type: string
-        country_code:
-          type: string
-        full_name:
-          type: string
-        geo:
-          $ref: '#/components/schemas/PlaceGeo'
-        id:
-          type: string
-        name:
-          type: string
-        place_type:
-          type: string
-    GetUsersAffiliatesResponse:
+          description: Indicates whether this content is withheld due to a copyright claim.
+        country_codes:
+          type: array
+          description: Uppercase ISO 3166-1 alpha-2 country codes where this content is withheld.
+          items:
+            type: string
+        scope:
+          type:
+          - string
+          - 'null'
+          description: Whether the withholding applies to a Post or a User.
+          enum:
+          - post
+          - user
+    GetUsersMeResponse:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
+          $ref: '#/components/schemas/User'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
         includes:
           $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    GetUsersBookmarkFoldersResponseData:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the bookmark folder.
-        name:
-          type: string
-          description: Display name of the bookmark folder.
-    UnpinListResponse:
+    CreateUsersBookmarkResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/UnpinListResponseData'
+          $ref: '#/components/schemas/CreateUsersBookmarkResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    FollowListResponseData:
+    DisallowedResourceProblem:
       type: object
       required:
-      - following
+      - type
+      - title
+      - detail
       properties:
-        following:
-          type: boolean
-          description: Whether the user is following the List.
-    BlockUsersDmsResponseData:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    Problem:
+      oneOf:
+      - $ref: '#/components/schemas/ResourceNotFoundProblem'
+      - $ref: '#/components/schemas/InvalidRequestProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
+      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
+      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
+      - $ref: '#/components/schemas/ResourceUnavailableProblem'
+      - $ref: '#/components/schemas/DisallowedResourceProblem'
+      - $ref: '#/components/schemas/InternalErrorProblem'
+      discriminator:
+        propertyName: type
+        mapping:
+          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
+          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
+          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
+          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
+          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
+          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
+          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
+          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
+          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    RepostPostResponse:
       type: object
-      required:
-      - blocked
       properties:
-        blocked:
-          type: boolean
-          description: Indicates whether the target user is DM-blocked.
-    PublicKey:
-      type: object
-      properties:
-        identity_public_key_signature:
-          type: string
-        juicebox_config:
-          type: object
-        public_key:
-          type: string
-        public_key_version:
-          type: string
-        signing_public_key:
-          type: string
-    GetUsersLikedPostsResponse:
+        data:
+          $ref: '#/components/schemas/RepostPostResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetUsersBookmarksResponse:
       type: object
       properties:
         data:
@@ -4043,51 +4179,56 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
-    DeleteUsersBookmarkResponse:
+    PostEditControls:
+      type: object
+      description: Indicates how much longer (if at all) this Post can be edited.
+      properties:
+        editable_until:
+          type:
+          - string
+          - 'null'
+          description: The time until which this Post can be edited.
+        edits_remaining:
+          type:
+          - integer
+          - 'null'
+          description: Number of edits still allowed for this Post.
+          format: int64
+        is_edit_eligible:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates whether this Post is eligible to be edited.
+    GetUsersByIdResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/DeleteUsersBookmarkResponseData'
+          $ref: '#/components/schemas/User'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    PostPublicMetrics:
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    UnrepostPostResponse:
       type: object
-      description: Engagement metrics for the Post at the time of the request.
-      required:
-      - repost_count
-      - reply_count
-      - like_count
-      - quote_count
-      - bookmark_count
-      - impression_count
       properties:
-        bookmark_count:
-          type: integer
-          description: Number of times this Post has been bookmarked.
-          format: int64
-        impression_count:
-          type: integer
-          description: Number of times this Post has been viewed.
-          format: int64
-        like_count:
-          type: integer
-          description: Number of likes on this Post.
-          format: int64
-        quote_count:
-          type: integer
-          description: Number of quote Posts of this Post.
-          format: int64
-        reply_count:
-          type: integer
-          description: Number of replies to this Post.
-          format: int64
-        repost_count:
-          type: integer
-          description: Number of times this Post has been reposted.
-          format: int64
-    GetUsersMutingResponse:
+        data:
+          $ref: '#/components/schemas/UnrepostPostResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    PinListResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PinListResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetUsersBlockingResponse:
       type: object
       properties:
         data:
@@ -4113,83 +4254,29 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
-    Media:
+    UnfollowListResponseData:
       type: object
+      required:
+      - following
       properties:
-        alt_text:
-          type: string
-        duration_ms:
-          type: integer
-        height:
-          type: integer
-        media_key:
-          type: string
-        non_public_metrics:
-          $ref: '#/components/schemas/MediaNonPublicMetrics'
-        organic_metrics:
-          $ref: '#/components/schemas/MediaOrganicMetrics'
-        preview_image_url:
-          type: string
-        promoted_metrics:
-          $ref: '#/components/schemas/MediaPromotedMetrics'
-        public_metrics:
-          $ref: '#/components/schemas/MediaPublicMetrics'
-        type:
-          type: string
-        url:
-          type: string
-        variants:
-          $ref: '#/components/schemas/MediaVariants'
-        width:
-          type: integer
-    PostId:
-      type: string
-      description: Unique identifier of a Post
-      pattern: ^[0-9]{1,19}$
-      example: '1346889436626259968'
-    UnlikePostResponse:
+        following:
+          type: boolean
+          description: Indicates whether the user is following the List.
+    ListMemberCount:
+      type: integer
+      description: The number of members in this List.
+      format: int64
+    GetUsersByUsernameResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/UnlikePostResponseData'
+          $ref: '#/components/schemas/User'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    PinListRequest:
-      type: object
-      required:
-      - list_id
-      properties:
-        list_id:
-          type: string
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
-    MuteUserRequest:
-      type: object
-      required:
-      - target_user_id
-      properties:
-        target_user_id:
-          type: string
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
-    CreateUsersBookmarkFolderRequest:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-          description: Name of the Bookmark folder (1-25 characters).
-          minLength: 1
-          maxLength: 25
-      additionalProperties: false
-    PostSuggestedSourceLinks:
-      type: array
-      description: URLs suggested as sources for this Post.
-      items:
-        type: string
+        includes:
+          $ref: '#/components/schemas/Expansions'
     NotAuthorizedForResourceProblem:
       type: object
       required:
@@ -4218,135 +4305,19 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-resource
         value:
           type: string
-    FollowUserResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/FollowUserResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    LikePostRequest:
-      type: object
-      required:
-      - tweet_id
-      properties:
-        tweet_id:
-          type: string
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
-    GetUsersPostsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            newest_id:
-              type: string
-              description: Most recent ID in the data array.
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            oldest_id:
-              type: string
-              description: Oldest ID in the data array.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    FollowUserResponseData:
-      type: object
-      required:
-      - following
-      - pending_follow
-      properties:
-        following:
-          type: boolean
-          description: Whether the source User is following the target User.
-        pending_follow:
-          type: boolean
-          description: Whether the follow request is pending the target User's approval.
-    MediaNonPublicMetrics:
-      type: object
-      description: Nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-        playback_100_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-        playback_25_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-        playback_50_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-        playback_75_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-    GetUsersBookmarkFoldersResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/GetUsersBookmarkFoldersResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    UserConnectionStatus:
+    PlaceContainedWithin:
       type: array
-      description: Returns detailed information about the relationship between two users.
+      description: A list of unique identifiers of the Places that contain this place.
       items:
         type: string
-        description: A connection between the authenticated User and this User.
-        enum:
-        - blocking
-        - follow_request_received
-        - follow_request_sent
-        - followed_by
-        - following
-        - muting
-    PinListResponse:
+    PinListResponseData:
       type: object
+      required:
+      - pinned
       properties:
-        data:
-          $ref: '#/components/schemas/PinListResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
+        pinned:
+          type: boolean
+          description: Indicates whether the List is pinned by the authenticated user.
     MuteUserResponse:
       type: object
       properties:
@@ -4356,361 +4327,36 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    Post:
-      type: object
-      properties:
-        article:
-          type: object
-        article_title:
-          type: object
-          description: Metadata about the long-form Article attached to this Post, if any.
-        attachments:
-          $ref: '#/components/schemas/PostAttachments'
-        author_id:
-          type: string
-          description: Unique identifier of the author of this Post.
-        card_uri:
-          type: string
-        community_id:
-          type: string
-          description: The unique identifier of the Community this Post belongs to, if any.
-        context_annotations:
-          $ref: '#/components/schemas/PostContextAnnotations'
-        conversation_id:
-          type: string
-          description: The ID of the conversation this Post belongs to (matches the root Post's ID).
-        created_at:
-          type: string
-          description: Creation time of the Post.
-          format: date-time
-        display_text_range:
-          $ref: '#/components/schemas/PostDisplayTextRange'
-        edit_controls:
-          $ref: '#/components/schemas/PostEditControls'
-        edit_history_post_ids:
-          type: array
-          description: A list of Post IDs in this Post's edit history chain.
-          items:
-            type: string
-        entities:
-          $ref: '#/components/schemas/PostEntities'
-        geo:
-          $ref: '#/components/schemas/PostGeo'
-        id:
-          type: string
-          description: Unique identifier of this Post.
-        in_reply_to_user_id:
-          type: string
-          description: Unique identifier of the User this Post is replying to.
-        lang:
-          type: string
-          description: Language of the Post, if detected by X. Returned as a BCP47 language tag.
-        matched_media_notes:
-          $ref: '#/components/schemas/PostMatchedMediaNotes'
-        media_metadata:
-          $ref: '#/components/schemas/PostMediaMetadata'
-        non_public_metrics:
-          type: object
-          description: Nonpublic engagement metrics for the Post at the time of the request.
-        note_post:
-          $ref: '#/components/schemas/PostNotePost'
-        note_request_suggestions:
-          $ref: '#/components/schemas/PostNoteRequestSuggestions'
-        organic_metrics:
-          type: object
-          description: Organic nonpublic engagement metrics for the Post at the time of the request.
-        paid_partnership:
-          type: boolean
-          description: Indicates if this Post is a paid partnership, i.e. it has been disclosed by the author as containing paid promotion.
-        possibly_sensitive:
-          type: boolean
-          description: Indicates if this Post contains URLs marked as sensitive, for example content suitable for mature audiences.
-        promoted_metrics:
-          type: object
-          description: Promoted nonpublic engagement metrics for the Post at the time of the request.
-        public_metrics:
-          $ref: '#/components/schemas/PostPublicMetrics'
-        referenced_posts:
-          $ref: '#/components/schemas/PostReferencedPosts'
-        reply_settings:
-          type: string
-          description: Shows who can reply to this Post.
-        scopes:
-          $ref: '#/components/schemas/PostScopes'
-        source:
-          type: string
-          description: The name of the app the user posted from. This is deprecated.
-        suggested_source_links:
-          $ref: '#/components/schemas/PostSuggestedSourceLinks'
-        suggested_source_links_with_counts:
-          $ref: '#/components/schemas/PostSuggestedSourceLinksWithCounts'
-        text:
-          type: string
-          description: The content of the Post.
-        username:
-          type: string
-        withheld:
-          $ref: '#/components/schemas/PostWithheld'
-    InvalidRequestProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/invalid-request
-        value:
-          type: string
-    CreateUsersBookmarkFolderResponseData:
-      type: object
-      required:
-      - id
-      - name
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the created Bookmark folder.
-        name:
-          type: string
-          description: The name of the created Bookmark folder.
-    PostAttachments:
-      type: object
-      description: Specifies the type of attachments (if any) present in this Post.
-      properties:
-        media_keys:
-          type:
-          - array
-          - 'null'
-          description: Media keys of media attached to this Post.
-          items:
-            type: string
-        media_source_tweet_id:
-          type:
-          - array
-          - 'null'
-          description: IDs of the source Posts the attached media originated from.
-          items:
-            type: string
-        poll_ids:
-          type:
-          - array
-          - 'null'
-          description: IDs of polls attached to this Post.
-          items:
-            type: string
-    GetUsersBlockingResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    PostContextAnnotations:
+    PostMediaMetadata:
       type: array
-      description: Annotations inferred about the Post (domain and entity context).
+      description: Metadata for media attached to this Post.
       items:
         type: object
-        description: A single inferred annotation about the Post (domain and entity context).
-        required:
-        - domain
-        - entity
+        description: Metadata for one media item attached to this Post.
         properties:
-          domain:
-            description: The domain (broad category) this annotation belongs to.
-            oneOf:
-            - type: object
-              description: A domain or entity referenced by a context annotation.
-              properties:
-                description:
-                  type:
-                  - string
-                  - 'null'
-                id:
-                  type:
-                  - string
-                  - 'null'
-                name:
-                  type:
-                  - string
-                  - 'null'
-          entity:
-            description: The specific entity recognized within the domain.
-            oneOf:
-            - type: object
-              description: A domain or entity referenced by a context annotation.
-              properties:
-                description:
-                  type:
-                  - string
-                  - 'null'
-                id:
-                  type:
-                  - string
-                  - 'null'
-                name:
-                  type:
-                  - string
-                  - 'null'
-    PollOptions:
-      type: array
-      description: The list of options (choices) available in this poll.
-      items:
-        type: object
-        description: A single option (choice) available in a poll.
-        required:
-        - position
-        - label
-        - votes
-        properties:
-          label:
-            type: string
-            description: The text label of this poll option.
-          position:
-            type: integer
-            description: The 1-based position of this option within the poll.
-            format: int64
-          votes:
-            type: integer
-            description: The number of votes this option has received.
-            format: int64
-    RepostPostResponseData:
+          alt_text:
+            type:
+            - string
+            - 'null'
+            description: Alternative text describing the media for accessibility.
+          description:
+            type:
+            - string
+            - 'null'
+            description: Description of the media.
+          media_key:
+            type:
+            - string
+            - 'null'
+            description: The unique identifier of the media.
+          title:
+            type:
+            - string
+            - 'null'
+            description: Title of the media.
+    MediaPromotedMetrics:
       type: object
-      required:
-      - retweeted
-      - rest_id
-      properties:
-        rest_id:
-          type: string
-          description: The ID of the reposted Post.
-        retweeted:
-          type: boolean
-          description: Indicates whether the user reposted the Post.
-    CreateUsersBookmarkFolderResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateUsersBookmarkFolderResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    UnpinListResponseData:
-      type: object
-      required:
-      - pinned
-      properties:
-        pinned:
-          type: boolean
-          description: Indicates whether the List is pinned by the authenticated user.
-    PlaceGeo:
-      type: object
-      description: The geographic location of this place, expressed as a GeoJSON Feature.
-      required:
-      - type
-      - bbox
-      - properties
-      properties:
-        bbox:
-          type: array
-          description: The bounding box as [southwest_longitude, southwest_latitude, northeast_longitude, northeast_latitude].
-          minItems: 4
-          maxItems: 4
-          items:
-            type: number
-            format: double
-        properties:
-          type: object
-          description: Additional GeoJSON feature properties.
-        type:
-          description: The GeoJSON feature type.
-          oneOf:
-          - type: string
-            enum:
-            - Feature
-    GetUsersByIdResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/User'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-    UnfollowListResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/UnfollowListResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    UnlikePostResponseData:
-      type: object
-      required:
-      - liked
-      properties:
-        liked:
-          type: boolean
-          description: Whether the Post is liked.
-    PostWithheld:
-      type: object
-      description: Withholding details for withheld content.
-      required:
-      - copyright
-      - country_codes
-      properties:
-        copyright:
-          type: boolean
-          description: Indicates whether this content is withheld due to a copyright claim.
-        country_codes:
-          type: array
-          description: Uppercase ISO 3166-1 alpha-2 country codes where this content is withheld.
-          items:
-            type: string
-        scope:
-          type:
-          - string
-          - 'null'
-          description: Whether the withholding applies to a Post or a User.
-          enum:
-          - post
-          - user
-    MediaOrganicMetrics:
-      type: object
-      description: Organic nonpublic engagement metrics for the media at the time of the request.
+      description: Promoted nonpublic engagement metrics for the media at the time of the request.
       properties:
         playback_0_count:
           type:
@@ -4746,64 +4392,34 @@ components:
           type:
           - integer
           - 'null'
-          description: The number of organic views of this video. Null when the backend returns quartile data without a view count.
+          description: The number of promoted views of this video. Null when the backend returns quartile data without a view count.
           format: int64
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    PostMatchedMediaNotes:
-      type: array
-      description: Community-Notes media matches for this Post.
-      items:
-        type: object
-        description: A Community-Notes media match for this Post.
-        properties:
-          match_status:
-            type:
-            - string
-            - 'null'
-            description: The status of the media note match.
-          note_id:
-            type:
-            - string
-            - 'null'
-            description: The matched note's unique identifier.
-    GetUsersByUsernamesResponse:
+    GetUsersLikedPostsResponse:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/User'
+            $ref: '#/components/schemas/Post'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
         includes:
           $ref: '#/components/schemas/Expansions'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            previous_token:
+              type: string
+              description: Pagination token for the previous page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
     FieldUnauthorizedProblem:
       type: object
       required:
@@ -4828,13 +4444,149 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
-    GetUsersMentionsResponse:
+    GetUsersByIdsResponse:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Post'
+            $ref: '#/components/schemas/User'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    PostReferencedPosts:
+      type: array
+      description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes the referenced Post's type and ID.
+      items:
+        type: object
+        description: A reference from this Post to another Post (repost, quote, or reply).
+        required:
+        - type
+        - id
+        properties:
+          id:
+            type: string
+            description: Unique identifier of the referenced Post.
+          type:
+            description: How this Post references the other Post.
+            oneOf:
+            - type: string
+              description: The kind of Post-to-Post reference.
+              enum:
+              - retweeted
+              - quoted
+              - replied_to
+    PollOptions:
+      type: array
+      description: The list of options (choices) available in this poll.
+      items:
+        type: object
+        description: A single option (choice) available in a poll.
+        required:
+        - position
+        - label
+        - votes
+        properties:
+          label:
+            type: string
+            description: The text label of this poll option.
+          position:
+            type: integer
+            description: The 1-based position of this option within the poll.
+            format: int64
+          votes:
+            type: integer
+            description: The number of votes this option has received.
+            format: int64
+    FollowListResponseData:
+      type: object
+      required:
+      - following
+      properties:
+        following:
+          type: boolean
+          description: Whether the user is following the List.
+    UnfollowListResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UnfollowListResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    UnlikePostResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UnlikePostResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    RepostPostResponseData:
+      type: object
+      required:
+      - retweeted
+      - rest_id
+      properties:
+        rest_id:
+          type: string
+          description: The ID of the reposted Post.
+        retweeted:
+          type: boolean
+          description: Indicates whether the user reposted the Post.
+    FollowUserResponseData:
+      type: object
+      required:
+      - following
+      - pending_follow
+      properties:
+        following:
+          type: boolean
+          description: Whether the source User is following the target User.
+        pending_follow:
+          type: boolean
+          description: Whether the follow request is pending the target User's approval.
+    GetUsersByUsernamesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    ListId:
+      type: string
+      description: Unique identifier of a List
+      pattern: ^[0-9]{1,19}$
+      example: '1146654567674912769'
+    GetUsersListMembershipsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/List'
         errors:
           type: array
           items:
@@ -4844,15 +4596,9 @@ components:
         meta:
           type: object
           properties:
-            newest_id:
-              type: string
-              description: Most recent ID in the data array.
             next_token:
               type: string
               description: Pagination token for the next page of results.
-            oldest_id:
-              type: string
-              description: Oldest ID in the data array.
             previous_token:
               type: string
               description: Pagination token for the previous page of results.
@@ -4860,12 +4606,266 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
-    FollowUserRequest:
+    UserAffiliation:
+      type: object
+      description: Metadata about a user's affiliation.
+      properties:
+        badge_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the affiliation badge image shown on the User's profile.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Description of the affiliation.
+        url:
+          type:
+          - string
+          - 'null'
+          description: URL associated with the affiliation.
+        user_id:
+          type:
+          - array
+          - 'null'
+          description: A list of unique identifiers of the accounts this User is affiliated with.
+          items:
+            type: string
+    UnblockUsersDmsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UnblockUsersDmsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    PublicKey:
+      type: object
+      properties:
+        identity_public_key_signature:
+          type: string
+        juicebox_config:
+          type: object
+        public_key:
+          type: string
+        public_key_version:
+          type: string
+        signing_public_key:
+          type: string
+    BlockUsersDmsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/BlockUsersDmsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetUsersFollowedListsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/List'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            previous_token:
+              type: string
+              description: Pagination token for the previous page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    UnrepostPostResponseData:
       type: object
       required:
-      - target_user_id
+      - retweeted
       properties:
-        target_user_id:
+        retweeted:
+          type: boolean
+          description: Whether the Post is reposted.
+    Poll:
+      type: object
+      properties:
+        duration_minutes:
+          type: integer
+        end_datetime:
+          type: string
+        id:
+          type: string
+        options:
+          $ref: '#/components/schemas/PollOptions'
+        voting_status:
+          type: string
+    PlaceGeo:
+      type: object
+      description: The geographic location of this place, expressed as a GeoJSON Feature.
+      required:
+      - type
+      - bbox
+      - properties
+      properties:
+        bbox:
+          type: array
+          description: The bounding box as [southwest_longitude, southwest_latitude, northeast_longitude, northeast_latitude].
+          minItems: 4
+          maxItems: 4
+          items:
+            type: number
+            format: double
+        properties:
+          type: object
+          description: Additional GeoJSON feature properties.
+        type:
+          description: The GeoJSON feature type.
+          oneOf:
+          - type: string
+            enum:
+            - Feature
+    UnfollowUserResponseData:
+      type: object
+      required:
+      - following
+      properties:
+        following:
+          type: boolean
+          description: Whether the user is followed.
+    PostPublicMetrics:
+      type: object
+      description: Engagement metrics for the Post at the time of the request.
+      required:
+      - repost_count
+      - reply_count
+      - like_count
+      - quote_count
+      - bookmark_count
+      - impression_count
+      properties:
+        bookmark_count:
+          type: integer
+          description: Number of times this Post has been bookmarked.
+          format: int64
+        impression_count:
+          type: integer
+          description: Number of times this Post has been viewed.
+          format: int64
+        like_count:
+          type: integer
+          description: Number of likes on this Post.
+          format: int64
+        quote_count:
+          type: integer
+          description: Number of quote Posts of this Post.
+          format: int64
+        reply_count:
+          type: integer
+          description: Number of replies to this Post.
+          format: int64
+        repost_count:
+          type: integer
+          description: Number of times this Post has been reposted.
+          format: int64
+    PostAttachments:
+      type: object
+      description: Specifies the type of attachments (if any) present in this Post.
+      properties:
+        media_keys:
+          type:
+          - array
+          - 'null'
+          description: Media keys of media attached to this Post.
+          items:
+            type: string
+        media_source_tweet_id:
+          type:
+          - array
+          - 'null'
+          description: IDs of the source Posts the attached media originated from.
+          items:
+            type: string
+        poll_ids:
+          type:
+          - array
+          - 'null'
+          description: IDs of polls attached to this Post.
+          items:
+            type: string
+    UserSubscription:
+      type: object
+      description: The subscription relationship between this User and you.
+      required:
+      - subscribes_to_you
+      properties:
+        subscribes_to_you:
+          type: boolean
+          description: Indicates if this User subscribes to you.
+    ListFollowerCount:
+      type: integer
+      description: The number of users who follow this List.
+      format: int64
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    PostSuggestedSourceLinksWithCounts:
+      type: array
+      description: Suggested source URLs for this Post, each with the number of times it was suggested.
+      items:
+        type: object
+        description: A suggested source URL for this Post with the number of times it was suggested.
+        properties:
+          count:
+            type:
+            - integer
+            - 'null'
+            description: Number of times this source link was suggested.
+            format: int64
+          url:
+            type:
+            - string
+            - 'null'
+            description: The suggested source URL.
+    FollowListResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/FollowListResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    FollowListRequest:
+      type: object
+      required:
+      - list_id
+      properties:
+        list_id:
           type: string
           pattern: ^[0-9]{1,19}$
       additionalProperties: false
@@ -4885,6 +4885,21 @@ components:
           - affiliation
           - most_recent_post_id
           - pinned_post_id
+      explode: false
+      style: form
+    ListExpansionsParameter:
+      name: expansions
+      in: query
+      description: A comma separated list of fields to expand.
+      required: false
+      schema:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - owner_id
       explode: false
       style: form
     PublicKeyFieldsParameter:
@@ -4907,54 +4922,24 @@ components:
           - signing_public_key
       explode: false
       style: form
-    MediaFieldsParameter:
-      name: media.fields
+    PollFieldsParameter:
+      name: poll.fields
       in: query
-      description: A comma separated list of Media fields to display.
+      description: A comma separated list of Poll fields to display.
       required: false
       schema:
         type: array
-        description: The fields available for a Media object.
+        description: The fields available for a Poll object.
         minItems: 1
         uniqueItems: true
         items:
           type: string
           enum:
-          - alt_text
-          - duration_ms
-          - height
-          - media_key
-          - non_public_metrics
-          - organic_metrics
-          - preview_image_url
-          - promoted_metrics
-          - public_metrics
-          - type
-          - url
-          - variants
-          - width
-      explode: false
-      style: form
-    ListFieldsParameter:
-      name: list.fields
-      in: query
-      description: A comma separated list of List fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a List object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - created_at
-          - description
-          - follower_count
+          - duration_minutes
+          - end_datetime
           - id
-          - member_count
-          - name
-          - private
+          - options
+          - voting_status
       explode: false
       style: form
     PlaceFieldsParameter:
@@ -4978,41 +4963,6 @@ components:
           - id
           - name
           - place_type
-      explode: false
-      style: form
-    ListExpansionsParameter:
-      name: expansions
-      in: query
-      description: A comma separated list of fields to expand.
-      required: false
-      schema:
-        type: array
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - owner_id
-      explode: false
-      style: form
-    PollFieldsParameter:
-      name: poll.fields
-      in: query
-      description: A comma separated list of Poll fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Poll object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - duration_minutes
-          - end_datetime
-          - id
-          - options
-          - voting_status
       explode: false
       style: form
     PostExpansionsParameter:
@@ -5039,6 +4989,46 @@ components:
           - in_reply_to_user_id
           - referenced_posts
           - username
+      explode: false
+      style: form
+    UserFieldsParameter:
+      name: user.fields
+      in: query
+      description: A comma separated list of User fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a User object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - confirmed_email
+          - connection_status
+          - created_at
+          - description
+          - entities
+          - id
+          - is_identity_verified
+          - location
+          - name
+          - parody
+          - profile_banner_url
+          - profile_image_url
+          - protected
+          - public_metrics
+          - receives_your_dm
+          - subscriber_count
+          - subscribes_to_you
+          - subscription
+          - subscription_type
+          - url
+          - username
+          - verified
+          - verified_followers_count
+          - verified_type
+          - withheld
       explode: false
       style: form
     PostFieldsParameter:
@@ -5087,44 +5077,54 @@ components:
           - withheld
       explode: false
       style: form
-    UserFieldsParameter:
-      name: user.fields
+    ListFieldsParameter:
+      name: list.fields
       in: query
-      description: A comma separated list of User fields to display.
+      description: A comma separated list of List fields to display.
       required: false
       schema:
         type: array
-        description: The fields available for a User object.
+        description: The fields available for a List object.
         minItems: 1
         uniqueItems: true
         items:
           type: string
           enum:
-          - confirmed_email
-          - connection_status
           - created_at
           - description
-          - entities
+          - follower_count
           - id
-          - is_identity_verified
-          - location
+          - member_count
           - name
-          - parody
-          - profile_banner_url
-          - profile_image_url
-          - protected
+          - private
+      explode: false
+      style: form
+    MediaFieldsParameter:
+      name: media.fields
+      in: query
+      description: A comma separated list of Media fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a Media object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - alt_text
+          - duration_ms
+          - height
+          - media_key
+          - non_public_metrics
+          - organic_metrics
+          - preview_image_url
+          - promoted_metrics
           - public_metrics
-          - receives_your_dm
-          - subscriber_count
-          - subscribes_to_you
-          - subscription
-          - subscription_type
+          - type
           - url
-          - username
-          - verified
-          - verified_followers_count
-          - verified_type
-          - withheld
+          - variants
+          - width
       explode: false
       style: form
   securitySchemes:

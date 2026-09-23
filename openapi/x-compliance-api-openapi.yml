@@ -294,6 +294,36 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-hydration-failure
+    UploadComplianceJobSubmissionResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ComplianceJob'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    InvalidRequestProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
     NotAuthorizedForResourceProblem:
       type: object
       required:
@@ -322,7 +352,102 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-resource
         value:
           type: string
-    GetComplianceJobsByIdResponse:
+    GetComplianceJobsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplianceJob'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    FieldUnauthorizedProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-unauthorized
+    ComplianceJob:
+      type: object
+      properties:
+        created_at:
+          type: string
+        download_expires_at:
+          type: string
+        download_url:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        resumable:
+          type: boolean
+        status:
+          type: string
+        type:
+          type: string
+        upload_expires_at:
+          type: string
+        upload_url:
+          type: string
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    CreateComplianceJobsRequest:
+      type: object
+      required:
+      - type
+      properties:
+        name:
+          type: string
+          description: A user-provided name for this job.
+          maxLength: 64
+        resumable:
+          type: boolean
+          description: Whether to enable the upload URL with support for resumable uploads.
+        type:
+          type: string
+          description: Type of compliance job to list.
+          enum:
+          - tweets
+          - users
+      additionalProperties: false
+    DeleteComplianceJobsByIdResponse:
       type: object
       properties:
         data:
@@ -331,24 +456,55 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    UploadComplianceJobSubmissionResponse:
+    ResourceNotFoundProblem:
       type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
       properties:
-        data:
-          $ref: '#/components/schemas/ComplianceJob'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    CreateComplianceJobsResponse:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    DisallowedResourceProblem:
       type: object
+      required:
+      - type
+      - title
+      - detail
       properties:
-        data:
-          $ref: '#/components/schemas/ComplianceJob'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
     NotAuthorizedForFieldProblem:
       type: object
       required:
@@ -379,150 +535,6 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
           type: string
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    InvalidRequestProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/invalid-request
-        value:
-          type: string
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    GetComplianceJobsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ComplianceJob'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        meta:
-          type: object
-          properties:
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    InternalErrorProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    ComplianceJob:
-      type: object
-      properties:
-        created_at:
-          type: string
-        download_expires_at:
-          type: string
-        download_url:
-          type: string
-        id:
-          type: string
-        name:
-          type: string
-        resumable:
-          type: boolean
-        status:
-          type: string
-        type:
-          type: string
-        upload_expires_at:
-          type: string
-        upload_url:
-          type: string
-    DeleteComplianceJobsByIdResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ComplianceJob'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
     Problem:
       oneOf:
       - $ref: '#/components/schemas/ResourceNotFoundProblem'
@@ -546,7 +558,16 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    ResourceNotFoundProblem:
+    GetComplianceJobsByIdResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ComplianceJob'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    ResourceUnavailableProblem:
       type: object
       required:
       - type
@@ -555,8 +576,6 @@ components:
       - resource_type
       properties:
         detail:
-          type: string
-        parameter:
           type: string
         resource_id:
           type: string
@@ -569,43 +588,15 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    CreateComplianceJobsRequest:
-      type: object
-      required:
-      - type
-      properties:
-        name:
-          type: string
-          description: A user-provided name for this job.
-          maxLength: 64
-        resumable:
-          type: boolean
-          description: Whether to enable the upload URL with support for resumable uploads.
-        type:
-          type: string
-          description: Type of compliance job to list.
-          enum:
-          - tweets
-          - users
-      additionalProperties: false
-    FieldUnauthorizedProblem:
+          - https://api.x.com/2/problems/resource-unavailable
+    InternalErrorProblem:
       type: object
       required:
       - type
       - title
       - detail
-      - field
       properties:
         detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
           type: string
         status:
           type: integer
@@ -614,7 +605,16 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/field-unauthorized
+          - https://api.x.com/2/problems/internal-error
+    CreateComplianceJobsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ComplianceJob'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
   parameters:
     ComplianceJobFieldsParameter:
       name: compliance_job.fields

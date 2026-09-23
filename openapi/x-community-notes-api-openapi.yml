@@ -242,149 +242,46 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    PostPublicMetrics:
+    MediaOrganicMetrics:
       type: object
-      description: Engagement metrics for the Post at the time of the request.
-      required:
-      - repost_count
-      - reply_count
-      - like_count
-      - quote_count
-      - bookmark_count
-      - impression_count
+      description: Organic nonpublic engagement metrics for the media at the time of the request.
       properties:
-        bookmark_count:
-          type: integer
-          description: Number of times this Post has been bookmarked.
-          format: int64
-        impression_count:
-          type: integer
-          description: Number of times this Post has been viewed.
-          format: int64
-        like_count:
-          type: integer
-          description: Number of likes on this Post.
-          format: int64
-        quote_count:
-          type: integer
-          description: Number of quote Posts of this Post.
-          format: int64
-        reply_count:
-          type: integer
-          description: Number of replies to this Post.
-          format: int64
-        repost_count:
-          type: integer
-          description: Number of times this Post has been reposted.
-          format: int64
-    PostDisplayTextRange:
-      type: array
-      description: The inclusive start and exclusive end indices of the displayable content of the Post.
-      minItems: 2
-      maxItems: 2
-      items:
-        type: integer
-        format: int64
-    Expansions:
-      type: object
-      properties:
-        media:
-          type: array
-          items:
-            $ref: '#/components/schemas/Media'
-        places:
-          type: array
-          items:
-            $ref: '#/components/schemas/Place'
-        polls:
-          type: array
-          items:
-            $ref: '#/components/schemas/Poll'
-        posts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        topics:
-          type: array
-          items:
-            $ref: '#/components/schemas/Topic'
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-    Media:
-      type: object
-      properties:
-        alt_text:
-          type: string
-        duration_ms:
-          type: integer
-        height:
-          type: integer
-        media_key:
-          type: string
-        non_public_metrics:
-          $ref: '#/components/schemas/MediaNonPublicMetrics'
-        organic_metrics:
-          $ref: '#/components/schemas/MediaOrganicMetrics'
-        preview_image_url:
-          type: string
-        promoted_metrics:
-          $ref: '#/components/schemas/MediaPromotedMetrics'
-        public_metrics:
-          $ref: '#/components/schemas/MediaPublicMetrics'
-        type:
-          type: string
-        url:
-          type: string
-        variants:
-          $ref: '#/components/schemas/MediaVariants'
-        width:
-          type: integer
-    Note:
-      type: object
-      properties:
-        id:
-          type: string
-        info:
-          $ref: '#/components/schemas/NoteInfo'
-        scoring_status:
-          $ref: '#/components/schemas/NoteScoringStatus'
-        status:
-          type: string
-        test_result:
-          $ref: '#/components/schemas/NoteTestResult'
-    PostGeo:
-      type: object
-      description: The location tagged on the Post, if the user provided one.
-      properties:
-        coordinates:
+        playback_0_count:
           type:
-          - object
+          - integer
           - 'null'
-          description: A GeoJSON Point geometry.
-          required:
-          - type
-          - coordinates
-          properties:
-            coordinates:
-              type: array
-              description: '[longitude, latitude].'
-              minItems: 2
-              maxItems: 2
-              items:
-                type: number
-                format: double
-            type:
-              type: string
-              description: The GeoJSON geometry type.
-              enum:
-              - Point
-        place_id:
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
           type:
-          - string
+          - integer
           - 'null'
-          description: The unique identifier of the tagged place.
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+        view_count:
+          type:
+          - integer
+          - 'null'
+          description: The number of organic views of this video. Null when the backend returns quartile data without a view count.
+          format: int64
     FieldHydrationFailureProblem:
       type: object
       required:
@@ -445,527 +342,6 @@ components:
           - boolean
           - 'null'
           description: Whether the note cites trustworthy sources.
-    PostSuggestedSourceLinks:
-      type: array
-      description: URLs suggested as sources for this Post.
-      items:
-        type: string
-    NotAuthorizedForResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
-          type: string
-    PostEntities:
-      type: object
-      description: A list of metadata entities (hashtags, mentions, URLs) found in the Post text.
-      properties:
-        cashtags:
-          type:
-          - array
-          - 'null'
-          items:
-            type: object
-            description: A hashtag or cashtag entity.
-            required:
-            - start
-            - end
-            - tag
-            properties:
-              end:
-                type: integer
-                description: End index in the text (exclusive).
-                format: int64
-              start:
-                type: integer
-                description: Start index in the text (inclusive).
-                format: int64
-              tag:
-                type: string
-        hashtags:
-          type:
-          - array
-          - 'null'
-          items:
-            type: object
-            description: A hashtag or cashtag entity.
-            required:
-            - start
-            - end
-            - tag
-            properties:
-              end:
-                type: integer
-                description: End index in the text (exclusive).
-                format: int64
-              start:
-                type: integer
-                description: Start index in the text (inclusive).
-                format: int64
-              tag:
-                type: string
-        mentions:
-          type:
-          - array
-          - 'null'
-          items:
-            type: object
-            description: A user mention entity.
-            required:
-            - start
-            - end
-            properties:
-              end:
-                type: integer
-                format: int64
-              id:
-                type:
-                - string
-                - 'null'
-              start:
-                type: integer
-                format: int64
-              username:
-                type:
-                - string
-                - 'null'
-        urls:
-          type:
-          - array
-          - 'null'
-          items:
-            type: object
-            description: A URL entity found in the Post text, enriched with link metadata.
-            required:
-            - start
-            - end
-            properties:
-              description:
-                type:
-                - string
-                - 'null'
-                description: Description of the linked page, when available.
-              display_url:
-                type:
-                - string
-                - 'null'
-                description: The URL as displayed in the Post text.
-              end:
-                type: integer
-                format: int64
-              expanded_url:
-                type:
-                - string
-                - 'null'
-                description: The fully resolved URL.
-              images:
-                type:
-                - array
-                - 'null'
-                items:
-                  type: object
-                  description: A preview image for a linked page.
-                  properties:
-                    height:
-                      type:
-                      - integer
-                      - 'null'
-                      format: int64
-                    url:
-                      type:
-                      - string
-                      - 'null'
-                    width:
-                      type:
-                      - integer
-                      - 'null'
-                      format: int64
-              media_key:
-                type:
-                - string
-                - 'null'
-              start:
-                type: integer
-                format: int64
-              status:
-                type:
-                - integer
-                - 'null'
-                description: HTTP status from resolving the URL.
-                format: int64
-              title:
-                type:
-                - string
-                - 'null'
-                description: Title of the linked page, when available.
-              unwound_url:
-                type:
-                - string
-                - 'null'
-                description: The final destination after following redirects.
-              url:
-                type:
-                - string
-                - 'null'
-                description: The t.co shortened URL.
-    MediaVariants:
-      type: array
-      description: Each media object may have multiple display or playback variants, with different resolutions or formats.
-      items:
-        type: object
-        description: A single playback or display variant of a media object.
-        properties:
-          bit_rate:
-            type:
-            - integer
-            - 'null'
-            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
-            format: int64
-          content_type:
-            type:
-            - string
-            - 'null'
-            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
-          url:
-            type:
-            - string
-            - 'null'
-            description: The URL to this media variant.
-    DeleteCommunityNotesResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteCommunityNotesResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    PostReferencedPosts:
-      type: array
-      description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes the referenced Post's type and ID.
-      items:
-        type: object
-        description: A reference from this Post to another Post (repost, quote, or reply).
-        required:
-        - type
-        - id
-        properties:
-          id:
-            type: string
-            description: Unique identifier of the referenced Post.
-          type:
-            description: How this Post references the other Post.
-            oneOf:
-            - type: string
-              description: The kind of Post-to-Post reference.
-              enum:
-              - retweeted
-              - quoted
-              - replied_to
-    EvaluateCommunityNotesRequest:
-      type: object
-      required:
-      - post_id
-      - note_text
-      properties:
-        note_text:
-          type: string
-          description: Text of the community note to evaluate.
-        post_id:
-          type: string
-          description: ID of the Post the note evaluates.
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
-    SearchEligiblePostsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    MediaNonPublicMetrics:
-      type: object
-      description: Nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-        playback_100_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-        playback_25_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-        playback_50_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-        playback_75_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-    UserConnectionStatus:
-      type: array
-      description: Returns detailed information about the relationship between two users.
-      items:
-        type: string
-        description: A connection between the authenticated User and this User.
-        enum:
-        - blocking
-        - follow_request_received
-        - follow_request_sent
-        - followed_by
-        - following
-        - muting
-    SearchCommunityNotesWrittenResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Note'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    NotAuthorizedForFieldProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-field
-        value:
-          type: string
-    CreateCommunityNotesResponseData:
-      type: object
-      required:
-      - id
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the created Community Note.
-    NoteTestResult:
-      type: object
-      description: AI evaluation results for the Community Note (returned in test mode).
-      properties:
-        evaluation_outcome:
-          type:
-          - array
-          - 'null'
-          description: Per-evaluator outcomes for the note.
-          items:
-            type: object
-            description: A single evaluator's outcome for a Community Note.
-            required:
-            - evaluator_type
-            - evaluator_score_bucket
-            properties:
-              evaluator_score_bucket:
-                type: string
-                description: The score bucket the evaluator assigned.
-              evaluator_type:
-                type: string
-                description: The type of evaluator that produced this outcome.
-    Post:
-      type: object
-      properties:
-        article:
-          type: object
-        article_title:
-          type: object
-          description: Metadata about the long-form Article attached to this Post, if any.
-        attachments:
-          $ref: '#/components/schemas/PostAttachments'
-        author_id:
-          type: string
-          description: Unique identifier of the author of this Post.
-        card_uri:
-          type: string
-        community_id:
-          type: string
-          description: The unique identifier of the Community this Post belongs to, if any.
-        context_annotations:
-          $ref: '#/components/schemas/PostContextAnnotations'
-        conversation_id:
-          type: string
-          description: The ID of the conversation this Post belongs to (matches the root Post's ID).
-        created_at:
-          type: string
-          description: Creation time of the Post.
-          format: date-time
-        display_text_range:
-          $ref: '#/components/schemas/PostDisplayTextRange'
-        edit_controls:
-          $ref: '#/components/schemas/PostEditControls'
-        edit_history_post_ids:
-          type: array
-          description: A list of Post IDs in this Post's edit history chain.
-          items:
-            type: string
-        entities:
-          $ref: '#/components/schemas/PostEntities'
-        geo:
-          $ref: '#/components/schemas/PostGeo'
-        id:
-          type: string
-          description: Unique identifier of this Post.
-        in_reply_to_user_id:
-          type: string
-          description: Unique identifier of the User this Post is replying to.
-        lang:
-          type: string
-          description: Language of the Post, if detected by X. Returned as a BCP47 language tag.
-        matched_media_notes:
-          $ref: '#/components/schemas/PostMatchedMediaNotes'
-        media_metadata:
-          $ref: '#/components/schemas/PostMediaMetadata'
-        non_public_metrics:
-          type: object
-          description: Nonpublic engagement metrics for the Post at the time of the request.
-        note_post:
-          $ref: '#/components/schemas/PostNotePost'
-        note_request_suggestions:
-          $ref: '#/components/schemas/PostNoteRequestSuggestions'
-        organic_metrics:
-          type: object
-          description: Organic nonpublic engagement metrics for the Post at the time of the request.
-        paid_partnership:
-          type: boolean
-          description: Indicates if this Post is a paid partnership, i.e. it has been disclosed by the author as containing paid promotion.
-        possibly_sensitive:
-          type: boolean
-          description: Indicates if this Post contains URLs marked as sensitive, for example content suitable for mature audiences.
-        promoted_metrics:
-          type: object
-          description: Promoted nonpublic engagement metrics for the Post at the time of the request.
-        public_metrics:
-          $ref: '#/components/schemas/PostPublicMetrics'
-        referenced_posts:
-          $ref: '#/components/schemas/PostReferencedPosts'
-        reply_settings:
-          type: string
-          description: Shows who can reply to this Post.
-        scopes:
-          $ref: '#/components/schemas/PostScopes'
-        source:
-          type: string
-          description: The name of the app the user posted from. This is deprecated.
-        suggested_source_links:
-          $ref: '#/components/schemas/PostSuggestedSourceLinks'
-        suggested_source_links_with_counts:
-          $ref: '#/components/schemas/PostSuggestedSourceLinksWithCounts'
-        text:
-          type: string
-          description: The content of the Post.
-        username:
-          type: string
-        withheld:
-          $ref: '#/components/schemas/PostWithheld'
-    PostNoteRequestSuggestions:
-      type: array
-      description: Community-Notes request suggestions for this Post.
-      items:
-        type: object
-        description: A Community-Notes request suggestion for this Post.
-        properties:
-          source_link:
-            type:
-            - string
-            - 'null'
-            description: A suggested source link supporting the note request.
-          suggestion:
-            type:
-            - string
-            - 'null'
-            description: The text of the note request suggestion.
-          suggestion_id:
-            type:
-            - string
-            - 'null'
-            description: The unique identifier of the note request suggestion.
     PostNotePost:
       type: object
       description: The full content of the Post, including text beyond 280 characters.
@@ -1079,17 +455,12 @@ components:
         text:
           type: string
           description: The full note text of the Post.
-    Error:
+    EvaluateCommunityNotesResponseData:
       type: object
-      required:
-      - code
-      - message
       properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
+        claim_opinion_score:
+          type: number
+          description: The evaluated claim-opinion score for the note.
     InvalidRequestProblem:
       type: object
       required:
@@ -1111,13 +482,7 @@ components:
           - https://api.x.com/2/problems/invalid-request
         value:
           type: string
-    EvaluateCommunityNotesResponseData:
-      type: object
-      properties:
-        claim_opinion_score:
-          type: number
-          description: The evaluated claim-opinion score for the note.
-    ResourceUnavailableProblem:
+    NotAuthorizedForResourceProblem:
       type: object
       required:
       - type
@@ -1127,9 +492,13 @@ components:
       properties:
         detail:
           type: string
+        parameter:
+          type: string
         resource_id:
           type: string
         resource_type:
+          type: string
+        section:
           type: string
         status:
           type: integer
@@ -1138,38 +507,446 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    Poll:
-      type: object
-      properties:
-        duration_minutes:
-          type: integer
-        end_datetime:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
           type: string
+    PlaceContainedWithin:
+      type: array
+      description: A list of unique identifiers of the Places that contain this place.
+      items:
+        type: string
+    CreateCommunityNotesResponseData:
+      type: object
+      required:
+      - id
+      properties:
         id:
           type: string
-        options:
-          $ref: '#/components/schemas/PollOptions'
-        voting_status:
-          type: string
-    UserWithheld:
+          description: Unique identifier of the created Community Note.
+    Post:
       type: object
-      description: Withholding details for withheld content.
       properties:
-        country_codes:
-          type:
-          - array
-          - 'null'
-          description: A list of countries (as ISO 3166-1 alpha-2 codes) where this content is withheld.
+        article:
+          type: object
+        article_title:
+          type: object
+          description: Metadata about the long-form Article attached to this Post, if any.
+        attachments:
+          $ref: '#/components/schemas/PostAttachments'
+        author_id:
+          type: string
+          description: Unique identifier of the author of this Post.
+        card_uri:
+          type: string
+        community_id:
+          type: string
+          description: The unique identifier of the Community this Post belongs to, if any.
+        context_annotations:
+          $ref: '#/components/schemas/PostContextAnnotations'
+        conversation_id:
+          type: string
+          description: The ID of the conversation this Post belongs to (matches the root Post's ID).
+        created_at:
+          type: string
+          description: Creation time of the Post.
+          format: date-time
+        display_text_range:
+          $ref: '#/components/schemas/PostDisplayTextRange'
+        edit_controls:
+          $ref: '#/components/schemas/PostEditControls'
+        edit_history_post_ids:
+          type: array
+          description: A list of Post IDs in this Post's edit history chain.
           items:
             type: string
-        scope:
+        entities:
+          $ref: '#/components/schemas/PostEntities'
+        geo:
+          $ref: '#/components/schemas/PostGeo'
+        id:
+          type: string
+          description: Unique identifier of this Post.
+        in_reply_to_user_id:
+          type: string
+          description: Unique identifier of the User this Post is replying to.
+        lang:
+          type: string
+          description: Language of the Post, if detected by X. Returned as a BCP47 language tag.
+        matched_media_notes:
+          $ref: '#/components/schemas/PostMatchedMediaNotes'
+        media_metadata:
+          $ref: '#/components/schemas/PostMediaMetadata'
+        non_public_metrics:
+          type: object
+          description: Nonpublic engagement metrics for the Post at the time of the request.
+        note_post:
+          $ref: '#/components/schemas/PostNotePost'
+        note_request_suggestions:
+          $ref: '#/components/schemas/PostNoteRequestSuggestions'
+        organic_metrics:
+          type: object
+          description: Organic nonpublic engagement metrics for the Post at the time of the request.
+        paid_partnership:
+          type: boolean
+          description: Indicates if this Post is a paid partnership, i.e. it has been disclosed by the author as containing paid promotion.
+        possibly_sensitive:
+          type: boolean
+          description: Indicates if this Post contains URLs marked as sensitive, for example content suitable for mature audiences.
+        promoted_metrics:
+          type: object
+          description: Promoted nonpublic engagement metrics for the Post at the time of the request.
+        public_metrics:
+          $ref: '#/components/schemas/PostPublicMetrics'
+        referenced_posts:
+          $ref: '#/components/schemas/PostReferencedPosts'
+        reply_settings:
+          type: string
+          description: Shows who can reply to this Post.
+        scopes:
+          $ref: '#/components/schemas/PostScopes'
+        source:
+          type: string
+          description: The name of the app the user posted from. This is deprecated.
+        suggested_source_links:
+          $ref: '#/components/schemas/PostSuggestedSourceLinks'
+        suggested_source_links_with_counts:
+          $ref: '#/components/schemas/PostSuggestedSourceLinksWithCounts'
+        text:
+          type: string
+          description: The content of the Post.
+        username:
+          type: string
+        withheld:
+          $ref: '#/components/schemas/PostWithheld'
+    UserConnectionStatus:
+      type: array
+      description: Returns detailed information about the relationship between two users.
+      items:
+        type: string
+        description: A connection between the authenticated User and this User.
+        enum:
+        - blocking
+        - follow_request_received
+        - follow_request_sent
+        - followed_by
+        - following
+        - muting
+    NoteId:
+      type: string
+      description: Unique identifier of a Note
+      pattern: ^[0-9]{1,19}$
+    Expansions:
+      type: object
+      properties:
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        places:
+          type: array
+          items:
+            $ref: '#/components/schemas/Place'
+        polls:
+          type: array
+          items:
+            $ref: '#/components/schemas/Poll'
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        topics:
+          type: array
+          items:
+            $ref: '#/components/schemas/Topic'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    Media:
+      type: object
+      properties:
+        alt_text:
+          type: string
+        duration_ms:
+          type: integer
+        height:
+          type: integer
+        media_key:
+          type: string
+        non_public_metrics:
+          $ref: '#/components/schemas/MediaNonPublicMetrics'
+        organic_metrics:
+          $ref: '#/components/schemas/MediaOrganicMetrics'
+        preview_image_url:
+          type: string
+        promoted_metrics:
+          $ref: '#/components/schemas/MediaPromotedMetrics'
+        public_metrics:
+          $ref: '#/components/schemas/MediaPublicMetrics'
+        type:
+          type: string
+        url:
+          type: string
+        variants:
+          $ref: '#/components/schemas/MediaVariants'
+        width:
+          type: integer
+    Place:
+      type: object
+      properties:
+        contained_within:
+          $ref: '#/components/schemas/PlaceContainedWithin'
+        country:
+          type: string
+        country_code:
+          type: string
+        full_name:
+          type: string
+        geo:
+          $ref: '#/components/schemas/PlaceGeo'
+        id:
+          type: string
+        name:
+          type: string
+        place_type:
+          type: string
+    DeleteCommunityNotesResponseData:
+      type: object
+      required:
+      - deleted
+      properties:
+        deleted:
+          type: boolean
+          description: Indicates whether the Community Note was deleted.
+    SearchCommunityNotesWrittenResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Note'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    PostMediaMetadata:
+      type: array
+      description: Metadata for media attached to this Post.
+      items:
+        type: object
+        description: Metadata for one media item attached to this Post.
+        properties:
+          alt_text:
+            type:
+            - string
+            - 'null'
+            description: Alternative text describing the media for accessibility.
+          description:
+            type:
+            - string
+            - 'null'
+            description: Description of the media.
+          media_key:
+            type:
+            - string
+            - 'null'
+            description: The unique identifier of the media.
+          title:
+            type:
+            - string
+            - 'null'
+            description: Title of the media.
+    DeleteCommunityNotesResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteCommunityNotesResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    MediaPromotedMetrics:
+      type: object
+      description: Promoted nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+        view_count:
+          type:
+          - integer
+          - 'null'
+          description: The number of promoted views of this video. Null when the backend returns quartile data without a view count.
+          format: int64
+    FieldUnauthorizedProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-unauthorized
+    PostGeo:
+      type: object
+      description: The location tagged on the Post, if the user provided one.
+      properties:
+        coordinates:
+          type:
+          - object
+          - 'null'
+          description: A GeoJSON Point geometry.
+          required:
+          - type
+          - coordinates
+          properties:
+            coordinates:
+              type: array
+              description: '[longitude, latitude].'
+              minItems: 2
+              maxItems: 2
+              items:
+                type: number
+                format: double
+            type:
+              type: string
+              description: The GeoJSON geometry type.
+              enum:
+              - Point
+        place_id:
           type:
           - string
           - 'null'
-          description: The scope of the withholding. Only present, with the value "user", when the entire User is withheld.
-          enum:
-          - user
+          description: The unique identifier of the tagged place.
+    PostScopes:
+      type: object
+      description: The scopes for this Post.
+      required:
+      - followers
+      properties:
+        followers:
+          type: boolean
+          description: Indicates whether visibility of this Post is limited to the author's followers.
+    PostReferencedPosts:
+      type: array
+      description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes the referenced Post's type and ID.
+      items:
+        type: object
+        description: A reference from this Post to another Post (repost, quote, or reply).
+        required:
+        - type
+        - id
+        properties:
+          id:
+            type: string
+            description: Unique identifier of the referenced Post.
+          type:
+            description: How this Post references the other Post.
+            oneOf:
+            - type: string
+              description: The kind of Post-to-Post reference.
+              enum:
+              - retweeted
+              - quoted
+              - replied_to
+    PostContextAnnotations:
+      type: array
+      description: Annotations inferred about the Post (domain and entity context).
+      items:
+        type: object
+        description: A single inferred annotation about the Post (domain and entity context).
+        required:
+        - domain
+        - entity
+        properties:
+          domain:
+            description: The domain (broad category) this annotation belongs to.
+            oneOf:
+            - type: object
+              description: A domain or entity referenced by a context annotation.
+              properties:
+                description:
+                  type:
+                  - string
+                  - 'null'
+                id:
+                  type:
+                  - string
+                  - 'null'
+                name:
+                  type:
+                  - string
+                  - 'null'
+          entity:
+            description: The specific entity recognized within the domain.
+            oneOf:
+            - type: object
+              description: A domain or entity referenced by a context annotation.
+              properties:
+                description:
+                  type:
+                  - string
+                  - 'null'
+                id:
+                  type:
+                  - string
+                  - 'null'
+                name:
+                  type:
+                  - string
+                  - 'null'
     UserEntities:
       type: object
       description: A list of metadata found in the User's profile description.
@@ -1410,46 +1187,241 @@ components:
                   url:
                     type: string
                     description: The t.co shortened URL.
-    MediaPromotedMetrics:
+    PostEntities:
       type: object
-      description: Promoted nonpublic engagement metrics for the media at the time of the request.
+      description: A list of metadata entities (hashtags, mentions, URLs) found in the Post text.
       properties:
-        playback_0_count:
+        cashtags:
           type:
-          - integer
+          - array
           - 'null'
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-        playback_100_count:
+          items:
+            type: object
+            description: A hashtag or cashtag entity.
+            required:
+            - start
+            - end
+            - tag
+            properties:
+              end:
+                type: integer
+                description: End index in the text (exclusive).
+                format: int64
+              start:
+                type: integer
+                description: Start index in the text (inclusive).
+                format: int64
+              tag:
+                type: string
+        hashtags:
           type:
-          - integer
+          - array
           - 'null'
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-        playback_25_count:
+          items:
+            type: object
+            description: A hashtag or cashtag entity.
+            required:
+            - start
+            - end
+            - tag
+            properties:
+              end:
+                type: integer
+                description: End index in the text (exclusive).
+                format: int64
+              start:
+                type: integer
+                description: Start index in the text (inclusive).
+                format: int64
+              tag:
+                type: string
+        mentions:
           type:
-          - integer
+          - array
           - 'null'
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-        playback_50_count:
+          items:
+            type: object
+            description: A user mention entity.
+            required:
+            - start
+            - end
+            properties:
+              end:
+                type: integer
+                format: int64
+              id:
+                type:
+                - string
+                - 'null'
+              start:
+                type: integer
+                format: int64
+              username:
+                type:
+                - string
+                - 'null'
+        urls:
           type:
-          - integer
+          - array
           - 'null'
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-        playback_75_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 75% of this video.
-          format: int64
+          items:
+            type: object
+            description: A URL entity found in the Post text, enriched with link metadata.
+            required:
+            - start
+            - end
+            properties:
+              description:
+                type:
+                - string
+                - 'null'
+                description: Description of the linked page, when available.
+              display_url:
+                type:
+                - string
+                - 'null'
+                description: The URL as displayed in the Post text.
+              end:
+                type: integer
+                format: int64
+              expanded_url:
+                type:
+                - string
+                - 'null'
+                description: The fully resolved URL.
+              images:
+                type:
+                - array
+                - 'null'
+                items:
+                  type: object
+                  description: A preview image for a linked page.
+                  properties:
+                    height:
+                      type:
+                      - integer
+                      - 'null'
+                      format: int64
+                    url:
+                      type:
+                      - string
+                      - 'null'
+                    width:
+                      type:
+                      - integer
+                      - 'null'
+                      format: int64
+              media_key:
+                type:
+                - string
+                - 'null'
+              start:
+                type: integer
+                format: int64
+              status:
+                type:
+                - integer
+                - 'null'
+                description: HTTP status from resolving the URL.
+                format: int64
+              title:
+                type:
+                - string
+                - 'null'
+                description: Title of the linked page, when available.
+              unwound_url:
+                type:
+                - string
+                - 'null'
+                description: The final destination after following redirects.
+              url:
+                type:
+                - string
+                - 'null'
+                description: The t.co shortened URL.
+    PollOptions:
+      type: array
+      description: The list of options (choices) available in this poll.
+      items:
+        type: object
+        description: A single option (choice) available in a poll.
+        required:
+        - position
+        - label
+        - votes
+        properties:
+          label:
+            type: string
+            description: The text label of this poll option.
+          position:
+            type: integer
+            description: The 1-based position of this option within the poll.
+            format: int64
+          votes:
+            type: integer
+            description: The number of votes this option has received.
+            format: int64
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    EvaluateCommunityNotesResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EvaluateCommunityNotesResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    CreateCommunityNotesRequest:
+      type: object
+      required:
+      - test_mode
+      - post_id
+      - info
+      properties:
+        info:
+          description: The Community Note contents.
+          $ref: '#/components/schemas/CreateCommunityNotesInfo'
+        post_id:
+          type: string
+          description: ID of the Post the note is about.
+          pattern: ^[0-9]{1,19}$
+        test_mode:
+          type: boolean
+          description: If true, the note is only for testing and is not publicly visible.
+      additionalProperties: false
+    MediaPublicMetrics:
+      type: object
+      description: Public engagement metrics for the media at the time of the request.
+      required:
+      - view_count
+      properties:
         view_count:
-          type:
-          - integer
-          - 'null'
-          description: The number of promoted views of this video. Null when the backend returns quartile data without a view count.
+          type: integer
+          description: The number of times this video has been viewed.
           format: int64
+    PostDisplayTextRange:
+      type: array
+      description: The inclusive start and exclusive end indices of the displayable content of the Post.
+      minItems: 2
+      maxItems: 2
+      items:
+        type: integer
+        format: int64
+    PostSuggestedSourceLinks:
+      type: array
+      description: URLs suggested as sources for this Post.
+      items:
+        type: string
     NoteScoringStatus:
       type: object
       description: Per-model scoring breakdown for the Community Note.
@@ -1644,85 +1616,185 @@ components:
                         - integer
                         - 'null'
                         format: int64
-    PostAttachments:
-      type: object
-      description: Specifies the type of attachments (if any) present in this Post.
-      properties:
-        media_keys:
-          type:
-          - array
-          - 'null'
-          description: Media keys of media attached to this Post.
-          items:
-            type: string
-        media_source_tweet_id:
-          type:
-          - array
-          - 'null'
-          description: IDs of the source Posts the attached media originated from.
-          items:
-            type: string
-        poll_ids:
-          type:
-          - array
-          - 'null'
-          description: IDs of polls attached to this Post.
-          items:
-            type: string
-    PostMediaMetadata:
+    MediaVariants:
       type: array
-      description: Metadata for media attached to this Post.
+      description: Each media object may have multiple display or playback variants, with different resolutions or formats.
       items:
         type: object
-        description: Metadata for one media item attached to this Post.
+        description: A single playback or display variant of a media object.
         properties:
-          alt_text:
+          bit_rate:
+            type:
+            - integer
+            - 'null'
+            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
+            format: int64
+          content_type:
             type:
             - string
             - 'null'
-            description: Alternative text describing the media for accessibility.
-          description:
+            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
+          url:
             type:
             - string
             - 'null'
-            description: Description of the media.
-          media_key:
-            type:
-            - string
-            - 'null'
-            description: The unique identifier of the media.
-          title:
-            type:
-            - string
-            - 'null'
-            description: Title of the media.
-    PostScopes:
+            description: The URL to this media variant.
+    UserPublicMetrics:
       type: object
-      description: The scopes for this Post.
+      description: A list of metrics for this User.
       required:
-      - followers
+      - followers_count
+      - following_count
+      - post_count
+      - listed_count
       properties:
-        followers:
-          type: boolean
-          description: Indicates whether visibility of this Post is limited to the author's followers.
-    NoteId:
-      type: string
-      description: Unique identifier of a Note
-      pattern: ^[0-9]{1,19}$
-    DisallowedResourceProblem:
+        followers_count:
+          type: integer
+          description: Number of Users who follow this User.
+          format: int64
+        following_count:
+          type: integer
+          description: Number of Users this User follows.
+          format: int64
+        like_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of Posts this User has liked.
+          format: int64
+        listed_count:
+          type: integer
+          description: Number of Lists that include this User.
+          format: int64
+        media_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of media items posted by this User.
+          format: int64
+        post_count:
+          type: integer
+          description: Number of Posts (including Reposts) created by this User.
+          format: int64
+    UserAffiliation:
+      type: object
+      description: Metadata about a user's affiliation.
+      properties:
+        badge_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the affiliation badge image shown on the User's profile.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Description of the affiliation.
+        url:
+          type:
+          - string
+          - 'null'
+          description: URL associated with the affiliation.
+        user_id:
+          type:
+          - array
+          - 'null'
+          description: A list of unique identifiers of the accounts this User is affiliated with.
+          items:
+            type: string
+    MediaNonPublicMetrics:
+      type: object
+      description: Nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+    NoteTestResult:
+      type: object
+      description: AI evaluation results for the Community Note (returned in test mode).
+      properties:
+        evaluation_outcome:
+          type:
+          - array
+          - 'null'
+          description: Per-evaluator outcomes for the note.
+          items:
+            type: object
+            description: A single evaluator's outcome for a Community Note.
+            required:
+            - evaluator_type
+            - evaluator_score_bucket
+            properties:
+              evaluator_score_bucket:
+                type: string
+                description: The score bucket the evaluator assigned.
+              evaluator_type:
+                type: string
+                description: The type of evaluator that produced this outcome.
+    PostNoteRequestSuggestions:
+      type: array
+      description: Community-Notes request suggestions for this Post.
+      items:
+        type: object
+        description: A Community-Notes request suggestion for this Post.
+        properties:
+          source_link:
+            type:
+            - string
+            - 'null'
+            description: A suggested source link supporting the note request.
+          suggestion:
+            type:
+            - string
+            - 'null'
+            description: The text of the note request suggestion.
+          suggestion_id:
+            type:
+            - string
+            - 'null'
+            description: The unique identifier of the note request suggestion.
+    ResourceNotFoundProblem:
       type: object
       required:
       - type
       - title
       - detail
+      - resource_type
       properties:
         detail:
+          type: string
+        parameter:
           type: string
         resource_id:
           type: string
         resource_type:
-          type: string
-        section:
           type: string
         status:
           type: integer
@@ -1731,53 +1803,104 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    PostContextAnnotations:
-      type: array
-      description: Annotations inferred about the Post (domain and entity context).
-      items:
-        type: object
-        description: A single inferred annotation about the Post (domain and entity context).
-        required:
-        - domain
-        - entity
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    CreateCommunityNotesInfo:
+      type: object
+      required:
+      - text
+      - classification
+      - misleading_tags
+      - trustworthy_sources
+      properties:
+        classification:
+          type: string
+          description: Community Note classification.
+          enum:
+          - misinformed_or_potentially_misleading
+          - not_misleading
+        is_media_note:
+          type: boolean
+          description: Whether the note is a media note.
+        misleading_tags:
+          type: array
+          description: Tags describing why the Post is misleading.
+          items:
+            type: string
+            enum:
+            - disputed_claim_as_fact
+            - factual_error
+            - manipulated_media
+            - misinterpreted_satire
+            - missing_important_context
+            - other
+            - outdated_information
+        text:
+          type: string
+          description: The text summary of the Community Note (must contain a URL).
+          pattern: ^(?=[\s\S]*https?://\S+)[\s\S]+$
+        trustworthy_sources:
+          type: boolean
+          description: Whether the note cites trustworthy sources.
+      additionalProperties: false
+    PlaceGeo:
+      type: object
+      description: The geographic location of this place, expressed as a GeoJSON Feature.
+      required:
+      - type
+      - bbox
+      - properties
+      properties:
+        bbox:
+          type: array
+          description: The bounding box as [southwest_longitude, southwest_latitude, northeast_longitude, northeast_latitude].
+          minItems: 4
+          maxItems: 4
+          items:
+            type: number
+            format: double
         properties:
-          domain:
-            description: The domain (broad category) this annotation belongs to.
-            oneOf:
-            - type: object
-              description: A domain or entity referenced by a context annotation.
-              properties:
-                description:
-                  type:
-                  - string
-                  - 'null'
-                id:
-                  type:
-                  - string
-                  - 'null'
-                name:
-                  type:
-                  - string
-                  - 'null'
-          entity:
-            description: The specific entity recognized within the domain.
-            oneOf:
-            - type: object
-              description: A domain or entity referenced by a context annotation.
-              properties:
-                description:
-                  type:
-                  - string
-                  - 'null'
-                id:
-                  type:
-                  - string
-                  - 'null'
-                name:
-                  type:
-                  - string
-                  - 'null'
+          type: object
+          description: Additional GeoJSON feature properties.
+        type:
+          description: The GeoJSON feature type.
+          oneOf:
+          - type: string
+            enum:
+            - Feature
+    PostWithheld:
+      type: object
+      description: Withholding details for withheld content.
+      required:
+      - copyright
+      - country_codes
+      properties:
+        copyright:
+          type: boolean
+          description: Indicates whether this content is withheld due to a copyright claim.
+        country_codes:
+          type: array
+          description: Uppercase ISO 3166-1 alpha-2 country codes where this content is withheld.
+          items:
+            type: string
+        scope:
+          type:
+          - string
+          - 'null'
+          description: Whether the withholding applies to a Post or a User.
+          enum:
+          - post
+          - user
+    Topic:
+      type: object
+      properties:
+        description:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
     User:
       type: object
       properties:
@@ -1859,93 +1982,20 @@ components:
           description: 'The X Blue verified type of the user, e.g.: blue, government, business or none.'
         withheld:
           $ref: '#/components/schemas/UserWithheld'
-    PollOptions:
-      type: array
-      description: The list of options (choices) available in this poll.
-      items:
-        type: object
-        description: A single option (choice) available in a poll.
-        required:
-        - position
-        - label
-        - votes
-        properties:
-          label:
-            type: string
-            description: The text label of this poll option.
-          position:
-            type: integer
-            description: The 1-based position of this option within the poll.
-            format: int64
-          votes:
-            type: integer
-            description: The number of votes this option has received.
-            format: int64
-    PostSuggestedSourceLinksWithCounts:
-      type: array
-      description: Suggested source URLs for this Post, each with the number of times it was suggested.
-      items:
-        type: object
-        description: A suggested source URL for this Post with the number of times it was suggested.
-        properties:
-          count:
-            type:
-            - integer
-            - 'null'
-            description: Number of times this source link was suggested.
-            format: int64
-          url:
-            type:
-            - string
-            - 'null'
-            description: The suggested source URL.
-    DeleteCommunityNotesResponseData:
+    Poll:
       type: object
-      required:
-      - deleted
       properties:
-        deleted:
-          type: boolean
-          description: Indicates whether the Community Note was deleted.
-    CreateCommunityNotesInfo:
-      type: object
-      required:
-      - text
-      - classification
-      - misleading_tags
-      - trustworthy_sources
-      properties:
-        classification:
+        duration_minutes:
+          type: integer
+        end_datetime:
           type: string
-          description: Community Note classification.
-          enum:
-          - misinformed_or_potentially_misleading
-          - not_misleading
-        is_media_note:
-          type: boolean
-          description: Whether the note is a media note.
-        misleading_tags:
-          type: array
-          description: Tags describing why the Post is misleading.
-          items:
-            type: string
-            enum:
-            - disputed_claim_as_fact
-            - factual_error
-            - manipulated_media
-            - misinterpreted_satire
-            - missing_important_context
-            - other
-            - outdated_information
-        text:
+        id:
           type: string
-          description: The text summary of the Community Note (must contain a URL).
-          pattern: ^(?=[\s\S]*https?://\S+)[\s\S]+$
-        trustworthy_sources:
-          type: boolean
-          description: Whether the note cites trustworthy sources.
-      additionalProperties: false
-    InternalErrorProblem:
+        options:
+          $ref: '#/components/schemas/PollOptions'
+        voting_status:
+          type: string
+    DisallowedResourceProblem:
       type: object
       required:
       - type
@@ -1954,6 +2004,12 @@ components:
       properties:
         detail:
           type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
         status:
           type: integer
         title:
@@ -1961,170 +2017,72 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/internal-error
-    EvaluateCommunityNotesResponse:
+          - https://api.x.com/2/problems/disallowed-resource
+    PostPublicMetrics:
       type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/EvaluateCommunityNotesResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    Topic:
-      type: object
-      properties:
-        description:
-          type: string
-        id:
-          type: string
-        name:
-          type: string
-    UserPublicMetrics:
-      type: object
-      description: A list of metrics for this User.
+      description: Engagement metrics for the Post at the time of the request.
       required:
-      - followers_count
-      - following_count
-      - post_count
-      - listed_count
+      - repost_count
+      - reply_count
+      - like_count
+      - quote_count
+      - bookmark_count
+      - impression_count
       properties:
-        followers_count:
+        bookmark_count:
           type: integer
-          description: Number of Users who follow this User.
+          description: Number of times this Post has been bookmarked.
           format: int64
-        following_count:
+        impression_count:
           type: integer
-          description: Number of Users this User follows.
+          description: Number of times this Post has been viewed.
           format: int64
         like_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of Posts this User has liked.
-          format: int64
-        listed_count:
           type: integer
-          description: Number of Lists that include this User.
+          description: Number of likes on this Post.
           format: int64
-        media_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of media items posted by this User.
-          format: int64
-        post_count:
+        quote_count:
           type: integer
-          description: Number of Posts (including Reposts) created by this User.
+          description: Number of quote Posts of this Post.
           format: int64
-    PlaceGeo:
+        reply_count:
+          type: integer
+          description: Number of replies to this Post.
+          format: int64
+        repost_count:
+          type: integer
+          description: Number of times this Post has been reposted.
+          format: int64
+    NotAuthorizedForFieldProblem:
       type: object
-      description: The geographic location of this place, expressed as a GeoJSON Feature.
       required:
       - type
-      - bbox
-      - properties
+      - title
+      - detail
+      - field
       properties:
-        bbox:
-          type: array
-          description: The bounding box as [southwest_longitude, southwest_latitude, northeast_longitude, northeast_latitude].
-          minItems: 4
-          maxItems: 4
-          items:
-            type: number
-            format: double
-        properties:
-          type: object
-          description: Additional GeoJSON feature properties.
+        detail:
+          type: string
+        field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
         type:
-          description: The GeoJSON feature type.
-          oneOf:
-          - type: string
-            enum:
-            - Feature
-    CreateCommunityNotesRequest:
-      type: object
-      required:
-      - test_mode
-      - post_id
-      - info
-      properties:
-        info:
-          description: The Community Note contents.
-          $ref: '#/components/schemas/CreateCommunityNotesInfo'
-        post_id:
           type: string
-          description: ID of the Post the note is about.
-          pattern: ^[0-9]{1,19}$
-        test_mode:
-          type: boolean
-          description: If true, the note is only for testing and is not publicly visible.
-      additionalProperties: false
-    PostEditControls:
-      type: object
-      description: Indicates how much longer (if at all) this Post can be edited.
-      properties:
-        editable_until:
-          type:
-          - string
-          - 'null'
-          description: The time until which this Post can be edited.
-        edits_remaining:
-          type:
-          - integer
-          - 'null'
-          description: Number of edits still allowed for this Post.
-          format: int64
-        is_edit_eligible:
-          type:
-          - boolean
-          - 'null'
-          description: Indicates whether this Post is eligible to be edited.
-    Place:
-      type: object
-      properties:
-        contained_within:
-          $ref: '#/components/schemas/PlaceContainedWithin'
-        country:
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
           type: string
-        country_code:
-          type: string
-        full_name:
-          type: string
-        geo:
-          $ref: '#/components/schemas/PlaceGeo'
-        id:
-          type: string
-        name:
-          type: string
-        place_type:
-          type: string
-    UserAffiliation:
-      type: object
-      description: Metadata about a user's affiliation.
-      properties:
-        badge_url:
-          type:
-          - string
-          - 'null'
-          description: URL of the affiliation badge image shown on the User's profile.
-        description:
-          type:
-          - string
-          - 'null'
-          description: Description of the affiliation.
-        url:
-          type:
-          - string
-          - 'null'
-          description: URL associated with the affiliation.
-        user_id:
-          type:
-          - array
-          - 'null'
-          description: A list of unique identifiers of the accounts this User is affiliated with.
-          items:
-            type: string
     Problem:
       oneOf:
       - $ref: '#/components/schemas/ResourceNotFoundProblem'
@@ -2148,95 +2106,31 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    PostWithheld:
+    PostAttachments:
       type: object
-      description: Withholding details for withheld content.
-      required:
-      - copyright
-      - country_codes
+      description: Specifies the type of attachments (if any) present in this Post.
       properties:
-        copyright:
-          type: boolean
-          description: Indicates whether this content is withheld due to a copyright claim.
-        country_codes:
-          type: array
-          description: Uppercase ISO 3166-1 alpha-2 country codes where this content is withheld.
+        media_keys:
+          type:
+          - array
+          - 'null'
+          description: Media keys of media attached to this Post.
           items:
             type: string
-        scope:
+        media_source_tweet_id:
           type:
-          - string
+          - array
           - 'null'
-          description: Whether the withholding applies to a Post or a User.
-          enum:
-          - post
-          - user
-    MediaOrganicMetrics:
-      type: object
-      description: Organic nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
+          description: IDs of the source Posts the attached media originated from.
+          items:
+            type: string
+        poll_ids:
           type:
-          - integer
+          - array
           - 'null'
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-        playback_100_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-        playback_25_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-        playback_50_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-        playback_75_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-        view_count:
-          type:
-          - integer
-          - 'null'
-          description: The number of organic views of this video. Null when the backend returns quartile data without a view count.
-          format: int64
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
+          description: IDs of polls attached to this Post.
+          items:
+            type: string
     PostMatchedMediaNotes:
       type: array
       description: Community-Notes media matches for this Post.
@@ -2254,11 +2148,85 @@ components:
             - string
             - 'null'
             description: The matched note's unique identifier.
-    PlaceContainedWithin:
-      type: array
-      description: A list of unique identifiers of the Places that contain this place.
-      items:
-        type: string
+    PostEditControls:
+      type: object
+      description: Indicates how much longer (if at all) this Post can be edited.
+      properties:
+        editable_until:
+          type:
+          - string
+          - 'null'
+          description: The time until which this Post can be edited.
+        edits_remaining:
+          type:
+          - integer
+          - 'null'
+          description: Number of edits still allowed for this Post.
+          format: int64
+        is_edit_eligible:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates whether this Post is eligible to be edited.
+    EvaluateCommunityNotesRequest:
+      type: object
+      required:
+      - post_id
+      - note_text
+      properties:
+        note_text:
+          type: string
+          description: Text of the community note to evaluate.
+        post_id:
+          type: string
+          description: ID of the Post the note evaluates.
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    SearchEligiblePostsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
     UserSubscription:
       type: object
       description: The subscription relationship between this User and you.
@@ -2268,31 +2236,14 @@ components:
         subscribes_to_you:
           type: boolean
           description: Indicates if this User subscribes to you.
-    MediaPublicMetrics:
-      type: object
-      description: Public engagement metrics for the media at the time of the request.
-      required:
-      - view_count
-      properties:
-        view_count:
-          type: integer
-          description: The number of times this video has been viewed.
-          format: int64
-    FieldUnauthorizedProblem:
+    InternalErrorProblem:
       type: object
       required:
       - type
       - title
       - detail
-      - field
       properties:
         detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
           type: string
         status:
           type: integer
@@ -2301,8 +2252,148 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/field-unauthorized
+          - https://api.x.com/2/problems/internal-error
+    PostSuggestedSourceLinksWithCounts:
+      type: array
+      description: Suggested source URLs for this Post, each with the number of times it was suggested.
+      items:
+        type: object
+        description: A suggested source URL for this Post with the number of times it was suggested.
+        properties:
+          count:
+            type:
+            - integer
+            - 'null'
+            description: Number of times this source link was suggested.
+            format: int64
+          url:
+            type:
+            - string
+            - 'null'
+            description: The suggested source URL.
+    Note:
+      type: object
+      properties:
+        id:
+          type: string
+        info:
+          $ref: '#/components/schemas/NoteInfo'
+        scoring_status:
+          $ref: '#/components/schemas/NoteScoringStatus'
+        status:
+          type: string
+        test_result:
+          $ref: '#/components/schemas/NoteTestResult'
+    UserWithheld:
+      type: object
+      description: Withholding details for withheld content.
+      properties:
+        country_codes:
+          type:
+          - array
+          - 'null'
+          description: A list of countries (as ISO 3166-1 alpha-2 codes) where this content is withheld.
+          items:
+            type: string
+        scope:
+          type:
+          - string
+          - 'null'
+          description: The scope of the withholding. Only present, with the value "user", when the entire User is withheld.
+          enum:
+          - user
   parameters:
+    NoteFieldsParameter:
+      name: note.fields
+      in: query
+      description: A comma separated list of Note fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a Note object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - id
+          - info
+          - scoring_status
+          - status
+          - test_result
+      explode: false
+      style: form
+    PollFieldsParameter:
+      name: poll.fields
+      in: query
+      description: A comma separated list of Poll fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a Poll object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - duration_minutes
+          - end_datetime
+          - id
+          - options
+          - voting_status
+      explode: false
+      style: form
+    MediaFieldsParameter:
+      name: media.fields
+      in: query
+      description: A comma separated list of Media fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a Media object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - alt_text
+          - duration_ms
+          - height
+          - media_key
+          - non_public_metrics
+          - organic_metrics
+          - preview_image_url
+          - promoted_metrics
+          - public_metrics
+          - type
+          - url
+          - variants
+          - width
+      explode: false
+      style: form
+    PlaceFieldsParameter:
+      name: place.fields
+      in: query
+      description: A comma separated list of Place fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a Place object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - contained_within
+          - country
+          - country_code
+          - full_name
+          - geo
+          - id
+          - name
+          - place_type
+      explode: false
+      style: form
     PostExpansionsParameter:
       name: expansions
       in: query
@@ -2327,29 +2418,6 @@ components:
           - in_reply_to_user_id
           - referenced_posts
           - username
-      explode: false
-      style: form
-    PlaceFieldsParameter:
-      name: place.fields
-      in: query
-      description: A comma separated list of Place fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Place object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - contained_within
-          - country
-          - country_code
-          - full_name
-          - geo
-          - id
-          - name
-          - place_type
       explode: false
       style: form
     PostFieldsParameter:
@@ -2436,74 +2504,6 @@ components:
           - verified_followers_count
           - verified_type
           - withheld
-      explode: false
-      style: form
-    MediaFieldsParameter:
-      name: media.fields
-      in: query
-      description: A comma separated list of Media fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Media object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - alt_text
-          - duration_ms
-          - height
-          - media_key
-          - non_public_metrics
-          - organic_metrics
-          - preview_image_url
-          - promoted_metrics
-          - public_metrics
-          - type
-          - url
-          - variants
-          - width
-      explode: false
-      style: form
-    NoteFieldsParameter:
-      name: note.fields
-      in: query
-      description: A comma separated list of Note fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Note object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - id
-          - info
-          - scoring_status
-          - status
-          - test_result
-      explode: false
-      style: form
-    PollFieldsParameter:
-      name: poll.fields
-      in: query
-      description: A comma separated list of Poll fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Poll object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - duration_minutes
-          - end_datetime
-          - id
-          - options
-          - voting_status
       explode: false
       style: form
   securitySchemes:

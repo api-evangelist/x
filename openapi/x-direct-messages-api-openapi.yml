@@ -490,58 +490,432 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    DeleteDirectMessagesEventsResponse:
+    MediaOrganicMetrics:
+      type: object
+      description: Organic nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+        view_count:
+          type:
+          - integer
+          - 'null'
+          description: The number of organic views of this video. Null when the backend returns quartile data without a view count.
+          format: int64
+    CreateDirectMessagesConversationResponseData:
+      type: object
+      required:
+      - dm_conversation_id
+      - dm_event_id
+      properties:
+        dm_conversation_id:
+          type: string
+          description: The id of the created conversation.
+        dm_event_id:
+          type: string
+          description: The id of the created DM event.
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    PostNotePost:
+      type: object
+      description: The full content of the Post, including text beyond 280 characters.
+      required:
+      - text
+      properties:
+        entities:
+          type:
+          - object
+          - 'null'
+          description: Metadata entities (hashtags, cashtags, mentions, URLs) found in the note Post text.
+          properties:
+            cashtags:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A hashtag or cashtag entity.
+                required:
+                - start
+                - end
+                - tag
+                properties:
+                  end:
+                    type: integer
+                    description: End index in the text (exclusive).
+                    format: int64
+                  start:
+                    type: integer
+                    description: Start index in the text (inclusive).
+                    format: int64
+                  tag:
+                    type: string
+            hashtags:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A hashtag or cashtag entity.
+                required:
+                - start
+                - end
+                - tag
+                properties:
+                  end:
+                    type: integer
+                    description: End index in the text (exclusive).
+                    format: int64
+                  start:
+                    type: integer
+                    description: Start index in the text (inclusive).
+                    format: int64
+                  tag:
+                    type: string
+            mentions:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A user mention entity.
+                required:
+                - start
+                - end
+                properties:
+                  end:
+                    type: integer
+                    format: int64
+                  id:
+                    type:
+                    - string
+                    - 'null'
+                  start:
+                    type: integer
+                    format: int64
+                  username:
+                    type:
+                    - string
+                    - 'null'
+            urls:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A URL entity found in note Post text.
+                required:
+                - start
+                - end
+                properties:
+                  display_url:
+                    type:
+                    - string
+                    - 'null'
+                  end:
+                    type: integer
+                    format: int64
+                  expanded_url:
+                    type:
+                    - string
+                    - 'null'
+                  start:
+                    type: integer
+                    format: int64
+                  url:
+                    type:
+                    - string
+                    - 'null'
+        text:
+          type: string
+          description: The full note text of the Post.
+    CreateDirectMessagesByConversationIdResponseData:
+      type: object
+      required:
+      - dm_conversation_id
+      - dm_event_id
+      properties:
+        dm_conversation_id:
+          type: string
+          description: The conversation the message was sent to.
+        dm_event_id:
+          type: string
+          description: The id of the created DM event.
+    InvalidRequestProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+    PlaceContainedWithin:
+      type: array
+      description: A list of unique identifiers of the Places that contain this place.
+      items:
+        type: string
+    GetDirectMessagesEventsByConversationIdResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/DeleteDirectMessagesEventsResponseData'
+          type: array
+          items:
+            $ref: '#/components/schemas/DmEvent'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    PostPublicMetrics:
+        includes:
+          $ref: '#/components/schemas/Expansions'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            previous_token:
+              type: string
+              description: Pagination token for the previous page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    Post:
       type: object
-      description: Engagement metrics for the Post at the time of the request.
-      required:
-      - repost_count
-      - reply_count
-      - like_count
-      - quote_count
-      - bookmark_count
-      - impression_count
       properties:
-        bookmark_count:
-          type: integer
-          description: Number of times this Post has been bookmarked.
-          format: int64
-        impression_count:
-          type: integer
-          description: Number of times this Post has been viewed.
-          format: int64
-        like_count:
-          type: integer
-          description: Number of likes on this Post.
-          format: int64
-        quote_count:
-          type: integer
-          description: Number of quote Posts of this Post.
-          format: int64
-        reply_count:
-          type: integer
-          description: Number of replies to this Post.
-          format: int64
-        repost_count:
-          type: integer
-          description: Number of times this Post has been reposted.
-          format: int64
-    PostDisplayTextRange:
+        article:
+          type: object
+        article_title:
+          type: object
+          description: Metadata about the long-form Article attached to this Post, if any.
+        attachments:
+          $ref: '#/components/schemas/PostAttachments'
+        author_id:
+          type: string
+          description: Unique identifier of the author of this Post.
+        card_uri:
+          type: string
+        community_id:
+          type: string
+          description: The unique identifier of the Community this Post belongs to, if any.
+        context_annotations:
+          $ref: '#/components/schemas/PostContextAnnotations'
+        conversation_id:
+          type: string
+          description: The ID of the conversation this Post belongs to (matches the root Post's ID).
+        created_at:
+          type: string
+          description: Creation time of the Post.
+          format: date-time
+        display_text_range:
+          $ref: '#/components/schemas/PostDisplayTextRange'
+        edit_controls:
+          $ref: '#/components/schemas/PostEditControls'
+        edit_history_post_ids:
+          type: array
+          description: A list of Post IDs in this Post's edit history chain.
+          items:
+            type: string
+        entities:
+          $ref: '#/components/schemas/PostEntities'
+        geo:
+          $ref: '#/components/schemas/PostGeo'
+        id:
+          type: string
+          description: Unique identifier of this Post.
+        in_reply_to_user_id:
+          type: string
+          description: Unique identifier of the User this Post is replying to.
+        lang:
+          type: string
+          description: Language of the Post, if detected by X. Returned as a BCP47 language tag.
+        matched_media_notes:
+          $ref: '#/components/schemas/PostMatchedMediaNotes'
+        media_metadata:
+          $ref: '#/components/schemas/PostMediaMetadata'
+        non_public_metrics:
+          type: object
+          description: Nonpublic engagement metrics for the Post at the time of the request.
+        note_post:
+          $ref: '#/components/schemas/PostNotePost'
+        note_request_suggestions:
+          $ref: '#/components/schemas/PostNoteRequestSuggestions'
+        organic_metrics:
+          type: object
+          description: Organic nonpublic engagement metrics for the Post at the time of the request.
+        paid_partnership:
+          type: boolean
+          description: Indicates if this Post is a paid partnership, i.e. it has been disclosed by the author as containing paid promotion.
+        possibly_sensitive:
+          type: boolean
+          description: Indicates if this Post contains URLs marked as sensitive, for example content suitable for mature audiences.
+        promoted_metrics:
+          type: object
+          description: Promoted nonpublic engagement metrics for the Post at the time of the request.
+        public_metrics:
+          $ref: '#/components/schemas/PostPublicMetrics'
+        referenced_posts:
+          $ref: '#/components/schemas/PostReferencedPosts'
+        reply_settings:
+          type: string
+          description: Shows who can reply to this Post.
+        scopes:
+          $ref: '#/components/schemas/PostScopes'
+        source:
+          type: string
+          description: The name of the app the user posted from. This is deprecated.
+        suggested_source_links:
+          $ref: '#/components/schemas/PostSuggestedSourceLinks'
+        suggested_source_links_with_counts:
+          $ref: '#/components/schemas/PostSuggestedSourceLinksWithCounts'
+        text:
+          type: string
+          description: The content of the Post.
+        username:
+          type: string
+        withheld:
+          $ref: '#/components/schemas/PostWithheld'
+    UserConnectionStatus:
       type: array
-      description: The inclusive start and exclusive end indices of the displayable content of the Post.
-      minItems: 2
-      maxItems: 2
+      description: Returns detailed information about the relationship between two users.
       items:
-        type: integer
-        format: int64
+        type: string
+        description: A connection between the authenticated User and this User.
+        enum:
+        - blocking
+        - follow_request_received
+        - follow_request_sent
+        - followed_by
+        - following
+        - muting
+    CreateDirectMessagesConversationRequest:
+      type: object
+      required:
+      - conversation_type
+      - participant_ids
+      - message
+      properties:
+        conversation_type:
+          type: string
+          description: The conversation type to create. Supports `Group` only.
+          enum:
+          - Group
+        message:
+          description: The initial Direct Message to send to the conversation.
+          $ref: '#/components/schemas/CreateDirectMessagesConversationMessage'
+        participant_ids:
+          type: array
+          description: Participants for the conversation.
+          minItems: 2
+          maxItems: 49
+          items:
+            type: string
+            pattern: ^[0-9]{1,19}$
+      additionalProperties: false
+    CreateDirectMessagesConversationMessage:
+      type: object
+      properties:
+        attachments:
+          type: array
+          description: Attachments to include with the message.
+          items:
+            $ref: '#/components/schemas/CreateDirectMessagesConversationMessageAttachments'
+        text:
+          type: string
+          description: Text of the Direct Message.
+          minLength: 1
+      additionalProperties: false
     Expansions:
       type: object
       properties:
@@ -598,65 +972,60 @@ components:
           $ref: '#/components/schemas/MediaVariants'
         width:
           type: integer
-    GetDirectMessagesEventsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/DmEvent'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    CreateDirectMessagesByParticipantIdAttachments:
-      type: object
-      required:
-      - media_id
-      properties:
-        media_id:
-          type: string
-          description: A media id to attach to the message.
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
-    CreateDirectMessagesConversationMessage:
+    DmEvent:
       type: object
       properties:
         attachments:
+          $ref: '#/components/schemas/DmEventAttachments'
+        created_at:
+          type: string
+          format: date-time
+        dm_conversation_id:
+          type: string
+        entities:
+          $ref: '#/components/schemas/DmEventEntities'
+        event_type:
+          type: string
+        id:
+          type: string
+        participant_ids:
           type: array
-          description: Attachments to include with the message.
           items:
-            $ref: '#/components/schemas/CreateDirectMessagesConversationMessageAttachments'
+            type: string
+        referenced_posts:
+          $ref: '#/components/schemas/DmEventReferencedPosts'
+        sender_id:
+          type: string
         text:
           type: string
-          description: Text of the Direct Message.
-          minLength: 1
-      additionalProperties: false
-    CreateDirectMessagesByConversationIdAttachments:
+    Place:
       type: object
-      required:
-      - media_id
       properties:
-        media_id:
+        contained_within:
+          $ref: '#/components/schemas/PlaceContainedWithin'
+        country:
           type: string
-          description: A media id to attach to the message.
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
+        country_code:
+          type: string
+        full_name:
+          type: string
+        geo:
+          $ref: '#/components/schemas/PlaceGeo'
+        id:
+          type: string
+        name:
+          type: string
+        place_type:
+          type: string
+    PostScopes:
+      type: object
+      description: The scopes for this Post.
+      required:
+      - followers
+      properties:
+        followers:
+          type: boolean
+          description: Indicates whether visibility of this Post is limited to the author's followers.
     PostGeo:
       type: object
       description: The location tagged on the Post, if the user provided one.
@@ -688,133 +1057,73 @@ components:
           - string
           - 'null'
           description: The unique identifier of the tagged place.
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    CreateDirectMessagesByConversationIdRequest:
-      anyOf:
-      - required:
-        - text
-      - required:
-        - attachments
-      type: object
-      description: At least one of `text`, `attachments` is required.
-      properties:
-        attachments:
-          type: array
-          description: Attachments to include with the message.
-          items:
-            $ref: '#/components/schemas/CreateDirectMessagesByConversationIdAttachments'
-        text:
-          type: string
-          description: Text of the Direct Message.
-          minLength: 1
-      additionalProperties: false
-    CreateDirectMessagesConversationResponseData:
-      type: object
-      required:
-      - dm_conversation_id
-      - dm_event_id
-      properties:
-        dm_conversation_id:
-          type: string
-          description: The id of the created conversation.
-        dm_event_id:
-          type: string
-          description: The id of the created DM event.
-    CreateDirectMessagesByParticipantIdResponseData:
-      type: object
-      required:
-      - dm_conversation_id
-      - dm_event_id
-      properties:
-        dm_conversation_id:
-          type: string
-          description: The conversation the message was sent to.
-        dm_event_id:
-          type: string
-          description: The id of the created DM event.
-    PostSuggestedSourceLinks:
+    PostMediaMetadata:
       type: array
-      description: URLs suggested as sources for this Post.
+      description: Metadata for media attached to this Post.
       items:
-        type: string
-    NotAuthorizedForResourceProblem:
+        type: object
+        description: Metadata for one media item attached to this Post.
+        properties:
+          alt_text:
+            type:
+            - string
+            - 'null'
+            description: Alternative text describing the media for accessibility.
+          description:
+            type:
+            - string
+            - 'null'
+            description: Description of the media.
+          media_key:
+            type:
+            - string
+            - 'null'
+            description: The unique identifier of the media.
+          title:
+            type:
+            - string
+            - 'null'
+            description: Title of the media.
+    MediaPromotedMetrics:
       type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
+      description: Promoted nonpublic engagement metrics for the media at the time of the request.
       properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
-          type: string
-    DmEventAttachments:
-      type: object
-      description: Media and card attachments present in this Direct Message event.
-      properties:
-        card_ids:
+        playback_0_count:
           type:
-          - array
+          - integer
           - 'null'
-          description: IDs of cards attached to this Direct Message.
-          items:
-            type: string
-        media_keys:
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
           type:
-          - array
+          - integer
           - 'null'
-          description: Media keys of media (including audio) attached to this Direct Message.
-          items:
-            type: string
-    CreateDirectMessagesConversationResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateDirectMessagesConversationResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+        view_count:
+          type:
+          - integer
+          - 'null'
+          description: The number of promoted views of this video. Null when the backend returns quartile data without a view count.
+          format: int64
     PostEntities:
       type: object
       description: A list of metadata entities (hashtags, mentions, URLs) found in the Post text.
@@ -967,153 +1276,7 @@ components:
                 - string
                 - 'null'
                 description: The t.co shortened URL.
-    MediaVariants:
-      type: array
-      description: Each media object may have multiple display or playback variants, with different resolutions or formats.
-      items:
-        type: object
-        description: A single playback or display variant of a media object.
-        properties:
-          bit_rate:
-            type:
-            - integer
-            - 'null'
-            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
-            format: int64
-          content_type:
-            type:
-            - string
-            - 'null'
-            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
-          url:
-            type:
-            - string
-            - 'null'
-            description: The URL to this media variant.
-    PostReferencedPosts:
-      type: array
-      description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes the referenced Post's type and ID.
-      items:
-        type: object
-        description: A reference from this Post to another Post (repost, quote, or reply).
-        required:
-        - type
-        - id
-        properties:
-          id:
-            type: string
-            description: Unique identifier of the referenced Post.
-          type:
-            description: How this Post references the other Post.
-            oneOf:
-            - type: string
-              description: The kind of Post-to-Post reference.
-              enum:
-              - retweeted
-              - quoted
-              - replied_to
-    CreateDirectMessagesByParticipantIdResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateDirectMessagesByParticipantIdResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    CreateDirectMessagesByParticipantIdRequest:
-      anyOf:
-      - required:
-        - text
-      - required:
-        - attachments
-      type: object
-      description: At least one of `text`, `attachments` is required.
-      properties:
-        attachments:
-          type: array
-          description: Attachments to include with the message.
-          items:
-            $ref: '#/components/schemas/CreateDirectMessagesByParticipantIdAttachments'
-        text:
-          type: string
-          description: Text of the Direct Message.
-          minLength: 1
-      additionalProperties: false
-    MediaNonPublicMetrics:
-      type: object
-      description: Nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-        playback_100_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-        playback_25_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-        playback_50_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-        playback_75_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-    UserConnectionStatus:
-      type: array
-      description: Returns detailed information about the relationship between two users.
-      items:
-        type: string
-        description: A connection between the authenticated User and this User.
-        enum:
-        - blocking
-        - follow_request_received
-        - follow_request_sent
-        - followed_by
-        - following
-        - muting
-    GetDirectMessagesEventsByConversationIdResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/DmEvent'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    NotAuthorizedForFieldProblem:
+    FieldUnauthorizedProblem:
       type: object
       required:
       - type
@@ -1124,10 +1287,6 @@ components:
         detail:
           type: string
         field:
-          type: string
-        parameter:
-          type: string
-        resource_id:
           type: string
         resource_type:
           type: string
@@ -1140,402 +1299,7 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/not-authorized-for-field
-        value:
-          type: string
-    CreateDirectMessagesByConversationIdResponseData:
-      type: object
-      required:
-      - dm_conversation_id
-      - dm_event_id
-      properties:
-        dm_conversation_id:
-          type: string
-          description: The conversation the message was sent to.
-        dm_event_id:
-          type: string
-          description: The id of the created DM event.
-    PostNotePost:
-      type: object
-      description: The full content of the Post, including text beyond 280 characters.
-      required:
-      - text
-      properties:
-        entities:
-          type:
-          - object
-          - 'null'
-          description: Metadata entities (hashtags, cashtags, mentions, URLs) found in the note Post text.
-          properties:
-            cashtags:
-              type:
-              - array
-              - 'null'
-              items:
-                type: object
-                description: A hashtag or cashtag entity.
-                required:
-                - start
-                - end
-                - tag
-                properties:
-                  end:
-                    type: integer
-                    description: End index in the text (exclusive).
-                    format: int64
-                  start:
-                    type: integer
-                    description: Start index in the text (inclusive).
-                    format: int64
-                  tag:
-                    type: string
-            hashtags:
-              type:
-              - array
-              - 'null'
-              items:
-                type: object
-                description: A hashtag or cashtag entity.
-                required:
-                - start
-                - end
-                - tag
-                properties:
-                  end:
-                    type: integer
-                    description: End index in the text (exclusive).
-                    format: int64
-                  start:
-                    type: integer
-                    description: Start index in the text (inclusive).
-                    format: int64
-                  tag:
-                    type: string
-            mentions:
-              type:
-              - array
-              - 'null'
-              items:
-                type: object
-                description: A user mention entity.
-                required:
-                - start
-                - end
-                properties:
-                  end:
-                    type: integer
-                    format: int64
-                  id:
-                    type:
-                    - string
-                    - 'null'
-                  start:
-                    type: integer
-                    format: int64
-                  username:
-                    type:
-                    - string
-                    - 'null'
-            urls:
-              type:
-              - array
-              - 'null'
-              items:
-                type: object
-                description: A URL entity found in note Post text.
-                required:
-                - start
-                - end
-                properties:
-                  display_url:
-                    type:
-                    - string
-                    - 'null'
-                  end:
-                    type: integer
-                    format: int64
-                  expanded_url:
-                    type:
-                    - string
-                    - 'null'
-                  start:
-                    type: integer
-                    format: int64
-                  url:
-                    type:
-                    - string
-                    - 'null'
-        text:
-          type: string
-          description: The full note text of the Post.
-    Post:
-      type: object
-      properties:
-        article:
-          type: object
-        article_title:
-          type: object
-          description: Metadata about the long-form Article attached to this Post, if any.
-        attachments:
-          $ref: '#/components/schemas/PostAttachments'
-        author_id:
-          type: string
-          description: Unique identifier of the author of this Post.
-        card_uri:
-          type: string
-        community_id:
-          type: string
-          description: The unique identifier of the Community this Post belongs to, if any.
-        context_annotations:
-          $ref: '#/components/schemas/PostContextAnnotations'
-        conversation_id:
-          type: string
-          description: The ID of the conversation this Post belongs to (matches the root Post's ID).
-        created_at:
-          type: string
-          description: Creation time of the Post.
-          format: date-time
-        display_text_range:
-          $ref: '#/components/schemas/PostDisplayTextRange'
-        edit_controls:
-          $ref: '#/components/schemas/PostEditControls'
-        edit_history_post_ids:
-          type: array
-          description: A list of Post IDs in this Post's edit history chain.
-          items:
-            type: string
-        entities:
-          $ref: '#/components/schemas/PostEntities'
-        geo:
-          $ref: '#/components/schemas/PostGeo'
-        id:
-          type: string
-          description: Unique identifier of this Post.
-        in_reply_to_user_id:
-          type: string
-          description: Unique identifier of the User this Post is replying to.
-        lang:
-          type: string
-          description: Language of the Post, if detected by X. Returned as a BCP47 language tag.
-        matched_media_notes:
-          $ref: '#/components/schemas/PostMatchedMediaNotes'
-        media_metadata:
-          $ref: '#/components/schemas/PostMediaMetadata'
-        non_public_metrics:
-          type: object
-          description: Nonpublic engagement metrics for the Post at the time of the request.
-        note_post:
-          $ref: '#/components/schemas/PostNotePost'
-        note_request_suggestions:
-          $ref: '#/components/schemas/PostNoteRequestSuggestions'
-        organic_metrics:
-          type: object
-          description: Organic nonpublic engagement metrics for the Post at the time of the request.
-        paid_partnership:
-          type: boolean
-          description: Indicates if this Post is a paid partnership, i.e. it has been disclosed by the author as containing paid promotion.
-        possibly_sensitive:
-          type: boolean
-          description: Indicates if this Post contains URLs marked as sensitive, for example content suitable for mature audiences.
-        promoted_metrics:
-          type: object
-          description: Promoted nonpublic engagement metrics for the Post at the time of the request.
-        public_metrics:
-          $ref: '#/components/schemas/PostPublicMetrics'
-        referenced_posts:
-          $ref: '#/components/schemas/PostReferencedPosts'
-        reply_settings:
-          type: string
-          description: Shows who can reply to this Post.
-        scopes:
-          $ref: '#/components/schemas/PostScopes'
-        source:
-          type: string
-          description: The name of the app the user posted from. This is deprecated.
-        suggested_source_links:
-          $ref: '#/components/schemas/PostSuggestedSourceLinks'
-        suggested_source_links_with_counts:
-          $ref: '#/components/schemas/PostSuggestedSourceLinksWithCounts'
-        text:
-          type: string
-          description: The content of the Post.
-        username:
-          type: string
-        withheld:
-          $ref: '#/components/schemas/PostWithheld'
-    PostNoteRequestSuggestions:
-      type: array
-      description: Community-Notes request suggestions for this Post.
-      items:
-        type: object
-        description: A Community-Notes request suggestion for this Post.
-        properties:
-          source_link:
-            type:
-            - string
-            - 'null'
-            description: A suggested source link supporting the note request.
-          suggestion:
-            type:
-            - string
-            - 'null'
-            description: The text of the note request suggestion.
-          suggestion_id:
-            type:
-            - string
-            - 'null'
-            description: The unique identifier of the note request suggestion.
-    GetDirectMessagesEventsByParticipantIdResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/DmEvent'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            previous_token:
-              type: string
-              description: Pagination token for the previous page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    Poll:
-      type: object
-      properties:
-        duration_minutes:
-          type: integer
-        end_datetime:
-          type: string
-        id:
-          type: string
-        options:
-          $ref: '#/components/schemas/PollOptions'
-        voting_status:
-          type: string
-    UserWithheld:
-      type: object
-      description: Withholding details for withheld content.
-      properties:
-        country_codes:
-          type:
-          - array
-          - 'null'
-          description: A list of countries (as ISO 3166-1 alpha-2 codes) where this content is withheld.
-          items:
-            type: string
-        scope:
-          type:
-          - string
-          - 'null'
-          description: The scope of the withholding. Only present, with the value "user", when the entire User is withheld.
-          enum:
-          - user
-    MediaPromotedMetrics:
-      type: object
-      description: Promoted nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-        playback_100_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-        playback_25_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-        playback_50_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-        playback_75_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-        view_count:
-          type:
-          - integer
-          - 'null'
-          description: The number of promoted views of this video. Null when the backend returns quartile data without a view count.
-          format: int64
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    InvalidRequestProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/invalid-request
-        value:
-          type: string
+          - https://api.x.com/2/problems/field-unauthorized
     UserEntities:
       type: object
       description: A list of metadata found in the User's profile description.
@@ -1776,102 +1540,65 @@ components:
                   url:
                     type: string
                     description: The t.co shortened URL.
-    DmEventReferencedPosts:
+    UserPublicMetrics:
+      type: object
+      description: A list of metrics for this User.
+      required:
+      - followers_count
+      - following_count
+      - post_count
+      - listed_count
+      properties:
+        followers_count:
+          type: integer
+          description: Number of Users who follow this User.
+          format: int64
+        following_count:
+          type: integer
+          description: Number of Users this User follows.
+          format: int64
+        like_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of Posts this User has liked.
+          format: int64
+        listed_count:
+          type: integer
+          description: Number of Lists that include this User.
+          format: int64
+        media_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of media items posted by this User.
+          format: int64
+        post_count:
+          type: integer
+          description: Number of Posts (including Reposts) created by this User.
+          format: int64
+    PostReferencedPosts:
       type: array
+      description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes the referenced Post's type and ID.
       items:
         type: object
-        description: A reference from this event to a Post.
+        description: A reference from this Post to another Post (repost, quote, or reply).
         required:
+        - type
         - id
         properties:
           id:
             type: string
             description: Unique identifier of the referenced Post.
-    PostAttachments:
-      type: object
-      description: Specifies the type of attachments (if any) present in this Post.
-      properties:
-        media_keys:
           type:
-          - array
-          - 'null'
-          description: Media keys of media attached to this Post.
-          items:
-            type: string
-        media_source_tweet_id:
-          type:
-          - array
-          - 'null'
-          description: IDs of the source Posts the attached media originated from.
-          items:
-            type: string
-        poll_ids:
-          type:
-          - array
-          - 'null'
-          description: IDs of polls attached to this Post.
-          items:
-            type: string
-    CreateDirectMessagesConversationRequest:
-      type: object
-      required:
-      - conversation_type
-      - participant_ids
-      - message
-      properties:
-        conversation_type:
-          type: string
-          description: The conversation type to create. Supports `Group` only.
-          enum:
-          - Group
-        message:
-          description: The initial Direct Message to send to the conversation.
-          $ref: '#/components/schemas/CreateDirectMessagesConversationMessage'
-        participant_ids:
-          type: array
-          description: Participants for the conversation.
-          minItems: 2
-          maxItems: 49
-          items:
-            type: string
-            pattern: ^[0-9]{1,19}$
-      additionalProperties: false
-    PostMediaMetadata:
-      type: array
-      description: Metadata for media attached to this Post.
-      items:
-        type: object
-        description: Metadata for one media item attached to this Post.
-        properties:
-          alt_text:
-            type:
-            - string
-            - 'null'
-            description: Alternative text describing the media for accessibility.
-          description:
-            type:
-            - string
-            - 'null'
-            description: Description of the media.
-          media_key:
-            type:
-            - string
-            - 'null'
-            description: The unique identifier of the media.
-          title:
-            type:
-            - string
-            - 'null'
-            description: Title of the media.
-    PostScopes:
-      type: object
-      description: The scopes for this Post.
-      required:
-      - followers
-      properties:
-        followers:
-          type: boolean
-          description: Indicates whether visibility of this Post is limited to the author's followers.
+            description: How this Post references the other Post.
+            oneOf:
+            - type: string
+              description: The kind of Post-to-Post reference.
+              enum:
+              - retweeted
+              - quoted
+              - replied_to
     PostContextAnnotations:
       type: array
       description: Annotations inferred about the Post (domain and entity context).
@@ -1918,110 +1645,6 @@ components:
                   type:
                   - string
                   - 'null'
-    User:
-      type: object
-      properties:
-        affiliation:
-          $ref: '#/components/schemas/UserAffiliation'
-        confirmed_email:
-          type: string
-        connection_status:
-          $ref: '#/components/schemas/UserConnectionStatus'
-        created_at:
-          type: string
-          description: Creation time of this User.
-          format: date-time
-        description:
-          type: string
-          description: The text of this User's profile description (also known as bio), if the User provided one.
-        entities:
-          $ref: '#/components/schemas/UserEntities'
-        id:
-          type: string
-          description: Unique identifier of this User.
-        is_identity_verified:
-          type: boolean
-          description: Indicates if this User has completed identity verification.
-        location:
-          type: string
-          description: The location specified in the User's profile, if the User provided one. As this is a freeform value, it may not indicate a valid location.
-        most_recent_post_id:
-          type: string
-          description: Unique identifier of this User's most recent Post.
-        name:
-          type: string
-          description: The friendly name of this User, as shown on their profile.
-        parody:
-          type: boolean
-          description: Indicates if this User is a parody account.
-        pinned_post_id:
-          type: string
-          description: Unique identifier of this User's pinned Post.
-        profile_banner_url:
-          type: string
-          description: The URL to the profile banner for this User.
-        profile_image_url:
-          type: string
-          description: The URL to the profile image for this User.
-        protected:
-          type: boolean
-          description: Indicates if this User has chosen to protect their Posts (in other words, if this User's Posts are private).
-        public_metrics:
-          $ref: '#/components/schemas/UserPublicMetrics'
-        receives_your_dm:
-          type: boolean
-          description: Indicates if you can send a DM to this User.
-        subscriber_count:
-          type: integer
-          description: The number of Premium subscribers of this User.
-        subscribes_to_you:
-          type: boolean
-          description: Indicates if this User subscribes to you.
-        subscription:
-          $ref: '#/components/schemas/UserSubscription'
-        subscription_type:
-          type: string
-          description: 'The X Blue subscription type of the user, e.g.: Basic, Premium, PremiumPlus or None.'
-        url:
-          type: string
-          description: The URL specified in the User's profile.
-        username:
-          type: string
-          description: The X handle (screen name) of this User.
-        verified:
-          type: boolean
-          description: Indicates if this User is a verified X User.
-        verified_followers_count:
-          type: integer
-          description: The number of verified followers of this User.
-        verified_type:
-          type: string
-          description: 'The X Blue verified type of the user, e.g.: blue, government, business or none.'
-        withheld:
-          $ref: '#/components/schemas/UserWithheld'
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
     PollOptions:
       type: array
       description: The list of options (choices) available in this poll.
@@ -2044,188 +1667,116 @@ components:
             type: integer
             description: The number of votes this option has received.
             format: int64
-    PostSuggestedSourceLinksWithCounts:
-      type: array
-      description: Suggested source URLs for this Post, each with the number of times it was suggested.
-      items:
-        type: object
-        description: A suggested source URL for this Post with the number of times it was suggested.
-        properties:
-          count:
-            type:
-            - integer
-            - 'null'
-            description: Number of times this source link was suggested.
-            format: int64
-          url:
-            type:
-            - string
-            - 'null'
-            description: The suggested source URL.
-    InternalErrorProblem:
+    DeleteDirectMessagesEventsResponseData:
       type: object
       required:
-      - type
-      - title
-      - detail
+      - deleted
       properties:
-        detail:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    UserPublicMetrics:
+        deleted:
+          type: boolean
+          description: Whether the event was deleted.
+    CreateDirectMessagesByConversationIdRequest:
+      anyOf:
+      - required:
+        - text
+      - required:
+        - attachments
       type: object
-      description: A list of metrics for this User.
-      required:
-      - followers_count
-      - following_count
-      - post_count
-      - listed_count
+      description: At least one of `text`, `attachments` is required.
       properties:
-        followers_count:
-          type: integer
-          description: Number of Users who follow this User.
-          format: int64
-        following_count:
-          type: integer
-          description: Number of Users this User follows.
-          format: int64
-        like_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of Posts this User has liked.
-          format: int64
-        listed_count:
-          type: integer
-          description: Number of Lists that include this User.
-          format: int64
-        media_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of media items posted by this User.
-          format: int64
-        post_count:
-          type: integer
-          description: Number of Posts (including Reposts) created by this User.
-          format: int64
-    Topic:
-      type: object
-      properties:
-        description:
-          type: string
-        id:
-          type: string
-        name:
-          type: string
-    PlaceGeo:
-      type: object
-      description: The geographic location of this place, expressed as a GeoJSON Feature.
-      required:
-      - type
-      - bbox
-      - properties
-      properties:
-        bbox:
+        attachments:
           type: array
-          description: The bounding box as [southwest_longitude, southwest_latitude, northeast_longitude, northeast_latitude].
-          minItems: 4
-          maxItems: 4
+          description: Attachments to include with the message.
           items:
-            type: number
-            format: double
-        properties:
-          type: object
-          description: Additional GeoJSON feature properties.
-        type:
-          description: The GeoJSON feature type.
-          oneOf:
-          - type: string
-            enum:
-            - Feature
-    GetDirectMessagesEventsByIdResponse:
+            $ref: '#/components/schemas/CreateDirectMessagesByConversationIdAttachments'
+        text:
+          type: string
+          description: Text of the Direct Message.
+          minLength: 1
+      additionalProperties: false
+    GetDirectMessagesEventsByParticipantIdResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/DmEvent'
+          type: array
+          items:
+            $ref: '#/components/schemas/DmEvent'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
         includes:
           $ref: '#/components/schemas/Expansions'
-    DmEvent:
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            previous_token:
+              type: string
+              description: Pagination token for the previous page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    Error:
       type: object
+      required:
+      - code
+      - message
       properties:
-        attachments:
-          $ref: '#/components/schemas/DmEventAttachments'
-        created_at:
+        code:
+          type: integer
+          format: int32
+        message:
           type: string
-          format: date-time
-        dm_conversation_id:
-          type: string
-        entities:
-          $ref: '#/components/schemas/DmEventEntities'
-        event_type:
-          type: string
-        id:
-          type: string
-        participant_ids:
-          type: array
-          items:
-            type: string
-        referenced_posts:
-          $ref: '#/components/schemas/DmEventReferencedPosts'
-        sender_id:
-          type: string
-        text:
-          type: string
-    PostEditControls:
+    PostDisplayTextRange:
+      type: array
+      description: The inclusive start and exclusive end indices of the displayable content of the Post.
+      minItems: 2
+      maxItems: 2
+      items:
+        type: integer
+        format: int64
+    MediaPublicMetrics:
       type: object
-      description: Indicates how much longer (if at all) this Post can be edited.
+      description: Public engagement metrics for the media at the time of the request.
+      required:
+      - view_count
       properties:
-        editable_until:
-          type:
-          - string
-          - 'null'
-          description: The time until which this Post can be edited.
-        edits_remaining:
-          type:
-          - integer
-          - 'null'
-          description: Number of edits still allowed for this Post.
+        view_count:
+          type: integer
+          description: The number of times this video has been viewed.
           format: int64
-        is_edit_eligible:
-          type:
-          - boolean
-          - 'null'
-          description: Indicates whether this Post is eligible to be edited.
-    Place:
-      type: object
-      properties:
-        contained_within:
-          $ref: '#/components/schemas/PlaceContainedWithin'
-        country:
-          type: string
-        country_code:
-          type: string
-        full_name:
-          type: string
-        geo:
-          $ref: '#/components/schemas/PlaceGeo'
-        id:
-          type: string
-        name:
-          type: string
-        place_type:
-          type: string
+    PostSuggestedSourceLinks:
+      type: array
+      description: URLs suggested as sources for this Post.
+      items:
+        type: string
+    MediaVariants:
+      type: array
+      description: Each media object may have multiple display or playback variants, with different resolutions or formats.
+      items:
+        type: object
+        description: A single playback or display variant of a media object.
+        properties:
+          bit_rate:
+            type:
+            - integer
+            - 'null'
+            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
+            format: int64
+          content_type:
+            type:
+            - string
+            - 'null'
+            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
+          url:
+            type:
+            - string
+            - 'null'
+            description: The URL to this media variant.
     UserAffiliation:
       type: object
       description: Metadata about a user's affiliation.
@@ -2252,39 +1803,6 @@ components:
           description: A list of unique identifiers of the accounts this User is affiliated with.
           items:
             type: string
-    CreateDirectMessagesConversationMessageAttachments:
-      type: object
-      required:
-      - media_id
-      properties:
-        media_id:
-          type: string
-          description: A media id to attach to the message.
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
-    Problem:
-      oneOf:
-      - $ref: '#/components/schemas/ResourceNotFoundProblem'
-      - $ref: '#/components/schemas/InvalidRequestProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
-      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
-      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
-      - $ref: '#/components/schemas/ResourceUnavailableProblem'
-      - $ref: '#/components/schemas/DisallowedResourceProblem'
-      - $ref: '#/components/schemas/InternalErrorProblem'
-      discriminator:
-        propertyName: type
-        mapping:
-          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
-          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
-          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
-          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
-          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
-          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
-          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
-          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
-          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
     DmEventEntities:
       type: object
       description: A list of metadata entities (hashtags, cashtags, mentions, URLs) found in the Direct Message text.
@@ -2388,32 +1906,9 @@ components:
               url:
                 type: string
                 description: The t.co shortened URL.
-    PostWithheld:
+    MediaNonPublicMetrics:
       type: object
-      description: Withholding details for withheld content.
-      required:
-      - copyright
-      - country_codes
-      properties:
-        copyright:
-          type: boolean
-          description: Indicates whether this content is withheld due to a copyright claim.
-        country_codes:
-          type: array
-          description: Uppercase ISO 3166-1 alpha-2 country codes where this content is withheld.
-          items:
-            type: string
-        scope:
-          type:
-          - string
-          - 'null'
-          description: Whether the withholding applies to a Post or a User.
-          enum:
-          - post
-          - user
-    MediaOrganicMetrics:
-      type: object
-      description: Organic nonpublic engagement metrics for the media at the time of the request.
+      description: Nonpublic engagement metrics for the media at the time of the request.
       properties:
         playback_0_count:
           type:
@@ -2445,12 +1940,69 @@ components:
           - 'null'
           description: Number of users who watched at least 75% of this video.
           format: int64
-        view_count:
-          type:
-          - integer
-          - 'null'
-          description: The number of organic views of this video. Null when the backend returns quartile data without a view count.
-          format: int64
+    DeleteDirectMessagesEventsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteDirectMessagesEventsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    PostNoteRequestSuggestions:
+      type: array
+      description: Community-Notes request suggestions for this Post.
+      items:
+        type: object
+        description: A Community-Notes request suggestion for this Post.
+        properties:
+          source_link:
+            type:
+            - string
+            - 'null'
+            description: A suggested source link supporting the note request.
+          suggestion:
+            type:
+            - string
+            - 'null'
+            description: The text of the note request suggestion.
+          suggestion_id:
+            type:
+            - string
+            - 'null'
+            description: The unique identifier of the note request suggestion.
+    CreateDirectMessagesConversationMessageAttachments:
+      type: object
+      required:
+      - media_id
+      properties:
+        media_id:
+          type: string
+          description: A media id to attach to the message.
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
+    GetDirectMessagesEventsByIdResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DmEvent'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    DmEventReferencedPosts:
+      type: array
+      items:
+        type: object
+        description: A reference from this event to a Post.
+        required:
+        - id
+        properties:
+          id:
+            type: string
+            description: Unique identifier of the referenced Post.
     ResourceNotFoundProblem:
       type: object
       required:
@@ -2477,6 +2029,356 @@ components:
           - https://api.x.com/2/problems/resource-not-found
         value:
           type: string
+    User:
+      type: object
+      properties:
+        affiliation:
+          $ref: '#/components/schemas/UserAffiliation'
+        confirmed_email:
+          type: string
+        connection_status:
+          $ref: '#/components/schemas/UserConnectionStatus'
+        created_at:
+          type: string
+          description: Creation time of this User.
+          format: date-time
+        description:
+          type: string
+          description: The text of this User's profile description (also known as bio), if the User provided one.
+        entities:
+          $ref: '#/components/schemas/UserEntities'
+        id:
+          type: string
+          description: Unique identifier of this User.
+        is_identity_verified:
+          type: boolean
+          description: Indicates if this User has completed identity verification.
+        location:
+          type: string
+          description: The location specified in the User's profile, if the User provided one. As this is a freeform value, it may not indicate a valid location.
+        most_recent_post_id:
+          type: string
+          description: Unique identifier of this User's most recent Post.
+        name:
+          type: string
+          description: The friendly name of this User, as shown on their profile.
+        parody:
+          type: boolean
+          description: Indicates if this User is a parody account.
+        pinned_post_id:
+          type: string
+          description: Unique identifier of this User's pinned Post.
+        profile_banner_url:
+          type: string
+          description: The URL to the profile banner for this User.
+        profile_image_url:
+          type: string
+          description: The URL to the profile image for this User.
+        protected:
+          type: boolean
+          description: Indicates if this User has chosen to protect their Posts (in other words, if this User's Posts are private).
+        public_metrics:
+          $ref: '#/components/schemas/UserPublicMetrics'
+        receives_your_dm:
+          type: boolean
+          description: Indicates if you can send a DM to this User.
+        subscriber_count:
+          type: integer
+          description: The number of Premium subscribers of this User.
+        subscribes_to_you:
+          type: boolean
+          description: Indicates if this User subscribes to you.
+        subscription:
+          $ref: '#/components/schemas/UserSubscription'
+        subscription_type:
+          type: string
+          description: 'The X Blue subscription type of the user, e.g.: Basic, Premium, PremiumPlus or None.'
+        url:
+          type: string
+          description: The URL specified in the User's profile.
+        username:
+          type: string
+          description: The X handle (screen name) of this User.
+        verified:
+          type: boolean
+          description: Indicates if this User is a verified X User.
+        verified_followers_count:
+          type: integer
+          description: The number of verified followers of this User.
+        verified_type:
+          type: string
+          description: 'The X Blue verified type of the user, e.g.: blue, government, business or none.'
+        withheld:
+          $ref: '#/components/schemas/UserWithheld'
+    PlaceGeo:
+      type: object
+      description: The geographic location of this place, expressed as a GeoJSON Feature.
+      required:
+      - type
+      - bbox
+      - properties
+      properties:
+        bbox:
+          type: array
+          description: The bounding box as [southwest_longitude, southwest_latitude, northeast_longitude, northeast_latitude].
+          minItems: 4
+          maxItems: 4
+          items:
+            type: number
+            format: double
+        properties:
+          type: object
+          description: Additional GeoJSON feature properties.
+        type:
+          description: The GeoJSON feature type.
+          oneOf:
+          - type: string
+            enum:
+            - Feature
+    PostWithheld:
+      type: object
+      description: Withholding details for withheld content.
+      required:
+      - copyright
+      - country_codes
+      properties:
+        copyright:
+          type: boolean
+          description: Indicates whether this content is withheld due to a copyright claim.
+        country_codes:
+          type: array
+          description: Uppercase ISO 3166-1 alpha-2 country codes where this content is withheld.
+          items:
+            type: string
+        scope:
+          type:
+          - string
+          - 'null'
+          description: Whether the withholding applies to a Post or a User.
+          enum:
+          - post
+          - user
+    Topic:
+      type: object
+      properties:
+        description:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+    Poll:
+      type: object
+      properties:
+        duration_minutes:
+          type: integer
+        end_datetime:
+          type: string
+        id:
+          type: string
+        options:
+          $ref: '#/components/schemas/PollOptions'
+        voting_status:
+          type: string
+    CreateDirectMessagesByConversationIdResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateDirectMessagesByConversationIdResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    PostPublicMetrics:
+      type: object
+      description: Engagement metrics for the Post at the time of the request.
+      required:
+      - repost_count
+      - reply_count
+      - like_count
+      - quote_count
+      - bookmark_count
+      - impression_count
+      properties:
+        bookmark_count:
+          type: integer
+          description: Number of times this Post has been bookmarked.
+          format: int64
+        impression_count:
+          type: integer
+          description: Number of times this Post has been viewed.
+          format: int64
+        like_count:
+          type: integer
+          description: Number of likes on this Post.
+          format: int64
+        quote_count:
+          type: integer
+          description: Number of quote Posts of this Post.
+          format: int64
+        reply_count:
+          type: integer
+          description: Number of replies to this Post.
+          format: int64
+        repost_count:
+          type: integer
+          description: Number of times this Post has been reposted.
+          format: int64
+    NotAuthorizedForFieldProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
+          type: string
+    Problem:
+      oneOf:
+      - $ref: '#/components/schemas/ResourceNotFoundProblem'
+      - $ref: '#/components/schemas/InvalidRequestProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
+      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
+      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
+      - $ref: '#/components/schemas/ResourceUnavailableProblem'
+      - $ref: '#/components/schemas/DisallowedResourceProblem'
+      - $ref: '#/components/schemas/InternalErrorProblem'
+      discriminator:
+        propertyName: type
+        mapping:
+          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
+          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
+          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
+          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
+          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
+          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
+          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
+          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
+          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    CreateDirectMessagesByParticipantIdAttachments:
+      type: object
+      required:
+      - media_id
+      properties:
+        media_id:
+          type: string
+          description: A media id to attach to the message.
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
+    DmEventAttachments:
+      type: object
+      description: Media and card attachments present in this Direct Message event.
+      properties:
+        card_ids:
+          type:
+          - array
+          - 'null'
+          description: IDs of cards attached to this Direct Message.
+          items:
+            type: string
+        media_keys:
+          type:
+          - array
+          - 'null'
+          description: Media keys of media (including audio) attached to this Direct Message.
+          items:
+            type: string
+    GetDirectMessagesEventsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DmEvent'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            previous_token:
+              type: string
+              description: Pagination token for the previous page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    PostAttachments:
+      type: object
+      description: Specifies the type of attachments (if any) present in this Post.
+      properties:
+        media_keys:
+          type:
+          - array
+          - 'null'
+          description: Media keys of media attached to this Post.
+          items:
+            type: string
+        media_source_tweet_id:
+          type:
+          - array
+          - 'null'
+          description: IDs of the source Posts the attached media originated from.
+          items:
+            type: string
+        poll_ids:
+          type:
+          - array
+          - 'null'
+          description: IDs of polls attached to this Post.
+          items:
+            type: string
     PostMatchedMediaNotes:
       type: array
       description: Community-Notes media matches for this Post.
@@ -2494,11 +2396,60 @@ components:
             - string
             - 'null'
             description: The matched note's unique identifier.
-    PlaceContainedWithin:
-      type: array
-      description: A list of unique identifiers of the Places that contain this place.
-      items:
-        type: string
+    PostEditControls:
+      type: object
+      description: Indicates how much longer (if at all) this Post can be edited.
+      properties:
+        editable_until:
+          type:
+          - string
+          - 'null'
+          description: The time until which this Post can be edited.
+        edits_remaining:
+          type:
+          - integer
+          - 'null'
+          description: Number of edits still allowed for this Post.
+          format: int64
+        is_edit_eligible:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates whether this Post is eligible to be edited.
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    CreateDirectMessagesByParticipantIdResponseData:
+      type: object
+      required:
+      - dm_conversation_id
+      - dm_event_id
+      properties:
+        dm_conversation_id:
+          type: string
+          description: The conversation the message was sent to.
+        dm_event_id:
+          type: string
+          description: The id of the created DM event.
     UserSubscription:
       type: object
       description: The subscription relationship between this User and you.
@@ -2508,31 +2459,14 @@ components:
         subscribes_to_you:
           type: boolean
           description: Indicates if this User subscribes to you.
-    MediaPublicMetrics:
-      type: object
-      description: Public engagement metrics for the media at the time of the request.
-      required:
-      - view_count
-      properties:
-        view_count:
-          type: integer
-          description: The number of times this video has been viewed.
-          format: int64
-    FieldUnauthorizedProblem:
+    InternalErrorProblem:
       type: object
       required:
       - type
       - title
       - detail
-      - field
       properties:
         detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
           type: string
         status:
           type: integer
@@ -2541,24 +2475,90 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/field-unauthorized
-    CreateDirectMessagesByConversationIdResponse:
+          - https://api.x.com/2/problems/internal-error
+    UserWithheld:
+      type: object
+      description: Withholding details for withheld content.
+      properties:
+        country_codes:
+          type:
+          - array
+          - 'null'
+          description: A list of countries (as ISO 3166-1 alpha-2 codes) where this content is withheld.
+          items:
+            type: string
+        scope:
+          type:
+          - string
+          - 'null'
+          description: The scope of the withholding. Only present, with the value "user", when the entire User is withheld.
+          enum:
+          - user
+    CreateDirectMessagesConversationResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/CreateDirectMessagesByConversationIdResponseData'
+          $ref: '#/components/schemas/CreateDirectMessagesConversationResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    DeleteDirectMessagesEventsResponseData:
+    PostSuggestedSourceLinksWithCounts:
+      type: array
+      description: Suggested source URLs for this Post, each with the number of times it was suggested.
+      items:
+        type: object
+        description: A suggested source URL for this Post with the number of times it was suggested.
+        properties:
+          count:
+            type:
+            - integer
+            - 'null'
+            description: Number of times this source link was suggested.
+            format: int64
+          url:
+            type:
+            - string
+            - 'null'
+            description: The suggested source URL.
+    CreateDirectMessagesByConversationIdAttachments:
       type: object
       required:
-      - deleted
+      - media_id
       properties:
-        deleted:
-          type: boolean
-          description: Whether the event was deleted.
+        media_id:
+          type: string
+          description: A media id to attach to the message.
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
+    CreateDirectMessagesByParticipantIdRequest:
+      anyOf:
+      - required:
+        - text
+      - required:
+        - attachments
+      type: object
+      description: At least one of `text`, `attachments` is required.
+      properties:
+        attachments:
+          type: array
+          description: Attachments to include with the message.
+          items:
+            $ref: '#/components/schemas/CreateDirectMessagesByParticipantIdAttachments'
+        text:
+          type: string
+          description: Text of the Direct Message.
+          minLength: 1
+      additionalProperties: false
+    CreateDirectMessagesByParticipantIdResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateDirectMessagesByParticipantIdResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
   parameters:
     DmEventExpansionsParameter:
       name: expansions
@@ -2579,26 +2579,32 @@ components:
           - sender_id
       explode: false
       style: form
-    DmEventFieldsParameter:
-      name: dm_event.fields
+    MediaFieldsParameter:
+      name: media.fields
       in: query
-      description: A comma separated list of DmEvent fields to display.
+      description: A comma separated list of Media fields to display.
       required: false
       schema:
         type: array
-        description: The fields available for a DmEvent object.
+        description: The fields available for a Media object.
         minItems: 1
         uniqueItems: true
         items:
           type: string
           enum:
-          - attachments
-          - created_at
-          - dm_conversation_id
-          - entities
-          - event_type
-          - id
-          - text
+          - alt_text
+          - duration_ms
+          - height
+          - media_key
+          - non_public_metrics
+          - organic_metrics
+          - preview_image_url
+          - promoted_metrics
+          - public_metrics
+          - type
+          - url
+          - variants
+          - width
       explode: false
       style: form
     PostFieldsParameter:
@@ -2647,6 +2653,28 @@ components:
           - withheld
       explode: false
       style: form
+    DmEventFieldsParameter:
+      name: dm_event.fields
+      in: query
+      description: A comma separated list of DmEvent fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a DmEvent object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - attachments
+          - created_at
+          - dm_conversation_id
+          - entities
+          - event_type
+          - id
+          - text
+      explode: false
+      style: form
     UserFieldsParameter:
       name: user.fields
       in: query
@@ -2685,34 +2713,6 @@ components:
           - verified_followers_count
           - verified_type
           - withheld
-      explode: false
-      style: form
-    MediaFieldsParameter:
-      name: media.fields
-      in: query
-      description: A comma separated list of Media fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Media object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - alt_text
-          - duration_ms
-          - height
-          - media_key
-          - non_public_metrics
-          - organic_metrics
-          - preview_image_url
-          - promoted_metrics
-          - public_metrics
-          - type
-          - url
-          - variants
-          - width
       explode: false
       style: form
   securitySchemes:

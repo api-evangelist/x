@@ -38,7 +38,8 @@
     "x-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "tag 'Posts' spans 2 source specs (x-api-v2-openapi.json, x-openapi.yml): per-path servers applied",
     "tag 'Trends' spans 2 source specs (x-api-v2-openapi.json, x-openapi.yml): per-path servers applied",
-    "tag 'Users' spans 2 source specs (x-api-v2-openapi.json, x-openapi.yml): per-path servers applied"
+    "tag 'Users' spans 2 source specs (x-api-v2-openapi.json, x-openapi.yml): per-path servers applied",
+    "apis.yml register: already-registered"
   ],
   "skipped": [
     "x-account-activity-api-openapi.yml: previously refined output, superseded by openapi/_original/",
