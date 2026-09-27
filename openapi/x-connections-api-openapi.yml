@@ -205,7 +205,51 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    DeleteConnectionsByEndpointResponseDataResults:
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    InvalidRequestProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    DeleteAllConnectionsResponseDataResults:
       type: object
       required:
       - uuid
@@ -218,7 +262,16 @@ components:
         uuid:
           type: string
       additionalProperties: false
-    FieldHydrationFailureProblem:
+    DeleteAllConnectionsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteAllConnectionsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    FieldUnauthorizedProblem:
       type: object
       required:
       - type
@@ -241,49 +294,7 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    GetConnectionHistoryResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Connection'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    InvalidRequestProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/invalid-request
-        value:
-          type: string
+          - https://api.x.com/2/problems/field-unauthorized
     NotAuthorizedForResourceProblem:
       type: object
       required:
@@ -312,7 +323,155 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-resource
         value:
           type: string
-    FieldUnauthorizedProblem:
+    DeleteConnectionsByUuidsResponseData:
+      type: object
+      required:
+      - successful_kills
+      - failed_kills
+      properties:
+        failed_kills:
+          type: integer
+          description: Number of connections that could not be terminated.
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteConnectionsByUuidsResponseDataResults'
+        successful_kills:
+          type: integer
+          description: Number of connections successfully terminated.
+    GetConnectionHistoryResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Connection'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    Connection:
+      type: object
+      properties:
+        client_ip:
+          type: string
+        connected_at:
+          type: string
+          format: date-time
+        disconnect_reason:
+          type: string
+        disconnected_at:
+          type: string
+          format: date-time
+        endpoint_name:
+          type: string
+        id:
+          type: string
+    DeleteConnectionsByUuidsRequest:
+      type: object
+      required:
+      - uuids
+      properties:
+        uuids:
+          type: array
+          description: Connection UUIDs to terminate (1-100).
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+      additionalProperties: false
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    DeleteConnectionsByEndpointResponseDataResults:
+      type: object
+      required:
+      - uuid
+      - success
+      properties:
+        error_message:
+          type: string
+        success:
+          type: boolean
+        uuid:
+          type: string
+      additionalProperties: false
+    DeleteConnectionsByUuidsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteConnectionsByUuidsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    DeleteConnectionsByEndpointResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteConnectionsByEndpointResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    FieldHydrationFailureProblem:
       type: object
       required:
       - type
@@ -335,92 +494,8 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/field-unauthorized
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    DeleteConnectionsByUuidsRequest:
-      type: object
-      required:
-      - uuids
-      properties:
-        uuids:
-          type: array
-          description: Connection UUIDs to terminate (1-100).
-          minItems: 1
-          maxItems: 100
-          items:
-            type: string
-      additionalProperties: false
-    DeleteAllConnectionsResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteAllConnectionsResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    DeleteConnectionsByEndpointResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteConnectionsByEndpointResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    DeleteAllConnectionsResponseData:
-      type: object
-      required:
-      - successful_kills
-      - failed_kills
-      properties:
-        failed_kills:
-          type: integer
-          description: Number of connections that could not be terminated.
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/DeleteAllConnectionsResponseDataResults'
-        successful_kills:
-          type: integer
-          description: Number of connections successfully terminated.
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    DeleteAllConnectionsResponseDataResults:
+          - https://api.x.com/2/problems/field-hydration-failure
+    DeleteConnectionsByUuidsResponseDataResults:
       type: object
       required:
       - uuid
@@ -433,45 +508,6 @@ components:
         uuid:
           type: string
       additionalProperties: false
-    DeleteConnectionsByUuidsResponseData:
-      type: object
-      required:
-      - successful_kills
-      - failed_kills
-      properties:
-        failed_kills:
-          type: integer
-          description: Number of connections that could not be terminated.
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/DeleteConnectionsByUuidsResponseDataResults'
-        successful_kills:
-          type: integer
-          description: Number of connections successfully terminated.
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
     NotAuthorizedForFieldProblem:
       type: object
       required:
@@ -502,6 +538,64 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
           type: string
+    DeleteConnectionsByEndpointResponseData:
+      type: object
+      required:
+      - successful_kills
+      - failed_kills
+      properties:
+        failed_kills:
+          type: integer
+          description: Number of connections that could not be terminated.
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteConnectionsByEndpointResponseDataResults'
+        successful_kills:
+          type: integer
+          description: Number of connections successfully terminated.
+    ResourceNotFoundProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    DeleteAllConnectionsResponseData:
+      type: object
+      required:
+      - successful_kills
+      - failed_kills
+      properties:
+        failed_kills:
+          type: integer
+          description: Number of connections that could not be terminated.
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteAllConnectionsResponseDataResults'
+        successful_kills:
+          type: integer
+          description: Number of connections successfully terminated.
     Problem:
       oneOf:
       - $ref: '#/components/schemas/ResourceNotFoundProblem'
@@ -525,100 +619,6 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    Connection:
-      type: object
-      properties:
-        client_ip:
-          type: string
-        connected_at:
-          type: string
-          format: date-time
-        disconnect_reason:
-          type: string
-        disconnected_at:
-          type: string
-          format: date-time
-        endpoint_name:
-          type: string
-        id:
-          type: string
-    DeleteConnectionsByUuidsResponseDataResults:
-      type: object
-      required:
-      - uuid
-      - success
-      properties:
-        error_message:
-          type: string
-        success:
-          type: boolean
-        uuid:
-          type: string
-      additionalProperties: false
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    DeleteConnectionsByUuidsResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteConnectionsByUuidsResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    InternalErrorProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    DeleteConnectionsByEndpointResponseData:
-      type: object
-      required:
-      - successful_kills
-      - failed_kills
-      properties:
-        failed_kills:
-          type: integer
-          description: Number of connections that could not be terminated.
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/DeleteConnectionsByEndpointResponseDataResults'
-        successful_kills:
-          type: integer
-          description: Number of connections successfully terminated.
   parameters:
     ConnectionFieldsParameter:
       name: connection.fields

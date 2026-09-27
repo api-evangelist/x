@@ -84,7 +84,133 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    FieldHydrationFailureProblem:
+    Problem:
+      oneOf:
+      - $ref: '#/components/schemas/ResourceNotFoundProblem'
+      - $ref: '#/components/schemas/InvalidRequestProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
+      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
+      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
+      - $ref: '#/components/schemas/ResourceUnavailableProblem'
+      - $ref: '#/components/schemas/DisallowedResourceProblem'
+      - $ref: '#/components/schemas/InternalErrorProblem'
+      discriminator:
+        propertyName: type
+        mapping:
+          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
+          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
+          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
+          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
+          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
+          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
+          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
+          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
+          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    GetUsageCreditsResponseData:
+      type: object
+      required:
+      - total_balance
+      - prepaid_balance
+      - free_balance
+      - free_grants
+      properties:
+        free_balance:
+          type: number
+          description: USD remaining across unexpired free grants.
+        free_grants:
+          type: array
+          description: Unexpired free grants, soonest expiry first.
+          items:
+            $ref: '#/components/schemas/GetUsageCreditsResponseDataFreeGrants'
+        prepaid_balance:
+          type: number
+          description: Purchased (prepaid) USD balance. May be negative when paid usage has overdrawn this bucket.
+        total_balance:
+          type: number
+          description: 'Spendable USD remaining, clamped at 0.00: total_balance = max(0, prepaid_balance + free_balance).'
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    InvalidRequestProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    UsageDailyProjectUsage:
+      type: object
+      description: Project-level daily Post usage for the caller's project.
+      properties:
+        project_id:
+          type:
+          - string
+          - 'null'
+          description: Unique identifier of the project.
+        usage:
+          type:
+          - array
+          - 'null'
+          description: Daily usage entries for the project.
+          items:
+            type: object
+            description: A single day's usage entry.
+            required:
+            - date
+            properties:
+              date:
+                type: string
+                description: The day of the usage entry, as an ISO 8601 date-time.
+              usage:
+                type:
+                - string
+                - 'null'
+                description: Number of Posts used on this day.
+    GetUsageCreditsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GetUsageCreditsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    FieldUnauthorizedProblem:
       type: object
       required:
       - type
@@ -107,7 +233,35 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/field-hydration-failure
+          - https://api.x.com/2/problems/field-unauthorized
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
     UsageDailyClientAppUsage:
       type: array
       description: Per-client-app daily Post usage for the caller's project.
@@ -143,28 +297,22 @@ components:
             type: integer
             description: Number of daily usage entries returned for this client app.
             format: int64
-    InvalidRequestProblem:
+    Usage:
       type: object
-      required:
-      - type
-      - title
-      - detail
       properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        status:
+        cap_reset_day:
           type: integer
-        title:
+        daily_client_app_usage:
+          $ref: '#/components/schemas/UsageDailyClientAppUsage'
+        daily_project_usage:
+          $ref: '#/components/schemas/UsageDailyProjectUsage'
+        project_cap:
           type: string
-        type:
+        project_id:
           type: string
-          enum:
-          - https://api.x.com/2/problems/invalid-request
-        value:
+        project_usage:
           type: string
-    NotAuthorizedForResourceProblem:
+    ResourceUnavailableProblem:
       type: object
       required:
       - type
@@ -174,13 +322,9 @@ components:
       properties:
         detail:
           type: string
-        parameter:
-          type: string
         resource_id:
           type: string
         resource_type:
-          type: string
-        section:
           type: string
         status:
           type: integer
@@ -189,32 +333,36 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
-          type: string
-    GetUsageCreditsResponseData:
+          - https://api.x.com/2/problems/resource-unavailable
+    Error:
       type: object
       required:
-      - total_balance
-      - prepaid_balance
-      - free_balance
-      - free_grants
+      - code
+      - message
       properties:
-        free_balance:
-          type: number
-          description: USD remaining across unexpired free grants.
-        free_grants:
-          type: array
-          description: Unexpired free grants, soonest expiry first.
-          items:
-            $ref: '#/components/schemas/GetUsageCreditsResponseDataFreeGrants'
-        prepaid_balance:
-          type: number
-          description: Purchased (prepaid) USD balance. May be negative when paid usage has overdrawn this bucket.
-        total_balance:
-          type: number
-          description: 'Spendable USD remaining, clamped at 0.00: total_balance = max(0, prepaid_balance + free_balance).'
-    FieldUnauthorizedProblem:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    FieldHydrationFailureProblem:
       type: object
       required:
       - type
@@ -237,97 +385,7 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/field-unauthorized
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    GetUsageCreditsResponseDataFreeGrants:
-      type: object
-      required:
-      - amount
-      properties:
-        amount:
-          type: number
-          description: USD remaining in this free grant.
-        expires_at:
-          type: string
-          description: When this grant expires (RFC 3339). Omitted if the grant never expires or the expiry is unknown.
-      additionalProperties: false
-    GetUsageCreditsResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GetUsageCreditsResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    GetUsageResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Usage'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
+          - https://api.x.com/2/problems/field-hydration-failure
     NotAuthorizedForFieldProblem:
       type: object
       required:
@@ -358,58 +416,7 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
           type: string
-    Problem:
-      oneOf:
-      - $ref: '#/components/schemas/ResourceNotFoundProblem'
-      - $ref: '#/components/schemas/InvalidRequestProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
-      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
-      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
-      - $ref: '#/components/schemas/ResourceUnavailableProblem'
-      - $ref: '#/components/schemas/DisallowedResourceProblem'
-      - $ref: '#/components/schemas/InternalErrorProblem'
-      discriminator:
-        propertyName: type
-        mapping:
-          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
-          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
-          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
-          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
-          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
-          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
-          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
-          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
-          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    UsageDailyProjectUsage:
-      type: object
-      description: Project-level daily Post usage for the caller's project.
-      properties:
-        project_id:
-          type:
-          - string
-          - 'null'
-          description: Unique identifier of the project.
-        usage:
-          type:
-          - array
-          - 'null'
-          description: Daily usage entries for the project.
-          items:
-            type: object
-            description: A single day's usage entry.
-            required:
-            - date
-            properties:
-              date:
-                type: string
-                description: The day of the usage entry, as an ISO 8601 date-time.
-              usage:
-                type:
-                - string
-                - 'null'
-                description: Number of Posts used on this day.
-    ResourceUnavailableProblem:
+    ResourceNotFoundProblem:
       type: object
       required:
       - type
@@ -418,6 +425,8 @@ components:
       - resource_type
       properties:
         detail:
+          type: string
+        parameter:
           type: string
         resource_id:
           type: string
@@ -430,39 +439,30 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    InternalErrorProblem:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    GetUsageResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Usage'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetUsageCreditsResponseDataFreeGrants:
       type: object
       required:
-      - type
-      - title
-      - detail
+      - amount
       properties:
-        detail:
+        amount:
+          type: number
+          description: USD remaining in this free grant.
+        expires_at:
           type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    Usage:
-      type: object
-      properties:
-        cap_reset_day:
-          type: integer
-        daily_client_app_usage:
-          $ref: '#/components/schemas/UsageDailyClientAppUsage'
-        daily_project_usage:
-          $ref: '#/components/schemas/UsageDailyProjectUsage'
-        project_cap:
-          type: string
-        project_id:
-          type: string
-        project_usage:
-          type: string
+          description: When this grant expires (RFC 3339). Omitted if the grant never expires or the expiry is unknown.
+      additionalProperties: false
   parameters:
     UsageFieldsParameter:
       name: usage.fields

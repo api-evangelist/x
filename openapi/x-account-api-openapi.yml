@@ -79,17 +79,23 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    Error:
+    InternalErrorProblem:
       type: object
       required:
-      - code
-      - message
+      - type
+      - title
+      - detail
       properties:
-        code:
-          type: integer
-          format: int32
-        message:
+        detail:
           type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
     FieldHydrationFailureProblem:
       type: object
       required:
@@ -114,188 +120,6 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-hydration-failure
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    InvalidRequestProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/invalid-request
-        value:
-          type: string
-    NotAuthorizedForResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
-          type: string
-    EnsureAccountRequest:
-      type: object
-      properties:
-        metadata:
-          type: string
-          description: Optional provisioning-credit metadata (an opaque string, e.g. a subscription tier) to claim for the account, attributed to the calling app. Omit to just ensure the account.
-          maxLength: 64
-          pattern: ^[\x00-\x{FFFF}]*$
-    GetDeveloperAccountResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GetDeveloperAccountResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    InternalErrorProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    GetDeveloperAccountResponseData:
-      type: object
-      required:
-      - account_id
-      - name
-      - created_at
-      properties:
-        account_id:
-          type: string
-          description: Unique identifier of the developer account.
-        created_at:
-          type: string
-          description: Creation time of the account (ISO 8601).
-        name:
-          type: string
-          description: Display name of the developer account.
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    EnsureAccountResponseData:
-      type: object
-      required:
-      - account_id
-      - created
-      properties:
-        account_id:
-          type: string
-          description: Unique identifier of the developer account.
-        created:
-          type: boolean
-          description: Whether this request created the account.
     NotAuthorizedForFieldProblem:
       type: object
       required:
@@ -325,6 +149,206 @@ components:
           enum:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
+          type: string
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    GetDeveloperAccountResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GetDeveloperAccountResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    InvalidRequestProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    EnsureAccountRequest:
+      type: object
+      properties:
+        metadata:
+          type: string
+          description: Optional provisioning-credit metadata (an opaque string, e.g. a subscription tier) to claim for the account, attributed to the calling app. Omit to just ensure the account.
+          maxLength: 64
+          pattern: ^[\x00-\x{FFFF}]*$
+    ResourceNotFoundProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    FieldUnauthorizedProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-unauthorized
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+    GetDeveloperAccountResponseData:
+      type: object
+      required:
+      - account_id
+      - name
+      - created_at
+      properties:
+        account_id:
+          type: string
+          description: Unique identifier of the developer account.
+        created_at:
+          type: string
+          description: Creation time of the account (ISO 8601).
+        name:
+          type: string
+          description: Display name of the developer account.
+    EnsureAccountResponseData:
+      type: object
+      required:
+      - account_id
+      - created
+      properties:
+        account_id:
+          type: string
+          description: Unique identifier of the developer account.
+        created:
+          type: boolean
+          description: Whether this request created the account.
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
           type: string
     Problem:
       oneOf:
@@ -358,30 +382,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    FieldUnauthorizedProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-unauthorized
   securitySchemes:
     BearerToken:
       type: http

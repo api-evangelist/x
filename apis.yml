@@ -40,11 +40,11 @@ position: Consuming
 access: 3rd-Party
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/x.png
 tags:
-- Space
+- Spaces
 - Conversations
 - X
 - Social
-- Social-Media
+- Social Media
 - Posts
 - User
 - Direct Messages
@@ -56,6 +56,7 @@ tags:
 - Content
 - Agents
 - MCP
+- A2A
 tags_raw:
 - Spaces
 - Conversation
@@ -75,6 +76,8 @@ tags_raw:
 - Conversation
 - Agents
 - MCP
+- Social-Media
+- A2A
 created: '2025-08-14'
 modified: '2026-08-28'
 url: https://raw.githubusercontent.com/api-evangelist/x/refs/heads/main/apis.yml
@@ -274,6 +277,8 @@ apis:
   humanURL: https://docs.x.com/x-api/communities/introduction
   baseURL: https://api.x.com
   tags:
+  - Community
+  tags_raw:
   - Communities
   properties:
   - type: OpenAPI
@@ -412,7 +417,7 @@ apis:
   humanURL: https://docs.x.com/x-api/spaces/introduction
   baseURL: https://api.x.com
   tags:
-  - Space
+  - Spaces
   tags_raw:
   - Spaces
   properties:
@@ -496,6 +501,34 @@ apis:
     url: openapi/x-webhooks-api-openapi.yml
   - type: Documentation
     url: https://docs.x.com/x-api/enterprise-gnip-2.0/fundamentals/account-activity
+- aid: x:x-ads-api
+  name: X Ads API
+  description: The X Ads API enables programmatic management of advertising campaigns on the X platform
+    including campaign creation and scheduling, custom audience building, creative management (draft posts,
+    cards, media), and analytics retrieval for campaign performance metrics. Supports both synchronous
+    and asynchronous analytics endpoints for reporting.
+  image: https://abs.twimg.com/favicons/twitter.ico
+  humanURL: https://docs.x.com/x-ads-api
+  baseURL: https://ads-api.x.com
+  properties:
+  - type: Documentation
+    url: https://docs.x.com/x-ads-api
+  - type: GettingStarted
+    url: https://docs.x.com/x-ads-api/getting-started/create-a-campaign
+  - type: RateLimits
+    url: https://docs.x.com/x-ads-api/fundamentals/rate-limiting
+  tags:
+  - Advertising
+  - Campaigns
+  - Analytics
+  - Audiences
+  - Creative
+  tags_raw:
+  - Advertising
+  - Campaigns
+  - Analytics
+  - Audiences
+  - Creatives
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -504,3 +537,12 @@ x-enrichment:
   status: enriched
   artifacts_added: 49
   pass: local-v1
+x-tags-removed:
+- Space
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://docs.x.com/.well-known/agent-card.json"
+  grade: "conformant"
+  protocol_version: "0.3"
+  control: 404
