@@ -584,58 +584,127 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
 components:
-  schemas:
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
+  parameters:
+    BroadcastChatMessageExpansionsParameter:
+      name: expansions
+      in: query
+      description: A comma separated list of fields to expand.
+      required: false
+      schema:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
           type: string
           enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    PostMediaMetadata:
-      type: array
-      description: Metadata for media attached to this Post.
-      items:
-        type: object
-        description: Metadata for one media item attached to this Post.
-        properties:
-          alt_text:
-            type:
-            - string
-            - 'null'
-            description: Alternative text describing the media for accessibility.
-          description:
-            type:
-            - string
-            - 'null'
-            description: Description of the media.
-          media_key:
-            type:
-            - string
-            - 'null'
-            description: The unique identifier of the media.
-          title:
-            type:
-            - string
-            - 'null'
-            description: Title of the media.
-    ListScheduledBroadcastsResponseData:
+          - author_id
+      explode: false
+      style: form
+    BroadcastFieldsParameter:
+      name: broadcast.fields
+      in: query
+      description: A comma separated list of Broadcast fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a Broadcast object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - available_for_replay
+          - broadcast_id
+          - chat_option
+          - created_at_ms
+          - end_ms
+          - height
+          - id
+          - image_url
+          - image_url_medium
+          - image_url_small
+          - is_high_latency
+          - language
+          - media_key
+          - scheduled_end_ms
+          - scheduled_start_ms
+          - share_url
+          - source_id
+          - start_ms
+          - state
+          - title
+          - total_watched
+          - total_watching
+          - tweet_id
+          - twitter_user_id
+          - updated_at_ms
+          - width
+      explode: false
+      style: form
+    UserFieldsParameter:
+      name: user.fields
+      in: query
+      description: A comma separated list of User fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a User object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - confirmed_email
+          - connection_status
+          - created_at
+          - description
+          - entities
+          - id
+          - is_identity_verified
+          - location
+          - name
+          - parody
+          - profile_banner_url
+          - profile_image_url
+          - protected
+          - public_metrics
+          - receives_your_dm
+          - subscriber_count
+          - subscribes_to_you
+          - subscription
+          - subscription_type
+          - url
+          - username
+          - verified
+          - verified_followers_count
+          - verified_type
+          - withheld
+      explode: false
+      style: form
+    BroadcastChatMessageFieldsParameter:
+      name: broadcast_chat_message.fields
+      in: query
+      description: A comma separated list of BroadcastChatMessage fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a BroadcastChatMessage object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - author_name
+          - author_username
+          - broadcast_id
+          - created_at_ms
+          - id
+          - reply_to
+          - text
+      explode: false
+      style: form
+  schemas:
+    CreateScheduledBroadcastResponseData:
       type: object
       properties:
         available_for_replay:
@@ -683,11 +752,115 @@ components:
         title:
           type: string
           description: Broadcast title / status text.
-    GoLiveScheduledBroadcastResponse:
+    DeleteBroadcastChatMessageResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/GoLiveScheduledBroadcastResponseData'
+          $ref: '#/components/schemas/DeleteBroadcastChatMessageResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    UserAffiliation:
+      type: object
+      description: Metadata about a user's affiliation.
+      properties:
+        badge_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the affiliation badge image shown on the User's profile.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Description of the affiliation.
+        url:
+          type:
+          - string
+          - 'null'
+          description: URL associated with the affiliation.
+        user_id:
+          type:
+          - array
+          - 'null'
+          description: A list of unique identifiers of the accounts this User is affiliated with.
+          items:
+            type: string
+    PostGeo:
+      type: object
+      description: The location tagged on the Post, if the user provided one.
+      properties:
+        coordinates:
+          type:
+          - object
+          - 'null'
+          description: A GeoJSON Point geometry.
+          required:
+          - type
+          - coordinates
+          properties:
+            coordinates:
+              type: array
+              description: '[longitude, latitude].'
+              minItems: 2
+              maxItems: 2
+              items:
+                type: number
+                format: double
+            type:
+              type: string
+              description: The GeoJSON geometry type.
+              enum:
+              - Point
+        place_id:
+          type:
+          - string
+          - 'null'
+          description: The unique identifier of the tagged place.
+    PostMediaMetadata:
+      type: array
+      description: Metadata for media attached to this Post.
+      items:
+        type: object
+        description: Metadata for one media item attached to this Post.
+        properties:
+          alt_text:
+            type:
+            - string
+            - 'null'
+            description: Alternative text describing the media for accessibility.
+          description:
+            type:
+            - string
+            - 'null'
+            description: Description of the media.
+          media_key:
+            type:
+            - string
+            - 'null'
+            description: The unique identifier of the media.
+          title:
+            type:
+            - string
+            - 'null'
+            description: Title of the media.
+    DeleteScheduledBroadcastResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteScheduledBroadcastResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    ListScheduledBroadcastsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListScheduledBroadcastsResponseData'
         errors:
           type: array
           items:
@@ -740,15 +913,54 @@ components:
         title:
           type: string
           description: Broadcast title / status text.
-    CreateScheduledBroadcastResponse:
+    DisallowedResourceProblem:
       type: object
+      required:
+      - type
+      - title
+      - detail
       properties:
-        data:
-          $ref: '#/components/schemas/CreateScheduledBroadcastResponseData'
-        errors:
-          type: array
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    PostAttachments:
+      type: object
+      description: Specifies the type of attachments (if any) present in this Post.
+      properties:
+        media_keys:
+          type:
+          - array
+          - 'null'
+          description: Media keys of media attached to this Post.
           items:
-            $ref: '#/components/schemas/Problem'
+            type: string
+        media_source_tweet_id:
+          type:
+          - array
+          - 'null'
+          description: IDs of the source Posts the attached media originated from.
+          items:
+            type: string
+        poll_ids:
+          type:
+          - array
+          - 'null'
+          description: IDs of polls attached to this Post.
+          items:
+            type: string
     PostMatchedMediaNotes:
       type: array
       description: Community-Notes media matches for this Post.
@@ -766,120 +978,341 @@ components:
             - string
             - 'null'
             description: The matched note's unique identifier.
-    GetBroadcastResponse:
+    GetScheduledBroadcastResponseData:
       type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Broadcast'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    UpdateScheduledBroadcastRequest:
-      type: object
-      required:
-      - scheduled_broadcast_id
-      - scheduled_start_ms
-      - scheduled_end_ms
       properties:
         available_for_replay:
           type: boolean
-          description: Enable replay.
+          description: Whether replay is enabled.
+        broadcast_id:
+          type: string
+          description: Alphanumeric UBS broadcast id (path `:id` for get/update/delete/live).
         chat_option:
           type: string
-          description: Chat permission option (numeric string).
-          pattern: ^[0-9]{1,19}$
+          description: Optional chat permission option.
         description:
           type: string
-          description: Description.
-        is_locked:
-          type: boolean
-          description: Lock the broadcast.
+          description: Optional description.
         locale:
           type: string
-          description: Locale.
+          description: Optional locale.
         manual_publish:
           type: boolean
-          description: If true, do not auto-publish at start; call POST .../live when ready.
-        roll_forward:
-          type: boolean
-          description: When true, shift the head of a recurring series.
+          description: When true, coordinator will not auto-publish; call POST .../live when ready.
+        recurring_schedule_id:
+          type: string
+          description: Set when this occurrence belongs to a recurrence.
         scheduled_broadcast_id:
           type: string
-          description: Numeric scheduler id from create/list/get.
-          pattern: ^[0-9]{1,19}$
+          description: Numeric scheduler id. Required in the update request body.
         scheduled_end_ms:
           type: string
-          description: End time, ms since Unix epoch (decimal string).
-          pattern: ^[0-9]{1,19}$
+          description: Scheduled end, milliseconds since Unix epoch (decimal string).
         scheduled_start_ms:
           type: string
-          description: Start time, ms since Unix epoch (decimal string).
-          pattern: ^[0-9]{1,19}$
+          description: Scheduled start, milliseconds since Unix epoch (decimal string).
         source_id:
           type: string
-          description: Ingest / source id.
+          description: Bound ingest / source id (`rtmp_stream_key`).
+        state:
+          type: string
+          description: Scheduler state (Created, Scheduled, Running, …).
+        telecast_id:
+          type: string
+          description: Optional telecast association.
         thumbnail_media_id:
           type: string
-          description: Pre-live slate media id (numeric string).
-          pattern: ^[0-9]{1,19}$
+          description: Optional pre-live slate media id.
         title:
           type: string
-          description: Title / status text.
-      additionalProperties: false
-    Place:
+          description: Broadcast title / status text.
+    NotAuthorizedForResourceProblem:
       type: object
-      properties:
-        contained_within:
-          $ref: '#/components/schemas/PlaceContainedWithin'
-        country:
-          type: string
-        country_code:
-          type: string
-        full_name:
-          type: string
-        geo:
-          $ref: '#/components/schemas/PlaceGeo'
-        id:
-          type: string
-        name:
-          type: string
-        place_type:
-          type: string
-    PlaceGeo:
-      type: object
-      description: The geographic location of this place, expressed as a GeoJSON Feature.
       required:
       - type
-      - bbox
-      - properties
+      - title
+      - detail
+      - resource_type
       properties:
-        bbox:
-          type: array
-          description: The bounding box as [southwest_longitude, southwest_latitude, northeast_longitude, northeast_latitude].
-          minItems: 4
-          maxItems: 4
-          items:
-            type: number
-            format: double
-        properties:
-          type: object
-          description: Additional GeoJSON feature properties.
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
         type:
-          description: The GeoJSON feature type.
-          oneOf:
-          - type: string
-            enum:
-            - Feature
-    GetScheduledBroadcastResponse:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+    PostEditControls:
+      type: object
+      description: Indicates how much longer (if at all) this Post can be edited.
+      properties:
+        editable_until:
+          type:
+          - string
+          - 'null'
+          description: The time until which this Post can be edited.
+        edits_remaining:
+          type:
+          - integer
+          - 'null'
+          description: Number of edits still allowed for this Post.
+          format: int64
+        is_edit_eligible:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates whether this Post is eligible to be edited.
+    MediaPromotedMetrics:
+      type: object
+      description: Promoted nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+        view_count:
+          type:
+          - integer
+          - 'null'
+          description: The number of promoted views of this video. Null when the backend returns quartile data without a view count.
+          format: int64
+    MediaNonPublicMetrics:
+      type: object
+      description: Nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+    SendBroadcastChatResponseData:
+      type: object
+      required:
+      - success
+      - timestamp
+      properties:
+        success:
+          type: boolean
+          description: Whether the chat message was sent.
+        timestamp:
+          type: string
+          description: Server timestamp of the message, in nanoseconds.
+    FieldUnauthorizedProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-unauthorized
+    MediaVariants:
+      type: array
+      description: Each media object may have multiple display or playback variants, with different resolutions or formats.
+      items:
+        type: object
+        description: A single playback or display variant of a media object.
+        properties:
+          bit_rate:
+            type:
+            - integer
+            - 'null'
+            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
+            format: int64
+          content_type:
+            type:
+            - string
+            - 'null'
+            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
+          url:
+            type:
+            - string
+            - 'null'
+            description: The URL to this media variant.
+    ListScheduledBroadcastsResponseData:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/GetScheduledBroadcastResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
+        available_for_replay:
+          type: boolean
+          description: Whether replay is enabled.
+        broadcast_id:
+          type: string
+          description: Alphanumeric UBS broadcast id (path `:id` for get/update/delete/live).
+        chat_option:
+          type: string
+          description: Optional chat permission option.
+        description:
+          type: string
+          description: Optional description.
+        locale:
+          type: string
+          description: Optional locale.
+        manual_publish:
+          type: boolean
+          description: When true, coordinator will not auto-publish; call POST .../live when ready.
+        recurring_schedule_id:
+          type: string
+          description: Set when this occurrence belongs to a recurrence.
+        scheduled_broadcast_id:
+          type: string
+          description: Numeric scheduler id. Required in the update request body.
+        scheduled_end_ms:
+          type: string
+          description: Scheduled end, milliseconds since Unix epoch (decimal string).
+        scheduled_start_ms:
+          type: string
+          description: Scheduled start, milliseconds since Unix epoch (decimal string).
+        source_id:
+          type: string
+          description: Bound ingest / source id (`rtmp_stream_key`).
+        state:
+          type: string
+          description: Scheduler state (Created, Scheduled, Running, …).
+        telecast_id:
+          type: string
+          description: Optional telecast association.
+        thumbnail_media_id:
+          type: string
+          description: Optional pre-live slate media id.
+        title:
+          type: string
+          description: Broadcast title / status text.
+    CreateScheduledBroadcastRecurrence:
+      type: object
+      required:
+      - frequency
+      - repeats
+      properties:
+        frequency:
+          type: string
+          description: Recurrence frequency.
+          enum:
+          - Daily
+          - Weekly
+        repeats:
+          type: string
+          description: Number of repeats (numeric string).
+          pattern: ^[0-9]{1,19}$
+      additionalProperties: false
+    MuteBroadcastChatUserRequest:
+      type: object
+      required:
+      - user_id
+      properties:
+        end_at_ms:
+          type: string
+          description: The Unix timestamp in milliseconds when the mute expires. Omit this field to mute indefinitely.
+          pattern: ^[1-9][0-9]{0,18}$
+        message_id:
+          type: string
+          description: A chat message to remove while muting the user.
+          pattern: ^[1-9][0-9]{0,18}$
+        user_id:
+          type: string
+          description: The user to mute.
+          pattern: ^[1-9][0-9]{0,18}$
+      additionalProperties: false
+    Problem:
+      oneOf:
+      - $ref: '#/components/schemas/ResourceNotFoundProblem'
+      - $ref: '#/components/schemas/InvalidRequestProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
+      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
+      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
+      - $ref: '#/components/schemas/ResourceUnavailableProblem'
+      - $ref: '#/components/schemas/DisallowedResourceProblem'
+      - $ref: '#/components/schemas/InternalErrorProblem'
+      discriminator:
+        propertyName: type
+        mapping:
+          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
+          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
+          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
+          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
+          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
+          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
+          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
+          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
+          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
     UpdateScheduledBroadcastResponseData:
       type: object
       properties:
@@ -928,6 +1361,341 @@ components:
         title:
           type: string
           description: Broadcast title / status text.
+    Post:
+      type: object
+      properties:
+        article:
+          type: object
+        article_title:
+          type: object
+          description: Metadata about the long-form Article attached to this Post, if any.
+        attachments:
+          $ref: '#/components/schemas/PostAttachments'
+        author_id:
+          type: string
+          description: Unique identifier of the author of this Post.
+        card_uri:
+          type: string
+        community_id:
+          type: string
+          description: The unique identifier of the Community this Post belongs to, if any.
+        context_annotations:
+          $ref: '#/components/schemas/PostContextAnnotations'
+        conversation_id:
+          type: string
+          description: The ID of the conversation this Post belongs to (matches the root Post's ID).
+        created_at:
+          type: string
+          description: Creation time of the Post.
+          format: date-time
+        display_text_range:
+          $ref: '#/components/schemas/PostDisplayTextRange'
+        edit_controls:
+          $ref: '#/components/schemas/PostEditControls'
+        edit_history_post_ids:
+          type: array
+          description: A list of Post IDs in this Post's edit history chain.
+          items:
+            type: string
+        entities:
+          $ref: '#/components/schemas/PostEntities'
+        geo:
+          $ref: '#/components/schemas/PostGeo'
+        id:
+          type: string
+          description: Unique identifier of this Post.
+        in_reply_to_user_id:
+          type: string
+          description: Unique identifier of the User this Post is replying to.
+        lang:
+          type: string
+          description: Language of the Post, if detected by X. Returned as a BCP47 language tag.
+        matched_media_notes:
+          $ref: '#/components/schemas/PostMatchedMediaNotes'
+        media_metadata:
+          $ref: '#/components/schemas/PostMediaMetadata'
+        non_public_metrics:
+          type: object
+          description: Nonpublic engagement metrics for the Post at the time of the request.
+        note_post:
+          $ref: '#/components/schemas/PostNotePost'
+        note_request_suggestions:
+          $ref: '#/components/schemas/PostNoteRequestSuggestions'
+        organic_metrics:
+          type: object
+          description: Organic nonpublic engagement metrics for the Post at the time of the request.
+        paid_partnership:
+          type: boolean
+          description: Indicates if this Post is a paid partnership, i.e. it has been disclosed by the author as containing paid promotion.
+        possibly_sensitive:
+          type: boolean
+          description: Indicates if this Post contains URLs marked as sensitive, for example content suitable for mature audiences.
+        promoted_metrics:
+          type: object
+          description: Promoted nonpublic engagement metrics for the Post at the time of the request.
+        public_metrics:
+          $ref: '#/components/schemas/PostPublicMetrics'
+        referenced_posts:
+          $ref: '#/components/schemas/PostReferencedPosts'
+        reply_settings:
+          type: string
+          description: Shows who can reply to this Post.
+        scopes:
+          $ref: '#/components/schemas/PostScopes'
+        source:
+          type: string
+          description: The name of the app the user posted from. This is deprecated.
+        suggested_source_links:
+          $ref: '#/components/schemas/PostSuggestedSourceLinks'
+        suggested_source_links_with_counts:
+          $ref: '#/components/schemas/PostSuggestedSourceLinksWithCounts'
+        text:
+          type: string
+          description: The content of the Post.
+        username:
+          type: string
+        withheld:
+          $ref: '#/components/schemas/PostWithheld'
+    CreateScheduledBroadcastRequest:
+      type: object
+      required:
+      - source_id
+      - scheduled_start_ms
+      - scheduled_end_ms
+      properties:
+        available_for_replay:
+          type: boolean
+          description: Enable replay.
+        chat_option:
+          type: string
+          description: Chat permission option (numeric string).
+          pattern: ^[0-9]{1,19}$
+        description:
+          type: string
+          description: Description.
+        is_locked:
+          type: boolean
+          description: Lock the broadcast.
+        locale:
+          type: string
+          description: Locale.
+        manual_publish:
+          type: boolean
+          description: If true, do not auto-publish at start; call POST .../live when ready.
+        recurrence:
+          description: If set, creates a recurring series.
+          $ref: '#/components/schemas/CreateScheduledBroadcastRecurrence'
+        scheduled_end_ms:
+          type: string
+          description: End time, ms since Unix epoch (decimal string).
+          pattern: ^[0-9]{1,19}$
+        scheduled_start_ms:
+          type: string
+          description: Start time, ms since Unix epoch (decimal string).
+          pattern: ^[0-9]{1,19}$
+        source_id:
+          type: string
+          description: Ingest / source id to bind (same as sources `rtmp_stream_key`).
+          minLength: 1
+        telecast_id:
+          type: string
+          description: Optional telecast id (numeric string).
+          pattern: ^[0-9]{1,19}$
+        thumbnail_media_id:
+          type: string
+          description: Pre-live slate media id (numeric string).
+          pattern: ^[0-9]{1,19}$
+        title:
+          type: string
+          description: Title / status text.
+      additionalProperties: false
+    UpdateScheduledBroadcastResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UpdateScheduledBroadcastResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    PostNoteRequestSuggestions:
+      type: array
+      description: Community-Notes request suggestions for this Post.
+      items:
+        type: object
+        description: A Community-Notes request suggestion for this Post.
+        properties:
+          source_link:
+            type:
+            - string
+            - 'null'
+            description: A suggested source link supporting the note request.
+          suggestion:
+            type:
+            - string
+            - 'null'
+            description: The text of the note request suggestion.
+          suggestion_id:
+            type:
+            - string
+            - 'null'
+            description: The unique identifier of the note request suggestion.
+    PostScopes:
+      type: object
+      description: The scopes for this Post.
+      required:
+      - followers
+      properties:
+        followers:
+          type: boolean
+          description: Indicates whether visibility of this Post is limited to the author's followers.
+    UnmuteBroadcastChatUserResponseData:
+      type: object
+      required:
+      - muted
+      properties:
+        muted:
+          type: boolean
+          description: Whether the user is muted in this broadcast chat.
+    CreateScheduledBroadcastResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateScheduledBroadcastResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    PlaceGeo:
+      type: object
+      description: The geographic location of this place, expressed as a GeoJSON Feature.
+      required:
+      - type
+      - bbox
+      - properties
+      properties:
+        bbox:
+          type: array
+          description: The bounding box as [southwest_longitude, southwest_latitude, northeast_longitude, northeast_latitude].
+          minItems: 4
+          maxItems: 4
+          items:
+            type: number
+            format: double
+        properties:
+          type: object
+          description: Additional GeoJSON feature properties.
+        type:
+          description: The GeoJSON feature type.
+          oneOf:
+          - type: string
+            enum:
+            - Feature
+    PlaceContainedWithin:
+      type: array
+      description: A list of unique identifiers of the Places that contain this place.
+      items:
+        type: string
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    Expansions:
+      type: object
+      properties:
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        places:
+          type: array
+          items:
+            $ref: '#/components/schemas/Place'
+        polls:
+          type: array
+          items:
+            $ref: '#/components/schemas/Poll'
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        topics:
+          type: array
+          items:
+            $ref: '#/components/schemas/Topic'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    ResourceNotFoundProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    DeleteBroadcastChatMessageResponseData:
+      type: object
+      required:
+      - deleted
+      properties:
+        deleted:
+          type: boolean
+          description: Whether the chat message was removed.
     UserEntities:
       type: object
       description: A list of metadata found in the User's profile description.
@@ -1168,137 +1936,7 @@ components:
                   url:
                     type: string
                     description: The t.co shortened URL.
-    PostNotePost:
-      type: object
-      description: The full content of the Post, including text beyond 280 characters.
-      required:
-      - text
-      properties:
-        entities:
-          type:
-          - object
-          - 'null'
-          description: Metadata entities (hashtags, cashtags, mentions, URLs) found in the note Post text.
-          properties:
-            cashtags:
-              type:
-              - array
-              - 'null'
-              items:
-                type: object
-                description: A hashtag or cashtag entity.
-                required:
-                - start
-                - end
-                - tag
-                properties:
-                  end:
-                    type: integer
-                    description: End index in the text (exclusive).
-                    format: int64
-                  start:
-                    type: integer
-                    description: Start index in the text (inclusive).
-                    format: int64
-                  tag:
-                    type: string
-            hashtags:
-              type:
-              - array
-              - 'null'
-              items:
-                type: object
-                description: A hashtag or cashtag entity.
-                required:
-                - start
-                - end
-                - tag
-                properties:
-                  end:
-                    type: integer
-                    description: End index in the text (exclusive).
-                    format: int64
-                  start:
-                    type: integer
-                    description: Start index in the text (inclusive).
-                    format: int64
-                  tag:
-                    type: string
-            mentions:
-              type:
-              - array
-              - 'null'
-              items:
-                type: object
-                description: A user mention entity.
-                required:
-                - start
-                - end
-                properties:
-                  end:
-                    type: integer
-                    format: int64
-                  id:
-                    type:
-                    - string
-                    - 'null'
-                  start:
-                    type: integer
-                    format: int64
-                  username:
-                    type:
-                    - string
-                    - 'null'
-            urls:
-              type:
-              - array
-              - 'null'
-              items:
-                type: object
-                description: A URL entity found in note Post text.
-                required:
-                - start
-                - end
-                properties:
-                  display_url:
-                    type:
-                    - string
-                    - 'null'
-                  end:
-                    type: integer
-                    format: int64
-                  expanded_url:
-                    type:
-                    - string
-                    - 'null'
-                  start:
-                    type: integer
-                    format: int64
-                  url:
-                    type:
-                    - string
-                    - 'null'
-        text:
-          type: string
-          description: The full note text of the Post.
-    InternalErrorProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    FieldHydrationFailureProblem:
+    NotAuthorizedForFieldProblem:
       type: object
       required:
       - type
@@ -1309,6 +1947,10 @@ components:
         detail:
           type: string
         field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
           type: string
         resource_type:
           type: string
@@ -1321,108 +1963,8 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    MuteBroadcastChatUserResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/MuteBroadcastChatUserResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    UserPublicMetrics:
-      type: object
-      description: A list of metrics for this User.
-      required:
-      - followers_count
-      - following_count
-      - post_count
-      - listed_count
-      properties:
-        followers_count:
-          type: integer
-          description: Number of Users who follow this User.
-          format: int64
-        following_count:
-          type: integer
-          description: Number of Users this User follows.
-          format: int64
-        like_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of Posts this User has liked.
-          format: int64
-        listed_count:
-          type: integer
-          description: Number of Lists that include this User.
-          format: int64
-        media_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of media items posted by this User.
-          format: int64
-        post_count:
-          type: integer
-          description: Number of Posts (including Reposts) created by this User.
-          format: int64
-    PostPublicMetrics:
-      type: object
-      description: Engagement metrics for the Post at the time of the request.
-      required:
-      - repost_count
-      - reply_count
-      - like_count
-      - quote_count
-      - bookmark_count
-      - impression_count
-      properties:
-        bookmark_count:
-          type: integer
-          description: Number of times this Post has been bookmarked.
-          format: int64
-        impression_count:
-          type: integer
-          description: Number of times this Post has been viewed.
-          format: int64
-        like_count:
-          type: integer
-          description: Number of likes on this Post.
-          format: int64
-        quote_count:
-          type: integer
-          description: Number of quote Posts of this Post.
-          format: int64
-        reply_count:
-          type: integer
-          description: Number of replies to this Post.
-          format: int64
-        repost_count:
-          type: integer
-          description: Number of times this Post has been reposted.
-          format: int64
-    MuteBroadcastChatUserResponseData:
-      type: object
-      required:
-      - muted
-      properties:
-        muted:
-          type: boolean
-          description: Whether the user is muted in this broadcast chat.
-    Poll:
-      type: object
-      properties:
-        duration_minutes:
-          type: integer
-        end_datetime:
-          type: string
-        id:
-          type: string
-        options:
-          $ref: '#/components/schemas/PollOptions'
-        voting_status:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
           type: string
     Media:
       type: object
@@ -1453,193 +1995,53 @@ components:
           $ref: '#/components/schemas/MediaVariants'
         width:
           type: integer
-    PollOptions:
+    PostContextAnnotations:
       type: array
-      description: The list of options (choices) available in this poll.
+      description: Annotations inferred about the Post (domain and entity context).
       items:
         type: object
-        description: A single option (choice) available in a poll.
+        description: A single inferred annotation about the Post (domain and entity context).
         required:
-        - position
-        - label
-        - votes
+        - domain
+        - entity
         properties:
-          label:
-            type: string
-            description: The text label of this poll option.
-          position:
-            type: integer
-            description: The 1-based position of this option within the poll.
-            format: int64
-          votes:
-            type: integer
-            description: The number of votes this option has received.
-            format: int64
-    GetBroadcastChatResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/BroadcastChatMessage'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    PostSuggestedSourceLinksWithCounts:
-      type: array
-      description: Suggested source URLs for this Post, each with the number of times it was suggested.
-      items:
-        type: object
-        description: A suggested source URL for this Post with the number of times it was suggested.
-        properties:
-          count:
-            type:
-            - integer
-            - 'null'
-            description: Number of times this source link was suggested.
-            format: int64
-          url:
-            type:
-            - string
-            - 'null'
-            description: The suggested source URL.
-    InvalidRequestProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/invalid-request
-        value:
-          type: string
-    Expansions:
-      type: object
-      properties:
-        media:
-          type: array
-          items:
-            $ref: '#/components/schemas/Media'
-        places:
-          type: array
-          items:
-            $ref: '#/components/schemas/Place'
-        polls:
-          type: array
-          items:
-            $ref: '#/components/schemas/Poll'
-        posts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        topics:
-          type: array
-          items:
-            $ref: '#/components/schemas/Topic'
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-    PlaceContainedWithin:
-      type: array
-      description: A list of unique identifiers of the Places that contain this place.
-      items:
-        type: string
-    PostReferencedPosts:
-      type: array
-      description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes the referenced Post's type and ID.
-      items:
-        type: object
-        description: A reference from this Post to another Post (repost, quote, or reply).
-        required:
-        - type
-        - id
-        properties:
-          id:
-            type: string
-            description: Unique identifier of the referenced Post.
-          type:
-            description: How this Post references the other Post.
+          domain:
+            description: The domain (broad category) this annotation belongs to.
             oneOf:
-            - type: string
-              description: The kind of Post-to-Post reference.
-              enum:
-              - retweeted
-              - quoted
-              - replied_to
-    CreateScheduledBroadcastResponseData:
-      type: object
-      properties:
-        available_for_replay:
-          type: boolean
-          description: Whether replay is enabled.
-        broadcast_id:
-          type: string
-          description: Alphanumeric UBS broadcast id (path `:id` for get/update/delete/live).
-        chat_option:
-          type: string
-          description: Optional chat permission option.
-        description:
-          type: string
-          description: Optional description.
-        locale:
-          type: string
-          description: Optional locale.
-        manual_publish:
-          type: boolean
-          description: When true, coordinator will not auto-publish; call POST .../live when ready.
-        recurring_schedule_id:
-          type: string
-          description: Set when this occurrence belongs to a recurrence.
-        scheduled_broadcast_id:
-          type: string
-          description: Numeric scheduler id. Required in the update request body.
-        scheduled_end_ms:
-          type: string
-          description: Scheduled end, milliseconds since Unix epoch (decimal string).
-        scheduled_start_ms:
-          type: string
-          description: Scheduled start, milliseconds since Unix epoch (decimal string).
-        source_id:
-          type: string
-          description: Bound ingest / source id (`rtmp_stream_key`).
-        state:
-          type: string
-          description: Scheduler state (Created, Scheduled, Running, …).
-        telecast_id:
-          type: string
-          description: Optional telecast association.
-        thumbnail_media_id:
-          type: string
-          description: Optional pre-live slate media id.
-        title:
-          type: string
-          description: Broadcast title / status text.
-    FieldUnauthorizedProblem:
+            - type: object
+              description: A domain or entity referenced by a context annotation.
+              properties:
+                description:
+                  type:
+                  - string
+                  - 'null'
+                id:
+                  type:
+                  - string
+                  - 'null'
+                name:
+                  type:
+                  - string
+                  - 'null'
+          entity:
+            description: The specific entity recognized within the domain.
+            oneOf:
+            - type: object
+              description: A domain or entity referenced by a context annotation.
+              properties:
+                description:
+                  type:
+                  - string
+                  - 'null'
+                id:
+                  type:
+                  - string
+                  - 'null'
+                name:
+                  type:
+                  - string
+                  - 'null'
+    FieldHydrationFailureProblem:
       type: object
       required:
       - type
@@ -1662,24 +2064,160 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/field-unauthorized
-    UserWithheld:
+          - https://api.x.com/2/problems/field-hydration-failure
+    Place:
+      type: object
+      properties:
+        contained_within:
+          $ref: '#/components/schemas/PlaceContainedWithin'
+        country:
+          type: string
+        country_code:
+          type: string
+        full_name:
+          type: string
+        geo:
+          $ref: '#/components/schemas/PlaceGeo'
+        id:
+          type: string
+        name:
+          type: string
+        place_type:
+          type: string
+    MuteBroadcastChatUserResponseData:
+      type: object
+      required:
+      - muted
+      properties:
+        muted:
+          type: boolean
+          description: Whether the user is muted in this broadcast chat.
+    InvalidRequestProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/invalid-request
+        value:
+          type: string
+    MediaPublicMetrics:
+      type: object
+      description: Public engagement metrics for the media at the time of the request.
+      required:
+      - view_count
+      properties:
+        view_count:
+          type: integer
+          description: The number of times this video has been viewed.
+          format: int64
+    UpdateScheduledBroadcastRequest:
+      type: object
+      required:
+      - scheduled_broadcast_id
+      - scheduled_start_ms
+      - scheduled_end_ms
+      properties:
+        available_for_replay:
+          type: boolean
+          description: Enable replay.
+        chat_option:
+          type: string
+          description: Chat permission option (numeric string).
+          pattern: ^[0-9]{1,19}$
+        description:
+          type: string
+          description: Description.
+        is_locked:
+          type: boolean
+          description: Lock the broadcast.
+        locale:
+          type: string
+          description: Locale.
+        manual_publish:
+          type: boolean
+          description: If true, do not auto-publish at start; call POST .../live when ready.
+        roll_forward:
+          type: boolean
+          description: When true, shift the head of a recurring series.
+        scheduled_broadcast_id:
+          type: string
+          description: Numeric scheduler id from create/list/get.
+          pattern: ^[0-9]{1,19}$
+        scheduled_end_ms:
+          type: string
+          description: End time, ms since Unix epoch (decimal string).
+          pattern: ^[0-9]{1,19}$
+        scheduled_start_ms:
+          type: string
+          description: Start time, ms since Unix epoch (decimal string).
+          pattern: ^[0-9]{1,19}$
+        source_id:
+          type: string
+          description: Ingest / source id.
+        thumbnail_media_id:
+          type: string
+          description: Pre-live slate media id (numeric string).
+          pattern: ^[0-9]{1,19}$
+        title:
+          type: string
+          description: Title / status text.
+      additionalProperties: false
+    ListBroadcastsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Broadcast'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    PostWithheld:
       type: object
       description: Withholding details for withheld content.
+      required:
+      - copyright
+      - country_codes
       properties:
+        copyright:
+          type: boolean
+          description: Indicates whether this content is withheld due to a copyright claim.
         country_codes:
-          type:
-          - array
-          - 'null'
-          description: A list of countries (as ISO 3166-1 alpha-2 codes) where this content is withheld.
+          type: array
+          description: Uppercase ISO 3166-1 alpha-2 country codes where this content is withheld.
           items:
             type: string
         scope:
           type:
           - string
           - 'null'
-          description: The scope of the withholding. Only present, with the value "user", when the entire User is withheld.
+          description: Whether the withholding applies to a Post or a User.
           enum:
+          - post
           - user
     User:
       type: object
@@ -1762,210 +2300,197 @@ components:
           description: 'The X Blue verified type of the user, e.g.: blue, government, business or none.'
         withheld:
           $ref: '#/components/schemas/UserWithheld'
-    Broadcast:
-      type: object
-      properties:
-        available_for_replay:
-          type: boolean
-        broadcast_id:
-          type: string
-        chat_option:
-          type: integer
-        created_at_ms:
-          type: string
-        end_ms:
-          type: string
-        height:
-          type: integer
-        id:
-          type: string
-        image_url:
-          type: string
-        image_url_medium:
-          type: string
-        image_url_small:
-          type: string
-        is_high_latency:
-          type: boolean
-        language:
-          type: string
-        media_key:
-          type: string
-        scheduled_end_ms:
-          type: string
-        scheduled_start_ms:
-          type: string
-        share_url:
-          type: string
-        source_id:
-          type: string
-        start_ms:
-          type: string
-        state:
-          type: string
-        title:
-          type: string
-        total_watched:
-          type: string
-        total_watching:
-          type: string
-        tweet_id:
-          type: string
-        twitter_user_id:
-          type: string
-        updated_at_ms:
-          type: string
-        width:
-          type: integer
-    UnmuteBroadcastChatUserResponseData:
-      type: object
-      required:
-      - muted
-      properties:
-        muted:
-          type: boolean
-          description: Whether the user is muted in this broadcast chat.
-    UpdateScheduledBroadcastResponse:
+    GoLiveScheduledBroadcastResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/UpdateScheduledBroadcastResponseData'
+          $ref: '#/components/schemas/GoLiveScheduledBroadcastResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    UserAffiliation:
+    UserWithheld:
       type: object
-      description: Metadata about a user's affiliation.
+      description: Withholding details for withheld content.
       properties:
-        badge_url:
-          type:
-          - string
-          - 'null'
-          description: URL of the affiliation badge image shown on the User's profile.
-        description:
-          type:
-          - string
-          - 'null'
-          description: Description of the affiliation.
-        url:
-          type:
-          - string
-          - 'null'
-          description: URL associated with the affiliation.
-        user_id:
+        country_codes:
           type:
           - array
           - 'null'
-          description: A list of unique identifiers of the accounts this User is affiliated with.
+          description: A list of countries (as ISO 3166-1 alpha-2 codes) where this content is withheld.
           items:
             type: string
-    Post:
+        scope:
+          type:
+          - string
+          - 'null'
+          description: The scope of the withholding. Only present, with the value "user", when the entire User is withheld.
+          enum:
+          - user
+    UnmuteBroadcastChatUserResponse:
       type: object
       properties:
-        article:
-          type: object
-        article_title:
-          type: object
-          description: Metadata about the long-form Article attached to this Post, if any.
-        attachments:
-          $ref: '#/components/schemas/PostAttachments'
+        data:
+          $ref: '#/components/schemas/UnmuteBroadcastChatUserResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    BroadcastChatMessage:
+      type: object
+      properties:
         author_id:
           type: string
-          description: Unique identifier of the author of this Post.
-        card_uri:
+        author_name:
           type: string
-        community_id:
+        author_username:
           type: string
-          description: The unique identifier of the Community this Post belongs to, if any.
-        context_annotations:
-          $ref: '#/components/schemas/PostContextAnnotations'
-        conversation_id:
+        broadcast_id:
           type: string
-          description: The ID of the conversation this Post belongs to (matches the root Post's ID).
-        created_at:
+        created_at_ms:
           type: string
-          description: Creation time of the Post.
-          format: date-time
-        display_text_range:
-          $ref: '#/components/schemas/PostDisplayTextRange'
-        edit_controls:
-          $ref: '#/components/schemas/PostEditControls'
-        edit_history_post_ids:
-          type: array
-          description: A list of Post IDs in this Post's edit history chain.
-          items:
-            type: string
-        entities:
-          $ref: '#/components/schemas/PostEntities'
-        geo:
-          $ref: '#/components/schemas/PostGeo'
         id:
           type: string
-          description: Unique identifier of this Post.
-        in_reply_to_user_id:
+        reply_to:
           type: string
-          description: Unique identifier of the User this Post is replying to.
-        lang:
-          type: string
-          description: Language of the Post, if detected by X. Returned as a BCP47 language tag.
-        matched_media_notes:
-          $ref: '#/components/schemas/PostMatchedMediaNotes'
-        media_metadata:
-          $ref: '#/components/schemas/PostMediaMetadata'
-        non_public_metrics:
-          type: object
-          description: Nonpublic engagement metrics for the Post at the time of the request.
-        note_post:
-          $ref: '#/components/schemas/PostNotePost'
-        note_request_suggestions:
-          $ref: '#/components/schemas/PostNoteRequestSuggestions'
-        organic_metrics:
-          type: object
-          description: Organic nonpublic engagement metrics for the Post at the time of the request.
-        paid_partnership:
-          type: boolean
-          description: Indicates if this Post is a paid partnership, i.e. it has been disclosed by the author as containing paid promotion.
-        possibly_sensitive:
-          type: boolean
-          description: Indicates if this Post contains URLs marked as sensitive, for example content suitable for mature audiences.
-        promoted_metrics:
-          type: object
-          description: Promoted nonpublic engagement metrics for the Post at the time of the request.
-        public_metrics:
-          $ref: '#/components/schemas/PostPublicMetrics'
-        referenced_posts:
-          $ref: '#/components/schemas/PostReferencedPosts'
-        reply_settings:
-          type: string
-          description: Shows who can reply to this Post.
-        scopes:
-          $ref: '#/components/schemas/PostScopes'
-        source:
-          type: string
-          description: The name of the app the user posted from. This is deprecated.
-        suggested_source_links:
-          $ref: '#/components/schemas/PostSuggestedSourceLinks'
-        suggested_source_links_with_counts:
-          $ref: '#/components/schemas/PostSuggestedSourceLinksWithCounts'
         text:
           type: string
-          description: The content of the Post.
-        username:
+    UserSubscription:
+      type: object
+      description: The subscription relationship between this User and you.
+      required:
+      - subscribes_to_you
+      properties:
+        subscribes_to_you:
+          type: boolean
+          description: Indicates if this User subscribes to you.
+    DeleteScheduledBroadcastResponseData:
+      type: object
+      required:
+      - deleted
+      properties:
+        deleted:
+          type: boolean
+          description: Whether the scheduled broadcast was deleted.
+    UserPublicMetrics:
+      type: object
+      description: A list of metrics for this User.
+      required:
+      - followers_count
+      - following_count
+      - post_count
+      - listed_count
+      properties:
+        followers_count:
+          type: integer
+          description: Number of Users who follow this User.
+          format: int64
+        following_count:
+          type: integer
+          description: Number of Users this User follows.
+          format: int64
+        like_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of Posts this User has liked.
+          format: int64
+        listed_count:
+          type: integer
+          description: Number of Lists that include this User.
+          format: int64
+        media_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of media items posted by this User.
+          format: int64
+        post_count:
+          type: integer
+          description: Number of Posts (including Reposts) created by this User.
+          format: int64
+    SendBroadcastChatRequest:
+      type: object
+      required:
+      - text
+      properties:
+        reply_to:
           type: string
-        withheld:
-          $ref: '#/components/schemas/PostWithheld'
-    ListBroadcastsResponse:
+          description: Message id to reply to, returned as timestamp when sent.
+          pattern: ^[0-9]{1,19}$
+        text:
+          type: string
+          description: The chat message text.
+          minLength: 1
+          maxLength: 140
+      additionalProperties: false
+    GetScheduledBroadcastResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GetScheduledBroadcastResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    PostReferencedPosts:
+      type: array
+      description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes the referenced Post's type and ID.
+      items:
+        type: object
+        description: A reference from this Post to another Post (repost, quote, or reply).
+        required:
+        - type
+        - id
+        properties:
+          id:
+            type: string
+            description: Unique identifier of the referenced Post.
+          type:
+            description: How this Post references the other Post.
+            oneOf:
+            - type: string
+              description: The kind of Post-to-Post reference.
+              enum:
+              - retweeted
+              - quoted
+              - replied_to
+    MuteBroadcastChatUserResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/MuteBroadcastChatUserResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    PostSuggestedSourceLinks:
+      type: array
+      description: URLs suggested as sources for this Post.
+      items:
+        type: string
+    SendBroadcastChatResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SendBroadcastChatResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetBroadcastChatResponse:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/Broadcast'
+            $ref: '#/components/schemas/BroadcastChatMessage'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
         meta:
           type: object
           properties:
@@ -1976,16 +2501,6 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
-    MediaPublicMetrics:
-      type: object
-      description: Public engagement metrics for the media at the time of the request.
-      required:
-      - view_count
-      properties:
-        view_count:
-          type: integer
-          description: The number of times this video has been viewed.
-          format: int64
     Error:
       type: object
       required:
@@ -1997,119 +2512,6 @@ components:
           format: int32
         message:
           type: string
-    DeleteBroadcastChatMessageResponseData:
-      type: object
-      required:
-      - deleted
-      properties:
-        deleted:
-          type: boolean
-          description: Whether the chat message was removed.
-    DeleteScheduledBroadcastResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteScheduledBroadcastResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    MediaNonPublicMetrics:
-      type: object
-      description: Nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-        playback_100_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-        playback_25_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-        playback_50_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-        playback_75_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-    NotAuthorizedForFieldProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-field
-        value:
-          type: string
-    PostWithheld:
-      type: object
-      description: Withholding details for withheld content.
-      required:
-      - copyright
-      - country_codes
-      properties:
-        copyright:
-          type: boolean
-          description: Indicates whether this content is withheld due to a copyright claim.
-        country_codes:
-          type: array
-          description: Uppercase ISO 3166-1 alpha-2 country codes where this content is withheld.
-          items:
-            type: string
-        scope:
-          type:
-          - string
-          - 'null'
-          description: Whether the withholding applies to a Post or a User.
-          enum:
-          - post
-          - user
-    DeleteBroadcastChatMessageResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteBroadcastChatMessageResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
     PostEntities:
       type: object
       description: A list of metadata entities (hashtags, mentions, URLs) found in the Post text.
@@ -2262,77 +2664,6 @@ components:
                 - string
                 - 'null'
                 description: The t.co shortened URL.
-    PostGeo:
-      type: object
-      description: The location tagged on the Post, if the user provided one.
-      properties:
-        coordinates:
-          type:
-          - object
-          - 'null'
-          description: A GeoJSON Point geometry.
-          required:
-          - type
-          - coordinates
-          properties:
-            coordinates:
-              type: array
-              description: '[longitude, latitude].'
-              minItems: 2
-              maxItems: 2
-              items:
-                type: number
-                format: double
-            type:
-              type: string
-              description: The GeoJSON geometry type.
-              enum:
-              - Point
-        place_id:
-          type:
-          - string
-          - 'null'
-          description: The unique identifier of the tagged place.
-    SendBroadcastChatRequest:
-      type: object
-      required:
-      - text
-      properties:
-        reply_to:
-          type: string
-          description: Message id to reply to, returned as timestamp when sent.
-          pattern: ^[0-9]{1,19}$
-        text:
-          type: string
-          description: The chat message text.
-          minLength: 1
-          maxLength: 140
-      additionalProperties: false
-    PostAttachments:
-      type: object
-      description: Specifies the type of attachments (if any) present in this Post.
-      properties:
-        media_keys:
-          type:
-          - array
-          - 'null'
-          description: Media keys of media attached to this Post.
-          items:
-            type: string
-        media_source_tweet_id:
-          type:
-          - array
-          - 'null'
-          description: IDs of the source Posts the attached media originated from.
-          items:
-            type: string
-        poll_ids:
-          type:
-          - array
-          - 'null'
-          description: IDs of polls attached to this Post.
-          items:
-            type: string
     UserConnectionStatus:
       type: array
       description: Returns detailed information about the relationship between two users.
@@ -2346,42 +2677,181 @@ components:
         - followed_by
         - following
         - muting
-    MuteBroadcastChatUserRequest:
+    PostSuggestedSourceLinksWithCounts:
+      type: array
+      description: Suggested source URLs for this Post, each with the number of times it was suggested.
+      items:
+        type: object
+        description: A suggested source URL for this Post with the number of times it was suggested.
+        properties:
+          count:
+            type:
+            - integer
+            - 'null'
+            description: Number of times this source link was suggested.
+            format: int64
+          url:
+            type:
+            - string
+            - 'null'
+            description: The suggested source URL.
+    PostNotePost:
       type: object
+      description: The full content of the Post, including text beyond 280 characters.
       required:
-      - user_id
+      - text
       properties:
-        end_at_ms:
+        entities:
+          type:
+          - object
+          - 'null'
+          description: Metadata entities (hashtags, cashtags, mentions, URLs) found in the note Post text.
+          properties:
+            cashtags:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A hashtag or cashtag entity.
+                required:
+                - start
+                - end
+                - tag
+                properties:
+                  end:
+                    type: integer
+                    description: End index in the text (exclusive).
+                    format: int64
+                  start:
+                    type: integer
+                    description: Start index in the text (inclusive).
+                    format: int64
+                  tag:
+                    type: string
+            hashtags:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A hashtag or cashtag entity.
+                required:
+                - start
+                - end
+                - tag
+                properties:
+                  end:
+                    type: integer
+                    description: End index in the text (exclusive).
+                    format: int64
+                  start:
+                    type: integer
+                    description: Start index in the text (inclusive).
+                    format: int64
+                  tag:
+                    type: string
+            mentions:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A user mention entity.
+                required:
+                - start
+                - end
+                properties:
+                  end:
+                    type: integer
+                    format: int64
+                  id:
+                    type:
+                    - string
+                    - 'null'
+                  start:
+                    type: integer
+                    format: int64
+                  username:
+                    type:
+                    - string
+                    - 'null'
+            urls:
+              type:
+              - array
+              - 'null'
+              items:
+                type: object
+                description: A URL entity found in note Post text.
+                required:
+                - start
+                - end
+                properties:
+                  display_url:
+                    type:
+                    - string
+                    - 'null'
+                  end:
+                    type: integer
+                    format: int64
+                  expanded_url:
+                    type:
+                    - string
+                    - 'null'
+                  start:
+                    type: integer
+                    format: int64
+                  url:
+                    type:
+                    - string
+                    - 'null'
+        text:
           type: string
-          description: The Unix timestamp in milliseconds when the mute expires. Omit this field to mute indefinitely.
-          pattern: ^[1-9][0-9]{0,18}$
-        message_id:
+          description: The full note text of the Post.
+    Poll:
+      type: object
+      properties:
+        duration_minutes:
+          type: integer
+        end_datetime:
           type: string
-          description: A chat message to remove while muting the user.
-          pattern: ^[1-9][0-9]{0,18}$
-        user_id:
+        id:
           type: string
-          description: The user to mute.
-          pattern: ^[1-9][0-9]{0,18}$
-      additionalProperties: false
-    UnmuteBroadcastChatUserResponse:
+        options:
+          $ref: '#/components/schemas/PollOptions'
+        voting_status:
+          type: string
+    GetBroadcastResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/UnmuteBroadcastChatUserResponseData'
+          $ref: '#/components/schemas/Broadcast'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    PostScopes:
-      type: object
-      description: The scopes for this Post.
-      required:
-      - followers
-      properties:
-        followers:
-          type: boolean
-          description: Indicates whether visibility of this Post is limited to the author's followers.
+    PollOptions:
+      type: array
+      description: The list of options (choices) available in this poll.
+      items:
+        type: object
+        description: A single option (choice) available in a poll.
+        required:
+        - position
+        - label
+        - votes
+        properties:
+          label:
+            type: string
+            description: The text label of this poll option.
+          position:
+            type: integer
+            description: The 1-based position of this option within the poll.
+            format: int64
+          votes:
+            type: integer
+            description: The number of votes this option has received.
+            format: int64
     Topic:
       type: object
       properties:
@@ -2390,192 +2860,6 @@ components:
         id:
           type: string
         name:
-          type: string
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    SendBroadcastChatResponseData:
-      type: object
-      required:
-      - success
-      - timestamp
-      properties:
-        success:
-          type: boolean
-          description: Whether the chat message was sent.
-        timestamp:
-          type: string
-          description: Server timestamp of the message, in nanoseconds.
-    CreateScheduledBroadcastRequest:
-      type: object
-      required:
-      - source_id
-      - scheduled_start_ms
-      - scheduled_end_ms
-      properties:
-        available_for_replay:
-          type: boolean
-          description: Enable replay.
-        chat_option:
-          type: string
-          description: Chat permission option (numeric string).
-          pattern: ^[0-9]{1,19}$
-        description:
-          type: string
-          description: Description.
-        is_locked:
-          type: boolean
-          description: Lock the broadcast.
-        locale:
-          type: string
-          description: Locale.
-        manual_publish:
-          type: boolean
-          description: If true, do not auto-publish at start; call POST .../live when ready.
-        recurrence:
-          description: If set, creates a recurring series.
-          $ref: '#/components/schemas/CreateScheduledBroadcastRecurrence'
-        scheduled_end_ms:
-          type: string
-          description: End time, ms since Unix epoch (decimal string).
-          pattern: ^[0-9]{1,19}$
-        scheduled_start_ms:
-          type: string
-          description: Start time, ms since Unix epoch (decimal string).
-          pattern: ^[0-9]{1,19}$
-        source_id:
-          type: string
-          description: Ingest / source id to bind (same as sources `rtmp_stream_key`).
-          minLength: 1
-        telecast_id:
-          type: string
-          description: Optional telecast id (numeric string).
-          pattern: ^[0-9]{1,19}$
-        thumbnail_media_id:
-          type: string
-          description: Pre-live slate media id (numeric string).
-          pattern: ^[0-9]{1,19}$
-        title:
-          type: string
-          description: Title / status text.
-      additionalProperties: false
-    PostEditControls:
-      type: object
-      description: Indicates how much longer (if at all) this Post can be edited.
-      properties:
-        editable_until:
-          type:
-          - string
-          - 'null'
-          description: The time until which this Post can be edited.
-        edits_remaining:
-          type:
-          - integer
-          - 'null'
-          description: Number of edits still allowed for this Post.
-          format: int64
-        is_edit_eligible:
-          type:
-          - boolean
-          - 'null'
-          description: Indicates whether this Post is eligible to be edited.
-    Problem:
-      oneOf:
-      - $ref: '#/components/schemas/ResourceNotFoundProblem'
-      - $ref: '#/components/schemas/InvalidRequestProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
-      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
-      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
-      - $ref: '#/components/schemas/ResourceUnavailableProblem'
-      - $ref: '#/components/schemas/DisallowedResourceProblem'
-      - $ref: '#/components/schemas/InternalErrorProblem'
-      discriminator:
-        propertyName: type
-        mapping:
-          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
-          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
-          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
-          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
-          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
-          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
-          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
-          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
-          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    CreateScheduledBroadcastRecurrence:
-      type: object
-      required:
-      - frequency
-      - repeats
-      properties:
-        frequency:
-          type: string
-          description: Recurrence frequency.
-          enum:
-          - Daily
-          - Weekly
-        repeats:
-          type: string
-          description: Number of repeats (numeric string).
-          pattern: ^[0-9]{1,19}$
-      additionalProperties: false
-    ListScheduledBroadcastsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ListScheduledBroadcastsResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    NotAuthorizedForResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
           type: string
     MediaOrganicMetrics:
       type: object
@@ -2617,125 +2901,40 @@ components:
           - 'null'
           description: The number of organic views of this video. Null when the backend returns quartile data without a view count.
           format: int64
-    GetScheduledBroadcastResponseData:
+    PostPublicMetrics:
       type: object
-      properties:
-        available_for_replay:
-          type: boolean
-          description: Whether replay is enabled.
-        broadcast_id:
-          type: string
-          description: Alphanumeric UBS broadcast id (path `:id` for get/update/delete/live).
-        chat_option:
-          type: string
-          description: Optional chat permission option.
-        description:
-          type: string
-          description: Optional description.
-        locale:
-          type: string
-          description: Optional locale.
-        manual_publish:
-          type: boolean
-          description: When true, coordinator will not auto-publish; call POST .../live when ready.
-        recurring_schedule_id:
-          type: string
-          description: Set when this occurrence belongs to a recurrence.
-        scheduled_broadcast_id:
-          type: string
-          description: Numeric scheduler id. Required in the update request body.
-        scheduled_end_ms:
-          type: string
-          description: Scheduled end, milliseconds since Unix epoch (decimal string).
-        scheduled_start_ms:
-          type: string
-          description: Scheduled start, milliseconds since Unix epoch (decimal string).
-        source_id:
-          type: string
-          description: Bound ingest / source id (`rtmp_stream_key`).
-        state:
-          type: string
-          description: Scheduler state (Created, Scheduled, Running, …).
-        telecast_id:
-          type: string
-          description: Optional telecast association.
-        thumbnail_media_id:
-          type: string
-          description: Optional pre-live slate media id.
-        title:
-          type: string
-          description: Broadcast title / status text.
-    UserSubscription:
-      type: object
-      description: The subscription relationship between this User and you.
+      description: Engagement metrics for the Post at the time of the request.
       required:
-      - subscribes_to_you
+      - repost_count
+      - reply_count
+      - like_count
+      - quote_count
+      - bookmark_count
+      - impression_count
       properties:
-        subscribes_to_you:
-          type: boolean
-          description: Indicates if this User subscribes to you.
-    MediaVariants:
-      type: array
-      description: Each media object may have multiple display or playback variants, with different resolutions or formats.
-      items:
-        type: object
-        description: A single playback or display variant of a media object.
-        properties:
-          bit_rate:
-            type:
-            - integer
-            - 'null'
-            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
-            format: int64
-          content_type:
-            type:
-            - string
-            - 'null'
-            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
-          url:
-            type:
-            - string
-            - 'null'
-            description: The URL to this media variant.
-    MediaPromotedMetrics:
-      type: object
-      description: Promoted nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who started playback (0% quartile) of this video.
+        bookmark_count:
+          type: integer
+          description: Number of times this Post has been bookmarked.
           format: int64
-        playback_100_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who completed playback (100% quartile) of this video.
+        impression_count:
+          type: integer
+          description: Number of times this Post has been viewed.
           format: int64
-        playback_25_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 25% of this video.
+        like_count:
+          type: integer
+          description: Number of likes on this Post.
           format: int64
-        playback_50_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 50% of this video.
+        quote_count:
+          type: integer
+          description: Number of quote Posts of this Post.
           format: int64
-        playback_75_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 75% of this video.
+        reply_count:
+          type: integer
+          description: Number of replies to this Post.
           format: int64
-        view_count:
-          type:
-          - integer
-          - 'null'
-          description: The number of promoted views of this video. Null when the backend returns quartile data without a view count.
+        repost_count:
+          type: integer
+          description: Number of times this Post has been reposted.
           format: int64
     PostDisplayTextRange:
       type: array
@@ -2745,260 +2944,61 @@ components:
       items:
         type: integer
         format: int64
-    BroadcastChatMessage:
+    Broadcast:
       type: object
       properties:
-        author_id:
-          type: string
-        author_name:
-          type: string
-        author_username:
-          type: string
+        available_for_replay:
+          type: boolean
         broadcast_id:
           type: string
+        chat_option:
+          type: integer
         created_at_ms:
           type: string
+        end_ms:
+          type: string
+        height:
+          type: integer
         id:
           type: string
-        reply_to:
+        image_url:
           type: string
-        text:
+        image_url_medium:
           type: string
-    PostContextAnnotations:
-      type: array
-      description: Annotations inferred about the Post (domain and entity context).
-      items:
-        type: object
-        description: A single inferred annotation about the Post (domain and entity context).
-        required:
-        - domain
-        - entity
-        properties:
-          domain:
-            description: The domain (broad category) this annotation belongs to.
-            oneOf:
-            - type: object
-              description: A domain or entity referenced by a context annotation.
-              properties:
-                description:
-                  type:
-                  - string
-                  - 'null'
-                id:
-                  type:
-                  - string
-                  - 'null'
-                name:
-                  type:
-                  - string
-                  - 'null'
-          entity:
-            description: The specific entity recognized within the domain.
-            oneOf:
-            - type: object
-              description: A domain or entity referenced by a context annotation.
-              properties:
-                description:
-                  type:
-                  - string
-                  - 'null'
-                id:
-                  type:
-                  - string
-                  - 'null'
-                name:
-                  type:
-                  - string
-                  - 'null'
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
+        image_url_small:
           type: string
-        parameter:
+        is_high_latency:
+          type: boolean
+        language:
           type: string
-        resource_id:
+        media_key:
           type: string
-        resource_type:
+        scheduled_end_ms:
           type: string
-        status:
-          type: integer
+        scheduled_start_ms:
+          type: string
+        share_url:
+          type: string
+        source_id:
+          type: string
+        start_ms:
+          type: string
+        state:
+          type: string
         title:
           type: string
-        type:
+        total_watched:
           type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
+        total_watching:
           type: string
-    SendBroadcastChatResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/SendBroadcastChatResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    PostSuggestedSourceLinks:
-      type: array
-      description: URLs suggested as sources for this Post.
-      items:
-        type: string
-    PostNoteRequestSuggestions:
-      type: array
-      description: Community-Notes request suggestions for this Post.
-      items:
-        type: object
-        description: A Community-Notes request suggestion for this Post.
-        properties:
-          source_link:
-            type:
-            - string
-            - 'null'
-            description: A suggested source link supporting the note request.
-          suggestion:
-            type:
-            - string
-            - 'null'
-            description: The text of the note request suggestion.
-          suggestion_id:
-            type:
-            - string
-            - 'null'
-            description: The unique identifier of the note request suggestion.
-    DeleteScheduledBroadcastResponseData:
-      type: object
-      required:
-      - deleted
-      properties:
-        deleted:
-          type: boolean
-          description: Whether the scheduled broadcast was deleted.
-  parameters:
-    UserFieldsParameter:
-      name: user.fields
-      in: query
-      description: A comma separated list of User fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a User object.
-        minItems: 1
-        uniqueItems: true
-        items:
+        tweet_id:
           type: string
-          enum:
-          - confirmed_email
-          - connection_status
-          - created_at
-          - description
-          - entities
-          - id
-          - is_identity_verified
-          - location
-          - name
-          - parody
-          - profile_banner_url
-          - profile_image_url
-          - protected
-          - public_metrics
-          - receives_your_dm
-          - subscriber_count
-          - subscribes_to_you
-          - subscription
-          - subscription_type
-          - url
-          - username
-          - verified
-          - verified_followers_count
-          - verified_type
-          - withheld
-      explode: false
-      style: form
-    BroadcastChatMessageExpansionsParameter:
-      name: expansions
-      in: query
-      description: A comma separated list of fields to expand.
-      required: false
-      schema:
-        type: array
-        minItems: 1
-        uniqueItems: true
-        items:
+        twitter_user_id:
           type: string
-          enum:
-          - author_id
-      explode: false
-      style: form
-    BroadcastFieldsParameter:
-      name: broadcast.fields
-      in: query
-      description: A comma separated list of Broadcast fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Broadcast object.
-        minItems: 1
-        uniqueItems: true
-        items:
+        updated_at_ms:
           type: string
-          enum:
-          - available_for_replay
-          - broadcast_id
-          - chat_option
-          - created_at_ms
-          - end_ms
-          - height
-          - id
-          - image_url
-          - image_url_medium
-          - image_url_small
-          - is_high_latency
-          - language
-          - media_key
-          - scheduled_end_ms
-          - scheduled_start_ms
-          - share_url
-          - source_id
-          - start_ms
-          - state
-          - title
-          - total_watched
-          - total_watching
-          - tweet_id
-          - twitter_user_id
-          - updated_at_ms
-          - width
-      explode: false
-      style: form
-    BroadcastChatMessageFieldsParameter:
-      name: broadcast_chat_message.fields
-      in: query
-      description: A comma separated list of BroadcastChatMessage fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a BroadcastChatMessage object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - author_name
-          - author_username
-          - broadcast_id
-          - created_at_ms
-          - id
-          - reply_to
-          - text
-      explode: false
-      style: form
+        width:
+          type: integer
   securitySchemes:
     BearerToken:
       type: http
