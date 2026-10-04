@@ -83,6 +83,9 @@ modified: '2026-08-28'
 url: https://raw.githubusercontent.com/api-evangelist/x/refs/heads/main/apis.yml
 specificationVersion: '0.23'
 common:
+- type: CapabilityMap
+  url: capabilities/x-capability-edges.yml
+  name: X Business Capability Map
 - type: AgentSkill
   url: skills/x-x-skill.md
 - type: Website

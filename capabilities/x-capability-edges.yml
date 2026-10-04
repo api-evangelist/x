@@ -1,0 +1,60 @@
+slug: x
+provider: X
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 4
+edges:
+- tag: Account Activity
+  spec_file: x-account-activity-api-openapi.yml
+  capability_id: BC-4270.80
+  capability_id_l1: BC-4270
+  capability_name: Webhook & Event Subscription Management
+  confidence: 0.9
+  evidence: POST /2/account_activity/webhooks/{webhook_id}/subscriptions/all  createAccountActivitySubscription  Create
+    subscription; schema WebhookConfigId
+  reason: Every operation manages subscriptions attached to a webhook_id, including creation, validation,
+    listing, counting and deletion. This is plainly the lifecycle of outbound webhook/event subscriptions
+    on a developer platform, i.e. BC-4270.80, not any customer-account business capability.
+- tag: Webhooks
+  spec_file: x-webhooks-api-openapi.yml
+  capability_id: BC-4270.80
+  capability_id_l1: BC-4270
+  capability_name: Webhook & Event Subscription Management
+  confidence: 0.85
+  evidence: POST /2/webhooks createWebhooks Create webhook; POST /2/webhooks/replay createWebhookReplayJob
+    Create replay job for webhook
+  reason: Full lifecycle of outbound webhook subscriptions — create, validate, delete, link to search
+    streams and replay missed deliveries — which is precisely Webhook & Event Subscription Management
+    on the developer platform.
+- tag: Activity
+  spec_file: x-activity-api-openapi.yml
+  capability_id: BC-4270.80
+  capability_id_l1: BC-4270
+  capability_name: Webhook & Event Subscription Management
+  confidence: 0.8
+  evidence: POST /2/activity/subscriptions  createActivitySubscription  Create X activity subscription;
+    CreateActivitySubscriptionResponseDataSubscriptionFilter
+  reason: CRUD over event-delivery subscriptions with filters, the sibling surface to the Account Activity
+    webhook subscriptions. Reads as outbound event subscription management rather than any business activity
+    tracking; slightly lower confidence than the Account Activity tag because the word 'webhook' does
+    not appear in these paths.
+- tag: Usage
+  spec_file: x-usage-api-openapi.yml
+  capability_id: BC-4270.50
+  capability_id_l1: BC-4270
+  capability_name: API Consumption Governance
+  confidence: 0.8
+  evidence: GET /2/usage/credits getUsageCredits Get usage credits; schemas UsageDailyProjectUsage, UsageDailyClientAppUsage,
+    GetUsageCreditsResponseDataFreeGrants
+  reason: Reports API consumption credits and daily per-project/per-client-app usage against grants —
+    quota and usage analytics for consumers of the public API, which is API Consumption Governance on
+    the developer platform.
