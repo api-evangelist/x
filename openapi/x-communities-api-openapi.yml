@@ -120,136 +120,6 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    FieldUnauthorizedProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-unauthorized
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    SearchCommunitiesResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Community'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        meta:
-          type: object
-          properties:
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    Community:
-      type: object
-      properties:
-        access:
-          type: string
-        created_at:
-          type: string
-        description:
-          type: string
-        id:
-          type: string
-        join_policy:
-          type: string
-        member_count:
-          type: integer
-        name:
-          type: string
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
     InternalErrorProblem:
       type: object
       required:
@@ -288,42 +158,6 @@ components:
           - https://api.x.com/2/problems/invalid-request
         value:
           type: string
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    GetCommunitiesByIdResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Community'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    CommunityId:
-      type: string
-      description: Unique identifier of a Community
-      pattern: ^[0-9]{1,19}$
     Problem:
       oneOf:
       - $ref: '#/components/schemas/ResourceNotFoundProblem'
@@ -347,6 +181,30 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    FieldUnauthorizedProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-unauthorized
     NotAuthorizedForResourceProblem:
       type: object
       required:
@@ -375,17 +233,105 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-resource
         value:
           type: string
-    Error:
+    FieldHydrationFailureProblem:
       type: object
       required:
-      - code
-      - message
+      - type
+      - title
+      - detail
+      - field
       properties:
-        code:
-          type: integer
-          format: int32
-        message:
+        detail:
           type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    ResourceNotFoundProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    CommunityId:
+      type: string
+      description: Unique identifier of a Community
+      pattern: ^[0-9]{1,19}$
     NotAuthorizedForFieldProblem:
       type: object
       required:
@@ -415,6 +361,60 @@ components:
           enum:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
+          type: string
+    SearchCommunitiesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Community'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    GetCommunitiesByIdResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Community'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    Community:
+      type: object
+      properties:
+        access:
+          type: string
+        created_at:
+          type: string
+        description:
+          type: string
+        id:
+          type: string
+        join_policy:
+          type: string
+        member_count:
+          type: integer
+        name:
           type: string
   parameters:
     CommunityFieldsParameter:

@@ -90,21 +90,14 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    FieldHydrationFailureProblem:
+    InternalErrorProblem:
       type: object
       required:
       - type
       - title
       - detail
-      - field
       properties:
         detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
           type: string
         status:
           type: integer
@@ -113,55 +106,7 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    ArticleCreateDraftResponseData:
-      type: object
-      required:
-      - id
-      - title
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the created draft Article.
-          pattern: ^[0-9]{1,19}$
-        title:
-          type: string
-          description: The title of the draft Article.
-    ArticleCreateDraftContentStateBlocksData:
-      type: object
-      properties:
-        cashtags:
-          type: array
-          description: Cashtag spans in this block.
-          items:
-            $ref: '#/components/schemas/ArticleCreateDraftContentStateBlocksDataCashtags'
-        hashtags:
-          type: array
-          description: Hashtag spans in this block.
-          items:
-            $ref: '#/components/schemas/ArticleCreateDraftContentStateBlocksDataHashtags'
-        mentions:
-          type: array
-          description: Mention spans in this block.
-          items:
-            $ref: '#/components/schemas/ArticleCreateDraftContentStateBlocksDataMentions'
-        urls:
-          type: array
-          description: URL spans in this block.
-          items:
-            $ref: '#/components/schemas/ArticleCreateDraftContentStateBlocksDataUrls'
-      additionalProperties: false
-    ArticleCreateDraftContentStateEntitiesValueDataMediaItems:
-      type: object
-      required:
-      - media_category
-      - media_id
-      properties:
-        media_category:
-          type: string
-        media_id:
-          type: string
-      additionalProperties: false
+          - https://api.x.com/2/problems/internal-error
     InvalidRequestProblem:
       type: object
       required:
@@ -182,26 +127,6 @@ components:
           enum:
           - https://api.x.com/2/problems/invalid-request
         value:
-          type: string
-    ArticleCreateDraftResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ArticleCreateDraftResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
           type: string
     FieldUnauthorizedProblem:
       type: object
@@ -227,55 +152,63 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
-    ArticleCreateDraftRequest:
+    ResourceUnavailableProblem:
       type: object
-      description: Create a draft Article.
       required:
+      - type
       - title
-      - content_state
+      - detail
+      - resource_type
       properties:
-        content_state:
-          description: DraftJS content state representing the article body. Special formatting          (markdown/code/tables, dividers, LaTeX, emoji, images, embedded posts) uses atomic          blocks with entity_ranges pointing into entities.
-          $ref: '#/components/schemas/ArticleCreateDraftContentState'
-        cover_media:
-          description: Optional cover media for the Article.
-          $ref: '#/components/schemas/ArticleCreateDraftCoverMedia'
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
         title:
           type: string
-          description: The title of the Article.
-          minLength: 1
-      additionalProperties: false
-    ArticleCreateDraftContentStateEntities:
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    ArticleCreateDraftResponseData:
       type: object
       required:
-      - key
-      - value
+      - id
+      - title
       properties:
-        key:
+        id:
           type: string
-          description: The entity key referenced by entity_ranges.
-        value:
-          $ref: '#/components/schemas/ArticleCreateDraftContentStateEntitiesValue'
-      additionalProperties: false
-    ArticleCreateDraftContentStateBlocksDataCashtags:
+          description: Unique identifier of the created draft Article.
+          pattern: ^[0-9]{1,19}$
+        title:
+          type: string
+          description: The title of the draft Article.
+    ArticleCreateDraftCoverMedia:
       type: object
       required:
-      - from_index
-      - to_index
-      - text
+      - media_category
+      - media_id
       properties:
-        from_index:
-          type: integer
-          description: Start index of the tagged span.
-          minimum: 0
-        text:
+        media_category:
           type: string
-          description: The tagged text.
-        to_index:
-          type: integer
-          description: End index of the tagged span.
-          minimum: 0
+          description: The media category (e.g. tweet_image).
+        media_id:
+          type: string
+          description: The media ID from the media upload endpoint.
       additionalProperties: false
+    ArticlePublishResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ArticlePublishResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     ArticleCreateDraftContentStateBlocksInlineStyleRanges:
       type: object
       required:
@@ -299,50 +232,6 @@ components:
           - italic
           - strikethrough
       additionalProperties: false
-    ArticleCreateDraftContentStateBlocksDataHashtags:
-      type: object
-      required:
-      - from_index
-      - to_index
-      - text
-      properties:
-        from_index:
-          type: integer
-          description: Start index of the tagged span.
-          minimum: 0
-        text:
-          type: string
-          description: The tagged text.
-        to_index:
-          type: integer
-          description: End index of the tagged span.
-          minimum: 0
-      additionalProperties: false
-    ArticleCreateDraftContentState:
-      type: object
-      required:
-      - blocks
-      - entities
-      properties:
-        blocks:
-          type: array
-          description: The text blocks that make up the article body.
-          items:
-            $ref: '#/components/schemas/ArticleCreateDraftContentStateBlocks'
-        entities:
-          type: array
-          description: Non-text entities referenced by blocks (links, embedded posts, images, emoji,          markdown/code/tables, dividers, LaTeX). Full set matches article storage.
-          items:
-            $ref: '#/components/schemas/ArticleCreateDraftContentStateEntities'
-      additionalProperties: false
-    ArticlePublishResponseData:
-      type: object
-      required:
-      - post_id
-      properties:
-        post_id:
-          type: string
-          description: The ID of the post created for the published Article.
     Problem:
       oneOf:
       - $ref: '#/components/schemas/ResourceNotFoundProblem'
@@ -366,6 +255,286 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    ArticleCreateDraftContentStateBlocksDataMentions:
+      type: object
+      required:
+      - from_index
+      - to_index
+      - text
+      properties:
+        from_index:
+          type: integer
+          description: Start index of the tagged span.
+          minimum: 0
+        text:
+          type: string
+          description: The tagged text.
+        to_index:
+          type: integer
+          description: End index of the tagged span.
+          minimum: 0
+      additionalProperties: false
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    ArticleCreateDraftContentStateBlocksData:
+      type: object
+      properties:
+        cashtags:
+          type: array
+          description: Cashtag spans in this block.
+          items:
+            $ref: '#/components/schemas/ArticleCreateDraftContentStateBlocksDataCashtags'
+        hashtags:
+          type: array
+          description: Hashtag spans in this block.
+          items:
+            $ref: '#/components/schemas/ArticleCreateDraftContentStateBlocksDataHashtags'
+        mentions:
+          type: array
+          description: Mention spans in this block.
+          items:
+            $ref: '#/components/schemas/ArticleCreateDraftContentStateBlocksDataMentions'
+        urls:
+          type: array
+          description: URL spans in this block.
+          items:
+            $ref: '#/components/schemas/ArticleCreateDraftContentStateBlocksDataUrls'
+      additionalProperties: false
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    ResourceNotFoundProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    ArticleCreateDraftResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ArticleCreateDraftResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    NotAuthorizedForFieldProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
+          type: string
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    ArticleCreateDraftContentState:
+      type: object
+      required:
+      - blocks
+      - entities
+      properties:
+        blocks:
+          type: array
+          description: The text blocks that make up the article body.
+          items:
+            $ref: '#/components/schemas/ArticleCreateDraftContentStateBlocks'
+        entities:
+          type: array
+          description: Non-text entities referenced by blocks (links, embedded posts, images, emoji,          markdown/code/tables, dividers, LaTeX). Full set matches article storage.
+          items:
+            $ref: '#/components/schemas/ArticleCreateDraftContentStateEntities'
+      additionalProperties: false
+    ArticleCreateDraftContentStateBlocksDataCashtags:
+      type: object
+      required:
+      - from_index
+      - to_index
+      - text
+      properties:
+        from_index:
+          type: integer
+          description: Start index of the tagged span.
+          minimum: 0
+        text:
+          type: string
+          description: The tagged text.
+        to_index:
+          type: integer
+          description: End index of the tagged span.
+          minimum: 0
+      additionalProperties: false
+    ArticleCreateDraftContentStateBlocksDataUrls:
+      type: object
+      required:
+      - from_index
+      - to_index
+      - text
+      properties:
+        from_index:
+          type: integer
+          description: Start index of the tagged span.
+          minimum: 0
+        text:
+          type: string
+          description: The tagged text.
+        to_index:
+          type: integer
+          description: End index of the tagged span.
+          minimum: 0
+      additionalProperties: false
+    ArticlePublishResponseData:
+      type: object
+      required:
+      - post_id
+      properties:
+        post_id:
+          type: string
+          description: The ID of the post created for the published Article.
+    ArticleCreateDraftContentStateBlocksEntityRanges:
+      type: object
+      required:
+      - key
+      - offset
+      - length
+      properties:
+        key:
+          type: integer
+          description: Index into the entities array.
+          minimum: 0
+        length:
+          type: integer
+          description: Length of the entity range.
+          minimum: 0
+        offset:
+          type: integer
+          description: Start offset in the text.
+          minimum: 0
+      additionalProperties: false
+    ArticleCreateDraftContentStateEntities:
+      type: object
+      required:
+      - key
+      - value
+      properties:
+        key:
+          type: string
+          description: The entity key referenced by entity_ranges.
+        value:
+          $ref: '#/components/schemas/ArticleCreateDraftContentStateEntitiesValue'
+      additionalProperties: false
+    ArticleCreateDraftContentStateBlocksDataHashtags:
+      type: object
+      required:
+      - from_index
+      - to_index
+      - text
+      properties:
+        from_index:
+          type: integer
+          description: Start index of the tagged span.
+          minimum: 0
+        text:
+          type: string
+          description: The tagged text.
+        to_index:
+          type: integer
+          description: End index of the tagged span.
+          minimum: 0
+      additionalProperties: false
     ArticleCreateDraftContentStateBlocks:
       type: object
       required:
@@ -404,193 +573,16 @@ components:
           - blockquote
           - atomic
       additionalProperties: false
-    InternalErrorProblem:
+    ArticleCreateDraftContentStateEntitiesValueDataMediaItems:
       type: object
       required:
-      - type
-      - title
-      - detail
+      - media_category
+      - media_id
       properties:
-        detail:
+        media_category:
           type: string
-        status:
-          type: integer
-        title:
+        media_id:
           type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    ArticleCreateDraftContentStateEntitiesValue:
-      type: object
-      required:
-      - type
-      - mutability
-      - data
-      properties:
-        data:
-          description: 'Entity payload. Fields depend on the entity type: post_id (post), url (link),          media_items (image), entity_key (emoji and other opaque keys), markdown (markdown /          code blocks / GFM tables). divider and latex use an empty data object; latex source          is the block text; emoji uses block text for the character(s). There is no separate          table entity type in article storage; tables are markdown.'
-          $ref: '#/components/schemas/ArticleCreateDraftContentStateEntitiesValueData'
-        mutability:
-          type: string
-          description: 'Whether the entity can be edited. Recommended: immutable for post, image, divider, latex; mutable for link and markdown (matches the in-app Articles composer).'
-          enum:
-          - immutable
-          - mutable
-          - segmented
-        type:
-          type: string
-          description: The entity type. markdown carries code blocks, GFM tables, and other Markdown;          emoji maps to backend TWEMOJI (Twemoji is internal); divider is a horizontal rule;          latex renders TeX from the block text. Tables are not a separate enum value — use          type markdown with a pipe table in data.markdown.
-          enum:
-          - post
-          - link
-          - image
-          - emoji
-          - markdown
-          - divider
-          - latex
-      additionalProperties: false
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    ArticleCreateDraftContentStateBlocksDataUrls:
-      type: object
-      required:
-      - from_index
-      - to_index
-      - text
-      properties:
-        from_index:
-          type: integer
-          description: Start index of the tagged span.
-          minimum: 0
-        text:
-          type: string
-          description: The tagged text.
-        to_index:
-          type: integer
-          description: End index of the tagged span.
-          minimum: 0
-      additionalProperties: false
-    ArticleCreateDraftContentStateEntitiesValueData:
-      type: object
-      properties:
-        caption:
-          type: string
-          description: Caption text.
-        entity_key:
-          type: string
-          description: Opaque entity key. Used with type emoji (and reserved for other keyed embeds) to match in-app Articles composer payloads.
-        markdown:
-          type: string
-          description: Markdown body for type markdown. Use fenced code blocks (```lang ... ```) for code. Max weighted length is enforced by the Articles backend (10,000 per article).
-        media_items:
-          type: array
-          description: Media keys. Used with type image.
-          items:
-            $ref: '#/components/schemas/ArticleCreateDraftContentStateEntitiesValueDataMediaItems'
-        post_id:
-          type: string
-          description: The ID of the post to embed. Used with type post.
-        url:
-          type: string
-          description: The URL. Used with type link.
-      additionalProperties: false
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    ArticlePublishResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ArticlePublishResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    ArticleCreateDraftContentStateBlocksDataMentions:
-      type: object
-      required:
-      - from_index
-      - to_index
-      - text
-      properties:
-        from_index:
-          type: integer
-          description: Start index of the tagged span.
-          minimum: 0
-        text:
-          type: string
-          description: The tagged text.
-        to_index:
-          type: integer
-          description: End index of the tagged span.
-          minimum: 0
       additionalProperties: false
     NotAuthorizedForResourceProblem:
       type: object
@@ -620,69 +612,77 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-resource
         value:
           type: string
-    ArticleCreateDraftCoverMedia:
+    ArticleCreateDraftRequest:
       type: object
+      description: Create a draft Article.
       required:
-      - media_category
-      - media_id
+      - title
+      - content_state
       properties:
-        media_category:
+        content_state:
+          description: DraftJS content state representing the article body. Special formatting          (markdown/code/tables, dividers, LaTeX, emoji, images, embedded posts) uses atomic          blocks with entity_ranges pointing into entities.
+          $ref: '#/components/schemas/ArticleCreateDraftContentState'
+        cover_media:
+          description: Optional cover media for the Article.
+          $ref: '#/components/schemas/ArticleCreateDraftCoverMedia'
+        title:
           type: string
-          description: The media category (e.g. tweet_image).
-        media_id:
-          type: string
-          description: The media ID from the media upload endpoint.
+          description: The title of the Article.
+          minLength: 1
       additionalProperties: false
-    ArticleCreateDraftContentStateBlocksEntityRanges:
+    ArticleCreateDraftContentStateEntitiesValueData:
       type: object
-      required:
-      - key
-      - offset
-      - length
       properties:
-        key:
-          type: integer
-          description: Index into the entities array.
-          minimum: 0
-        length:
-          type: integer
-          description: Length of the entity range.
-          minimum: 0
-        offset:
-          type: integer
-          description: Start offset in the text.
-          minimum: 0
+        caption:
+          type: string
+          description: Caption text.
+        entity_key:
+          type: string
+          description: Opaque entity key. Used with type emoji (and reserved for other keyed embeds) to match in-app Articles composer payloads.
+        markdown:
+          type: string
+          description: Markdown body for type markdown. Use fenced code blocks (```lang ... ```) for code. Max weighted length is enforced by the Articles backend (10,000 per article).
+        media_items:
+          type: array
+          description: Media keys. Used with type image.
+          items:
+            $ref: '#/components/schemas/ArticleCreateDraftContentStateEntitiesValueDataMediaItems'
+        post_id:
+          type: string
+          description: The ID of the post to embed. Used with type post.
+        url:
+          type: string
+          description: The URL. Used with type link.
       additionalProperties: false
-    NotAuthorizedForFieldProblem:
+    ArticleCreateDraftContentStateEntitiesValue:
       type: object
       required:
       - type
-      - title
-      - detail
-      - field
+      - mutability
+      - data
       properties:
-        detail:
+        data:
+          description: 'Entity payload. Fields depend on the entity type: post_id (post), url (link),          media_items (image), entity_key (emoji and other opaque keys), markdown (markdown /          code blocks / GFM tables). divider and latex use an empty data object; latex source          is the block text; emoji uses block text for the character(s). There is no separate          table entity type in article storage; tables are markdown.'
+          $ref: '#/components/schemas/ArticleCreateDraftContentStateEntitiesValueData'
+        mutability:
           type: string
-        field:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
+          description: 'Whether the entity can be edited. Recommended: immutable for post, image, divider, latex; mutable for link and markdown (matches the in-app Articles composer).'
+          enum:
+          - immutable
+          - mutable
+          - segmented
         type:
           type: string
+          description: The entity type. markdown carries code blocks, GFM tables, and other Markdown;          emoji maps to backend TWEMOJI (Twemoji is internal); divider is a horizontal rule;          latex renders TeX from the block text. Tables are not a separate enum value — use          type markdown with a pipe table in data.markdown.
           enum:
-          - https://api.x.com/2/problems/not-authorized-for-field
-        value:
-          type: string
+          - post
+          - link
+          - image
+          - emoji
+          - markdown
+          - divider
+          - latex
+      additionalProperties: false
   securitySchemes:
     BearerToken:
       type: http
