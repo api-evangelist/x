@@ -103,3 +103,34 @@ clients_documented:
 - Cursor
 - Claude
 - VS Code
+rfc9728:
+  endpoint: https://api.x.com/mcp
+  metadata_url: https://api.x.com/.well-known/oauth-protected-resource
+  discovered_via: WWW-Authenticate resource_metadata on an anonymous POST initialize
+  fetched: '2026-09-25'
+  http_status: 200
+  content_type: application/json
+  document:
+    resource: https://api.x.com/mcp
+    authorization_servers:
+    - https://api.x.com
+    scopes_supported:
+    - tweet.read
+    - users.read
+    - follows.read
+    - space.read
+    - mute.read
+    - like.read
+    - list.read
+    - list.write
+    - block.read
+    - block.write
+    - bookmark.read
+    - bookmark.write
+    - dm.read
+    - dm.write
+    - developer.billing.write
+    - developer.write
+    - offline.access
+    bearer_methods_supported:
+    - header
