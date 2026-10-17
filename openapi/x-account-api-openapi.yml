@@ -79,14 +79,54 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    InternalErrorProblem:
+    EnsureAccountRequest:
+      type: object
+      properties:
+        metadata:
+          type: string
+          description: Optional provisioning-credit metadata (an opaque string, e.g. a subscription tier) to claim for the account, attributed to the calling app. Omit to just ensure the account.
+          maxLength: 64
+          pattern: ^[\x00-\x{FFFF}]*$
+    EnsureAccountResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/EnsureAccountResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetDeveloperAccountResponseData:
+      type: object
+      required:
+      - account_id
+      - name
+      - created_at
+      properties:
+        account_id:
+          type: string
+          description: Unique identifier of the developer account.
+        created_at:
+          type: string
+          description: Creation time of the account (ISO 8601).
+        name:
+          type: string
+          description: Display name of the developer account.
+    ResourceNotFoundProblem:
       type: object
       required:
       - type
       - title
       - detail
+      - resource_type
       properties:
         detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
           type: string
         status:
           type: integer
@@ -95,7 +135,74 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/internal-error
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    NotAuthorizedForFieldProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
+          type: string
     InvalidRequestProblem:
       type: object
       required:
@@ -140,18 +247,6 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    EnsureAccountResponseData:
-      type: object
-      required:
-      - account_id
-      - created
-      properties:
-        account_id:
-          type: string
-          description: Unique identifier of the developer account.
-        created:
-          type: boolean
-          description: Whether this request created the account.
     FieldUnauthorizedProblem:
       type: object
       required:
@@ -176,6 +271,77 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    GetDeveloperAccountResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GetDeveloperAccountResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
     NotAuthorizedForResourceProblem:
       type: object
       required:
@@ -204,184 +370,18 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-resource
         value:
           type: string
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    GetDeveloperAccountResponseData:
+    EnsureAccountResponseData:
       type: object
       required:
       - account_id
-      - name
-      - created_at
+      - created
       properties:
         account_id:
           type: string
           description: Unique identifier of the developer account.
-        created_at:
-          type: string
-          description: Creation time of the account (ISO 8601).
-        name:
-          type: string
-          description: Display name of the developer account.
-    NotAuthorizedForFieldProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-field
-        value:
-          type: string
-    EnsureAccountRequest:
-      type: object
-      properties:
-        metadata:
-          type: string
-          description: Optional provisioning-credit metadata (an opaque string, e.g. a subscription tier) to claim for the account, attributed to the calling app. Omit to just ensure the account.
-          maxLength: 64
-          pattern: ^[\x00-\x{FFFF}]*$
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    GetDeveloperAccountResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GetDeveloperAccountResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    EnsureAccountResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/EnsureAccountResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
+        created:
+          type: boolean
+          description: Whether this request created the account.
   securitySchemes:
     BearerToken:
       type: http

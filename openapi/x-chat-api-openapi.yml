@@ -709,566 +709,18 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    AddUserPublicKeyResponseData:
+    AddChatGroupMembersConversationParticipantKeys:
       type: object
       properties:
-        juicebox_config:
-          type: object
-          description: Juicebox recovery-service configuration for this key.
+        encrypted_conversation_key:
+          type: string
+          description: Conversation key encrypted with this participant's public key.
         public_key_version:
           type: string
-          description: Version assigned to the registered public key.
-    CreateChatConversationResponseData:
-      type: object
-      required:
-      - conversation_id
-      properties:
-        conversation_id:
+          description: Version of the participant's public key used for encryption.
+        user_id:
           type: string
-          description: Canonical ID of the created conversation.
-        conversation_key_change_sequence_id:
-          type: string
-          description: Sequence ID of the conversation key change.
-    GetChatConversationsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/ChatConversation'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-        meta:
-          type: object
-          properties:
-            has_message_requests:
-              type: boolean
-            has_more:
-              type: boolean
-            next_token:
-              type: string
-              description: Pagination token for the next page of results.
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
-    PostEntities:
-      type: object
-      description: A list of metadata entities (hashtags, mentions, URLs) found in the Post text.
-      properties:
-        cashtags:
-          type:
-          - array
-          - 'null'
-          items:
-            type: object
-            description: A hashtag or cashtag entity.
-            required:
-            - start
-            - end
-            - tag
-            properties:
-              end:
-                type: integer
-                description: End index in the text (exclusive).
-                format: int64
-              start:
-                type: integer
-                description: Start index in the text (inclusive).
-                format: int64
-              tag:
-                type: string
-        hashtags:
-          type:
-          - array
-          - 'null'
-          items:
-            type: object
-            description: A hashtag or cashtag entity.
-            required:
-            - start
-            - end
-            - tag
-            properties:
-              end:
-                type: integer
-                description: End index in the text (exclusive).
-                format: int64
-              start:
-                type: integer
-                description: Start index in the text (inclusive).
-                format: int64
-              tag:
-                type: string
-        mentions:
-          type:
-          - array
-          - 'null'
-          items:
-            type: object
-            description: A user mention entity.
-            required:
-            - start
-            - end
-            properties:
-              end:
-                type: integer
-                format: int64
-              id:
-                type:
-                - string
-                - 'null'
-              start:
-                type: integer
-                format: int64
-              username:
-                type:
-                - string
-                - 'null'
-        urls:
-          type:
-          - array
-          - 'null'
-          items:
-            type: object
-            description: A URL entity found in the Post text, enriched with link metadata.
-            required:
-            - start
-            - end
-            properties:
-              description:
-                type:
-                - string
-                - 'null'
-                description: Description of the linked page, when available.
-              display_url:
-                type:
-                - string
-                - 'null'
-                description: The URL as displayed in the Post text.
-              end:
-                type: integer
-                format: int64
-              expanded_url:
-                type:
-                - string
-                - 'null'
-                description: The fully resolved URL.
-              images:
-                type:
-                - array
-                - 'null'
-                items:
-                  type: object
-                  description: A preview image for a linked page.
-                  properties:
-                    height:
-                      type:
-                      - integer
-                      - 'null'
-                      format: int64
-                    url:
-                      type:
-                      - string
-                      - 'null'
-                    width:
-                      type:
-                      - integer
-                      - 'null'
-                      format: int64
-              media_key:
-                type:
-                - string
-                - 'null'
-              start:
-                type: integer
-                format: int64
-              status:
-                type:
-                - integer
-                - 'null'
-                description: HTTP status from resolving the URL.
-                format: int64
-              title:
-                type:
-                - string
-                - 'null'
-                description: Title of the linked page, when available.
-              unwound_url:
-                type:
-                - string
-                - 'null'
-                description: The final destination after following redirects.
-              url:
-                type:
-                - string
-                - 'null'
-                description: The t.co shortened URL.
-    AddConversationKeysActionSignatures:
-      type: object
-      required:
-      - message_id
-      - encoded_message_event_detail
-      - message_event_signature
-      properties:
-        encoded_message_event_detail:
-          type: string
-          description: Base64-encoded message event detail.
-          minLength: 1
-          pattern: ^[A-Za-z0-9+/=_-]+$
-        message_event_signature:
-          description: Message event signature supplied with an action signature.
-          $ref: '#/components/schemas/AddConversationKeysActionSignaturesMessageEventSignature'
-        message_id:
-          type: string
-          description: Client-generated ID of the message being signed.
-          minLength: 1
-        signature_payload:
-          type: string
-          description: Payload string the client signed; used only in server-side failure logs.
-    MarkChatConversationReadResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/MarkChatConversationReadResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    PostWithheld:
-      type: object
-      description: Withholding details for withheld content.
-      required:
-      - copyright
-      - country_codes
-      properties:
-        copyright:
-          type: boolean
-          description: Indicates whether this content is withheld due to a copyright claim.
-        country_codes:
-          type: array
-          description: Uppercase ISO 3166-1 alpha-2 country codes where this content is withheld.
-          items:
-            type: string
-        scope:
-          type:
-          - string
-          - 'null'
-          description: Whether the withholding applies to a Post or a User.
-          enum:
-          - post
-          - user
-    InitializeChatGroupResponseData:
-      type: object
-      required:
-      - conversation_id
-      properties:
-        conversation_id:
-          type: string
-          description: Unique ID for the new group conversation.
-    DeleteChatMessagesResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteChatMessagesResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    AddUserPublicKeyPublicKey:
-      type: object
-      properties:
-        identity_public_key_signature:
-          type: string
-          description: Signature over the identity public key.
-        public_key:
-          type: string
-          description: Identity public key (base64 encoded).
-        public_key_fingerprint:
-          type: string
-          description: Fingerprint of the identity public key.
-        registration_method:
-          type: string
-          description: Registration method for the public key.
-        signing_public_key:
-          type: string
-          description: Signing public key (base64 encoded).
-        signing_public_key_signature:
-          type: string
-          description: Signature over the signing public key.
-    NotAuthorizedForFieldProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-field
-        value:
-          type: string
-    AddUserPublicKeyResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/AddUserPublicKeyResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    MarkChatConversationReadRequest:
-      type: object
-      required:
-      - seen_until_sequence_id
-      properties:
-        seen_until_sequence_id:
-          type: string
-          description: The sequence ID of the last message to mark as read up to.
-    AddUserPublicKeyRequest:
-      type: object
-      required:
-      - public_key
-      - version
-      properties:
-        generate_version:
-          type: boolean
-          description: When true, the server generates a new version.
-        public_key:
-          description: Public key registration payload.
-          $ref: '#/components/schemas/AddUserPublicKeyPublicKey'
-        version:
-          type: string
-          description: Public key version.
-    SendChatMessageRequest:
-      type: object
-      required:
-      - message_id
-      - encoded_message_create_event
-      properties:
-        conversation_token:
-          type: string
-          description: Optional conversation token.
-        encoded_message_create_event:
-          type: string
-          description: Base64-encoded Thrift MessageCreateEvent containing encrypted message contents.
-        encoded_message_event_signature:
-          type: string
-          description: Base64-encoded Thrift MessageEventSignature for message verification.
-        message_id:
-          type: string
-          description: Unique identifier for this message.
-    UserConnectionStatus:
-      type: array
-      description: Returns detailed information about the relationship between two users.
-      items:
-        type: string
-        description: A connection between the authenticated User and this User.
-        enum:
-        - blocking
-        - follow_request_received
-        - follow_request_sent
-        - followed_by
-        - following
-        - muting
-    PostReferencedPosts:
-      type: array
-      description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes the referenced Post's type and ID.
-      items:
-        type: object
-        description: A reference from this Post to another Post (repost, quote, or reply).
-        required:
-        - type
-        - id
-        properties:
-          id:
-            type: string
-            description: Unique identifier of the referenced Post.
-          type:
-            description: How this Post references the other Post.
-            oneOf:
-            - type: string
-              description: The kind of Post-to-Post reference.
-              enum:
-              - retweeted
-              - quoted
-              - replied_to
-    Post:
-      type: object
-      properties:
-        article:
-          type: object
-        article_title:
-          type: object
-          description: Metadata about the long-form Article attached to this Post, if any.
-        attachments:
-          $ref: '#/components/schemas/PostAttachments'
-        author_id:
-          type: string
-          description: Unique identifier of the author of this Post.
-        card_uri:
-          type: string
-        community_id:
-          type: string
-          description: The unique identifier of the Community this Post belongs to, if any.
-        context_annotations:
-          $ref: '#/components/schemas/PostContextAnnotations'
-        conversation_id:
-          type: string
-          description: The ID of the conversation this Post belongs to (matches the root Post's ID).
-        created_at:
-          type: string
-          description: Creation time of the Post.
-          format: date-time
-        display_text_range:
-          $ref: '#/components/schemas/PostDisplayTextRange'
-        edit_controls:
-          $ref: '#/components/schemas/PostEditControls'
-        edit_history_post_ids:
-          type: array
-          description: A list of Post IDs in this Post's edit history chain.
-          items:
-            type: string
-        entities:
-          $ref: '#/components/schemas/PostEntities'
-        geo:
-          $ref: '#/components/schemas/PostGeo'
-        id:
-          type: string
-          description: Unique identifier of this Post.
-        in_reply_to_user_id:
-          type: string
-          description: Unique identifier of the User this Post is replying to.
-        lang:
-          type: string
-          description: Language of the Post, if detected by X. Returned as a BCP47 language tag.
-        matched_media_notes:
-          $ref: '#/components/schemas/PostMatchedMediaNotes'
-        media_metadata:
-          $ref: '#/components/schemas/PostMediaMetadata'
-        non_public_metrics:
-          type: object
-          description: Nonpublic engagement metrics for the Post at the time of the request.
-        note_post:
-          $ref: '#/components/schemas/PostNotePost'
-        note_request_suggestions:
-          $ref: '#/components/schemas/PostNoteRequestSuggestions'
-        organic_metrics:
-          type: object
-          description: Organic nonpublic engagement metrics for the Post at the time of the request.
-        paid_partnership:
-          type: boolean
-          description: Indicates if this Post is a paid partnership, i.e. it has been disclosed by the author as containing paid promotion.
-        possibly_sensitive:
-          type: boolean
-          description: Indicates if this Post contains URLs marked as sensitive, for example content suitable for mature audiences.
-        promoted_metrics:
-          type: object
-          description: Promoted nonpublic engagement metrics for the Post at the time of the request.
-        public_metrics:
-          $ref: '#/components/schemas/PostPublicMetrics'
-        referenced_posts:
-          $ref: '#/components/schemas/PostReferencedPosts'
-        reply_settings:
-          type: string
-          description: Shows who can reply to this Post.
-        scopes:
-          $ref: '#/components/schemas/PostScopes'
-        source:
-          type: string
-          description: The name of the app the user posted from. This is deprecated.
-        suggested_source_links:
-          $ref: '#/components/schemas/PostSuggestedSourceLinks'
-        suggested_source_links_with_counts:
-          $ref: '#/components/schemas/PostSuggestedSourceLinksWithCounts'
-        text:
-          type: string
-          description: The content of the Post.
-        username:
-          type: string
-        withheld:
-          $ref: '#/components/schemas/PostWithheld'
-    PostNoteRequestSuggestions:
-      type: array
-      description: Community-Notes request suggestions for this Post.
-      items:
-        type: object
-        description: A Community-Notes request suggestion for this Post.
-        properties:
-          source_link:
-            type:
-            - string
-            - 'null'
-            description: A suggested source link supporting the note request.
-          suggestion:
-            type:
-            - string
-            - 'null'
-            description: The text of the note request suggestion.
-          suggestion_id:
-            type:
-            - string
-            - 'null'
-            description: The unique identifier of the note request suggestion.
-    Place:
-      type: object
-      properties:
-        contained_within:
-          $ref: '#/components/schemas/PlaceContainedWithin'
-        country:
-          type: string
-        country_code:
-          type: string
-        full_name:
-          type: string
-        geo:
-          $ref: '#/components/schemas/PlaceGeo'
-        id:
-          type: string
-        name:
-          type: string
-        place_type:
-          type: string
-    UserWithheld:
-      type: object
-      description: Withholding details for withheld content.
-      properties:
-        country_codes:
-          type:
-          - array
-          - 'null'
-          description: A list of countries (as ISO 3166-1 alpha-2 codes) where this content is withheld.
-          items:
-            type: string
-        scope:
-          type:
-          - string
-          - 'null'
-          description: The scope of the withholding. Only present, with the value "user", when the entire User is withheld.
-          enum:
-          - user
+          description: Participant user ID.
     PostEditControls:
       type: object
       description: Indicates how much longer (if at all) this Post can be edited.
@@ -1289,201 +741,95 @@ components:
           - boolean
           - 'null'
           description: Indicates whether this Post is eligible to be edited.
-    GetChatConversationResponse:
+    ChatMediaUploadAppendResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/ChatConversation'
+          $ref: '#/components/schemas/ChatMediaUploadAppendResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-        includes:
-          $ref: '#/components/schemas/Expansions'
-    UserId:
-      type: string
-      description: Unique identifier of a User
-      pattern: ^[0-9]{1,19}$
-      example: '2244994945'
-    InternalErrorProblem:
+    CreateChatConversationActionSignatures:
       type: object
       required:
-      - type
-      - title
-      - detail
+      - message_id
+      - encoded_message_event_detail
+      - message_event_signature
       properties:
-        detail:
+        encoded_message_event_detail:
           type: string
-        status:
-          type: integer
-        title:
+          description: Base64-encoded message event detail.
+          minLength: 1
+          pattern: ^[A-Za-z0-9+/=_-]+$
+        message_event_signature:
+          description: Message event signature supplied with an action signature.
+          $ref: '#/components/schemas/CreateChatConversationActionSignaturesMessageEventSignature'
+        message_id:
           type: string
-        type:
+          description: Client-generated ID of the message being signed.
+          minLength: 1
+        signature_payload:
           type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
-    PostScopes:
+          description: Payload string the client signed; used only in server-side failure logs.
+    MediaVariants:
+      type: array
+      description: Each media object may have multiple display or playback variants, with different resolutions or formats.
+      items:
+        type: object
+        description: A single playback or display variant of a media object.
+        properties:
+          bit_rate:
+            type:
+            - integer
+            - 'null'
+            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
+            format: int64
+          content_type:
+            type:
+            - string
+            - 'null'
+            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
+          url:
+            type:
+            - string
+            - 'null'
+            description: The URL to this media variant.
+    PostMediaMetadata:
+      type: array
+      description: Metadata for media attached to this Post.
+      items:
+        type: object
+        description: Metadata for one media item attached to this Post.
+        properties:
+          alt_text:
+            type:
+            - string
+            - 'null'
+            description: Alternative text describing the media for accessibility.
+          description:
+            type:
+            - string
+            - 'null'
+            description: Description of the media.
+          media_key:
+            type:
+            - string
+            - 'null'
+            description: The unique identifier of the media.
+          title:
+            type:
+            - string
+            - 'null'
+            description: Title of the media.
+    MarkChatConversationReadResponseData:
       type: object
-      description: The scopes for this Post.
       required:
-      - followers
+      - success
       properties:
-        followers:
+        success:
           type: boolean
-          description: Indicates whether visibility of this Post is limited to the author's followers.
-    PostMatchedMediaNotes:
-      type: array
-      description: Community-Notes media matches for this Post.
-      items:
-        type: object
-        description: A Community-Notes media match for this Post.
-        properties:
-          match_status:
-            type:
-            - string
-            - 'null'
-            description: The status of the media note match.
-          note_id:
-            type:
-            - string
-            - 'null'
-            description: The matched note's unique identifier.
-    ChatMediaUploadInitializeResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ChatMediaUploadInitializeResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    Problem:
-      oneOf:
-      - $ref: '#/components/schemas/ResourceNotFoundProblem'
-      - $ref: '#/components/schemas/InvalidRequestProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
-      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
-      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
-      - $ref: '#/components/schemas/ResourceUnavailableProblem'
-      - $ref: '#/components/schemas/DisallowedResourceProblem'
-      - $ref: '#/components/schemas/InternalErrorProblem'
-      discriminator:
-        propertyName: type
-        mapping:
-          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
-          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
-          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
-          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
-          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
-          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
-          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
-          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
-          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    PostContextAnnotations:
-      type: array
-      description: Annotations inferred about the Post (domain and entity context).
-      items:
-        type: object
-        description: A single inferred annotation about the Post (domain and entity context).
-        required:
-        - domain
-        - entity
-        properties:
-          domain:
-            description: The domain (broad category) this annotation belongs to.
-            oneOf:
-            - type: object
-              description: A domain or entity referenced by a context annotation.
-              properties:
-                description:
-                  type:
-                  - string
-                  - 'null'
-                id:
-                  type:
-                  - string
-                  - 'null'
-                name:
-                  type:
-                  - string
-                  - 'null'
-          entity:
-            description: The specific entity recognized within the domain.
-            oneOf:
-            - type: object
-              description: A domain or entity referenced by a context annotation.
-              properties:
-                description:
-                  type:
-                  - string
-                  - 'null'
-                id:
-                  type:
-                  - string
-                  - 'null'
-                name:
-                  type:
-                  - string
-                  - 'null'
-    PostDisplayTextRange:
-      type: array
-      description: The inclusive start and exclusive end indices of the displayable content of the Post.
-      minItems: 2
-      maxItems: 2
-      items:
-        type: integer
-        format: int64
+          description: Whether the conversation was marked read.
     CreateChatConversationActionSignaturesMessageEventSignature:
       type: object
       required:
@@ -1512,288 +858,73 @@ components:
         signing_public_key:
           type: string
           description: The public key used for signing.
-    Topic:
-      type: object
-      properties:
-        description:
-          type: string
-        id:
-          type: string
-        name:
-          type: string
-    CreateChatConversationConversationParticipantKeys:
-      type: object
-      properties:
-        encrypted_conversation_key:
-          type: string
-          description: Conversation key encrypted with this participant's public key.
-        public_key_version:
-          type: string
-          description: Version of the participant's public key used for encryption.
-        user_id:
-          type: string
-          description: Participant user ID.
-    DeleteChatMessagesActionSignaturesMessageEventSignature:
-      type: object
-      required:
-      - signature
-      - public_key_version
-      - signature_version
-      properties:
-        message_signing_key_info_list:
-          type: array
-          description: List of signing key information for message verification.
-          items:
-            $ref: '#/components/schemas/DeleteChatMessagesActionSignaturesMessageEventSignatureMessageSigningKeyInfoList'
-        public_key_version:
-          type: string
-          description: The version of the public key used for signing.
-          pattern: ^[0-9]+$
-        signature:
-          type: string
-          description: The signature of the message event.
-          minLength: 1
-          pattern: ^[A-Za-z0-9+/=_-]+$
-        signature_version:
-          type: string
-          description: The version of the signature algorithm.
-          pattern: ^[0-9]+$
-        signing_public_key:
-          type: string
-          description: The public key used for signing.
-    ChatMediaUploadAppendRequest:
-      type: object
-      required:
-      - media
-      - segment_index
-      - conversation_id
-      - media_hash_key
-      properties:
-        conversation_id:
-          type: string
-          description: The XChat conversation the upload belongs to.
-        media:
-          anyOf:
-          - type: string
-            format: binary
-          - type: string
-            format: byte
-          description: 'The media segment bytes: base64-encoded in JSON bodies, raw bytes in multipart bodies.'
-        media_hash_key:
-          type: string
-          description: The media hash key returned by the initialize step.
-        segment_index:
-          type: integer
-          description: The index of this segment in the upload sequence.
-          minimum: 0
-          maximum: 999
-      additionalProperties: false
-    PostSuggestedSourceLinks:
-      type: array
-      description: URLs suggested as sources for this Post.
-      items:
-        type: string
-    AddConversationKeysConversationParticipantKeys:
-      type: object
-      properties:
-        encrypted_conversation_key:
-          type: string
-          description: Conversation key encrypted with this participant's public key.
-        public_key_version:
-          type: string
-          description: Version of the participant's public key used for encryption.
-        user_id:
-          type: string
-          description: Participant user ID.
-    AddChatGroupMembersActionSignaturesMessageEventSignature:
-      type: object
-      required:
-      - signature
-      - public_key_version
-      - signature_version
-      properties:
-        message_signing_key_info_list:
-          type: array
-          description: List of signing key information for message verification.
-          items:
-            $ref: '#/components/schemas/AddChatGroupMembersActionSignaturesMessageEventSignatureMessageSigningKeyInfoList'
-        public_key_version:
-          type: string
-          description: The version of the public key used for signing.
-          pattern: ^[0-9]+$
-        signature:
-          type: string
-          description: The signature of the message event.
-          minLength: 1
-          pattern: ^[A-Za-z0-9+/=_-]+$
-        signature_version:
-          type: string
-          description: The version of the signature algorithm.
-          pattern: ^[0-9]+$
-        signing_public_key:
-          type: string
-          description: The public key used for signing.
-    AddChatGroupMembersActionSignaturesMessageEventSignatureMessageSigningKeyInfoList:
-      type: object
-      properties:
-        member_id:
-          type: string
-          description: The member ID associated with this signing key.
-        public_key_version:
-          type: string
-          description: The version of the public key.
-        signing_public_key:
-          type: string
-          description: The signing public key.
-    CreateChatConversationActionSignatures:
-      type: object
-      required:
-      - message_id
-      - encoded_message_event_detail
-      - message_event_signature
-      properties:
-        encoded_message_event_detail:
-          type: string
-          description: Base64-encoded message event detail.
-          minLength: 1
-          pattern: ^[A-Za-z0-9+/=_-]+$
-        message_event_signature:
-          description: Message event signature supplied with an action signature.
-          $ref: '#/components/schemas/CreateChatConversationActionSignaturesMessageEventSignature'
-        message_id:
-          type: string
-          description: Client-generated ID of the message being signed.
-          minLength: 1
-        signature_payload:
-          type: string
-          description: Payload string the client signed; used only in server-side failure logs.
-    DeleteChatMessagesActionSignaturesMessageEventSignatureMessageSigningKeyInfoList:
-      type: object
-      properties:
-        member_id:
-          type: string
-          description: The member ID associated with this signing key.
-        public_key_version:
-          type: string
-          description: The version of the public key.
-        signing_public_key:
-          type: string
-          description: The signing public key.
-    MediaPromotedMetrics:
-      type: object
-      description: Promoted nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-        playback_100_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-        playback_25_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-        playback_50_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-        playback_75_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-        view_count:
-          type:
-          - integer
-          - 'null'
-          description: The number of promoted views of this video. Null when the backend returns quartile data without a view count.
-          format: int64
-    SendChatTypingIndicatorResponseData:
-      type: object
-      required:
-      - success
-      properties:
-        success:
-          type: boolean
-          description: Whether the typing indicator was sent.
-    PostSuggestedSourceLinksWithCounts:
-      type: array
-      description: Suggested source URLs for this Post, each with the number of times it was suggested.
-      items:
-        type: object
-        description: A suggested source URL for this Post with the number of times it was suggested.
-        properties:
-          count:
-            type:
-            - integer
-            - 'null'
-            description: Number of times this source link was suggested.
-            format: int64
-          url:
-            type:
-            - string
-            - 'null'
-            description: The suggested source URL.
     PlaceContainedWithin:
       type: array
       description: A list of unique identifiers of the Places that contain this place.
       items:
         type: string
-    NotAuthorizedForResourceProblem:
+    ChatMediaUploadInitializeRequest:
       type: object
       required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
-          type: string
-    ChatMediaUploadInitializeResponseData:
-      type: object
-      required:
-      - session_id
-      - media_hash_key
       - conversation_id
+      - total_bytes
       properties:
         conversation_id:
           type: string
-          description: Canonical ID of the conversation.
-        media_hash_key:
+          description: The XChat conversation the upload belongs to.
+        total_bytes:
+          type: integer
+          description: Total size of the media upload in bytes.
+          minimum: 0
+      additionalProperties: false
+    ChatMediaUploadAppendResponseData:
+      type: object
+      properties:
+        expires_at:
+          type: integer
+          description: Epoch seconds when the upload session expires.
+    UserConnectionStatus:
+      type: array
+      description: Returns detailed information about the relationship between two users.
+      items:
+        type: string
+        description: A connection between the authenticated User and this User.
+        enum:
+        - blocking
+        - follow_request_received
+        - follow_request_sent
+        - followed_by
+        - following
+        - muting
+    Media:
+      type: object
+      properties:
+        alt_text:
           type: string
-          description: Hash key addressing the uploaded media.
-        session_id:
+        duration_ms:
+          type: integer
+        height:
+          type: integer
+        media_key:
           type: string
-          description: Upload session ID.
+        non_public_metrics:
+          $ref: '#/components/schemas/MediaNonPublicMetrics'
+        organic_metrics:
+          $ref: '#/components/schemas/MediaOrganicMetrics'
+        preview_image_url:
+          type: string
+        promoted_metrics:
+          $ref: '#/components/schemas/MediaPromotedMetrics'
+        public_metrics:
+          $ref: '#/components/schemas/MediaPublicMetrics'
+        type:
+          type: string
+        url:
+          type: string
+        variants:
+          $ref: '#/components/schemas/MediaVariants'
+        width:
+          type: integer
     PostNotePost:
       type: object
       description: The full content of the Post, including text beyond 280 characters.
@@ -1907,6 +1038,116 @@ components:
         text:
           type: string
           description: The full note text of the Post.
+    CreateChatConversationResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateChatConversationResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    ChatMediaUploadAppendRequest:
+      type: object
+      required:
+      - media
+      - segment_index
+      - conversation_id
+      - media_hash_key
+      properties:
+        conversation_id:
+          type: string
+          description: The XChat conversation the upload belongs to.
+        media:
+          anyOf:
+          - type: string
+            format: binary
+          - type: string
+            format: byte
+          description: 'The media segment bytes: base64-encoded in JSON bodies, raw bytes in multipart bodies.'
+        media_hash_key:
+          type: string
+          description: The media hash key returned by the initialize step.
+        segment_index:
+          type: integer
+          description: The index of this segment in the upload sequence.
+          minimum: 0
+          maximum: 999
+      additionalProperties: false
+    Poll:
+      type: object
+      properties:
+        duration_minutes:
+          type: integer
+        end_datetime:
+          type: string
+        id:
+          type: string
+        options:
+          $ref: '#/components/schemas/PollOptions'
+        voting_status:
+          type: string
+    UserId:
+      type: string
+      description: Unique identifier of a User
+      pattern: ^[0-9]{1,19}$
+      example: '2244994945'
+    AddUserPublicKeyResponseData:
+      type: object
+      properties:
+        juicebox_config:
+          type: object
+          description: Juicebox recovery-service configuration for this key.
+        public_key_version:
+          type: string
+          description: Version assigned to the registered public key.
+    AddConversationKeysConversationParticipantKeys:
+      type: object
+      properties:
+        encrypted_conversation_key:
+          type: string
+          description: Conversation key encrypted with this participant's public key.
+        public_key_version:
+          type: string
+          description: Version of the participant's public key used for encryption.
+        user_id:
+          type: string
+          description: Participant user ID.
+    ChatMediaUploadFinalizeResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ChatMediaUploadFinalizeResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    ChatMediaUploadInitializeResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ChatMediaUploadInitializeResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    InitializeChatGroupResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InitializeChatGroupResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    ChatMediaUploadFinalizeResponseData:
+      type: object
+      required:
+      - success
+      properties:
+        success:
+          type: boolean
+          description: Whether the upload was finalized.
     InvalidRequestProblem:
       type: object
       required:
@@ -1928,14 +1169,308 @@ components:
           - https://api.x.com/2/problems/invalid-request
         value:
           type: string
-    ChatMediaUploadFinalizeResponseData:
+    AddUserPublicKeyResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AddUserPublicKeyResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    ResourceUnavailableProblem:
       type: object
       required:
-      - success
+      - type
+      - title
+      - detail
+      - resource_type
       properties:
-        success:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    PostGeo:
+      type: object
+      description: The location tagged on the Post, if the user provided one.
+      properties:
+        coordinates:
+          type:
+          - object
+          - 'null'
+          description: A GeoJSON Point geometry.
+          required:
+          - type
+          - coordinates
+          properties:
+            coordinates:
+              type: array
+              description: '[longitude, latitude].'
+              minItems: 2
+              maxItems: 2
+              items:
+                type: number
+                format: double
+            type:
+              type: string
+              description: The GeoJSON geometry type.
+              enum:
+              - Point
+        place_id:
+          type:
+          - string
+          - 'null'
+          description: The unique identifier of the tagged place.
+    MediaOrganicMetrics:
+      type: object
+      description: Organic nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+        view_count:
+          type:
+          - integer
+          - 'null'
+          description: The number of organic views of this video. Null when the backend returns quartile data without a view count.
+          format: int64
+    AddConversationKeysResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AddConversationKeysResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetChatConversationsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatConversation'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+        meta:
+          type: object
+          properties:
+            has_message_requests:
+              type: boolean
+            has_more:
+              type: boolean
+            next_token:
+              type: string
+              description: Pagination token for the next page of results.
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    PostAttachments:
+      type: object
+      description: Specifies the type of attachments (if any) present in this Post.
+      properties:
+        media_keys:
+          type:
+          - array
+          - 'null'
+          description: Media keys of media attached to this Post.
+          items:
+            type: string
+        media_source_tweet_id:
+          type:
+          - array
+          - 'null'
+          description: IDs of the source Posts the attached media originated from.
+          items:
+            type: string
+        poll_ids:
+          type:
+          - array
+          - 'null'
+          description: IDs of polls attached to this Post.
+          items:
+            type: string
+    FieldUnauthorizedProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-unauthorized
+    PostReferencedPosts:
+      type: array
+      description: A list of Posts this Post refers to. If the Post is a Retweet, Quote or Reply, it includes the referenced Post's type and ID.
+      items:
+        type: object
+        description: A reference from this Post to another Post (repost, quote, or reply).
+        required:
+        - type
+        - id
+        properties:
+          id:
+            type: string
+            description: Unique identifier of the referenced Post.
+          type:
+            description: How this Post references the other Post.
+            oneOf:
+            - type: string
+              description: The kind of Post-to-Post reference.
+              enum:
+              - retweeted
+              - quoted
+              - replied_to
+    MediaPublicMetrics:
+      type: object
+      description: Public engagement metrics for the media at the time of the request.
+      required:
+      - view_count
+      properties:
+        view_count:
+          type: integer
+          description: The number of times this video has been viewed.
+          format: int64
+    UserPublicMetrics:
+      type: object
+      description: A list of metrics for this User.
+      required:
+      - followers_count
+      - following_count
+      - post_count
+      - listed_count
+      properties:
+        followers_count:
+          type: integer
+          description: Number of Users who follow this User.
+          format: int64
+        following_count:
+          type: integer
+          description: Number of Users this User follows.
+          format: int64
+        like_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of Posts this User has liked.
+          format: int64
+        listed_count:
+          type: integer
+          description: Number of Lists that include this User.
+          format: int64
+        media_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of media items posted by this User.
+          format: int64
+        post_count:
+          type: integer
+          description: Number of Posts (including Reposts) created by this User.
+          format: int64
+    Problem:
+      oneOf:
+      - $ref: '#/components/schemas/ResourceNotFoundProblem'
+      - $ref: '#/components/schemas/InvalidRequestProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
+      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
+      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
+      - $ref: '#/components/schemas/ResourceUnavailableProblem'
+      - $ref: '#/components/schemas/DisallowedResourceProblem'
+      - $ref: '#/components/schemas/InternalErrorProblem'
+      discriminator:
+        propertyName: type
+        mapping:
+          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
+          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
+          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
+          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
+          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
+          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
+          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
+          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
+          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    PostWithheld:
+      type: object
+      description: Withholding details for withheld content.
+      required:
+      - copyright
+      - country_codes
+      properties:
+        copyright:
           type: boolean
-          description: Whether the upload was finalized.
+          description: Indicates whether this content is withheld due to a copyright claim.
+        country_codes:
+          type: array
+          description: Uppercase ISO 3166-1 alpha-2 country codes where this content is withheld.
+          items:
+            type: string
+        scope:
+          type:
+          - string
+          - 'null'
+          description: Whether the withholding applies to a Post or a User.
+          enum:
+          - post
+          - user
     UserEntities:
       type: object
       description: A list of metadata found in the User's profile description.
@@ -2176,15 +1711,150 @@ components:
                   url:
                     type: string
                     description: The t.co shortened URL.
-    InitializeChatGroupResponse:
+    AddConversationKeysActionSignatures:
+      type: object
+      required:
+      - message_id
+      - encoded_message_event_detail
+      - message_event_signature
+      properties:
+        encoded_message_event_detail:
+          type: string
+          description: Base64-encoded message event detail.
+          minLength: 1
+          pattern: ^[A-Za-z0-9+/=_-]+$
+        message_event_signature:
+          description: Message event signature supplied with an action signature.
+          $ref: '#/components/schemas/AddConversationKeysActionSignaturesMessageEventSignature'
+        message_id:
+          type: string
+          description: Client-generated ID of the message being signed.
+          minLength: 1
+        signature_payload:
+          type: string
+          description: Payload string the client signed; used only in server-side failure logs.
+    SendChatTypingIndicatorResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/InitializeChatGroupResponseData'
+          $ref: '#/components/schemas/SendChatTypingIndicatorResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
+    DeleteChatMessagesActionSignatures:
+      type: object
+      required:
+      - message_id
+      - encoded_message_event_detail
+      - message_event_signature
+      properties:
+        encoded_message_event_detail:
+          type: string
+          description: Base64-encoded message event detail.
+          minLength: 1
+          pattern: ^[A-Za-z0-9+/=_-]+$
+        message_event_signature:
+          description: Message event signature supplied with an action signature.
+          $ref: '#/components/schemas/DeleteChatMessagesActionSignaturesMessageEventSignature'
+        message_id:
+          type: string
+          description: Client-generated ID of the message being signed.
+          minLength: 1
+        signature_payload:
+          type: string
+          description: Payload string the client signed; used only in server-side failure logs.
+    AddConversationKeysActionSignaturesMessageEventSignature:
+      type: object
+      required:
+      - signature
+      - public_key_version
+      - signature_version
+      properties:
+        message_signing_key_info_list:
+          type: array
+          description: List of signing key information for message verification.
+          items:
+            $ref: '#/components/schemas/AddConversationKeysActionSignaturesMessageEventSignatureMessageSigningKeyInfoList'
+        public_key_version:
+          type: string
+          description: The version of the public key used for signing.
+          pattern: ^[0-9]+$
+        signature:
+          type: string
+          description: The signature of the message event.
+          minLength: 1
+          pattern: ^[A-Za-z0-9+/=_-]+$
+        signature_version:
+          type: string
+          description: The version of the signature algorithm.
+          pattern: ^[0-9]+$
+        signing_public_key:
+          type: string
+          description: The public key used for signing.
+    PostPublicMetrics:
+      type: object
+      description: Engagement metrics for the Post at the time of the request.
+      required:
+      - repost_count
+      - reply_count
+      - like_count
+      - quote_count
+      - bookmark_count
+      - impression_count
+      properties:
+        bookmark_count:
+          type: integer
+          description: Number of times this Post has been bookmarked.
+          format: int64
+        impression_count:
+          type: integer
+          description: Number of times this Post has been viewed.
+          format: int64
+        like_count:
+          type: integer
+          description: Number of likes on this Post.
+          format: int64
+        quote_count:
+          type: integer
+          description: Number of quote Posts of this Post.
+          format: int64
+        reply_count:
+          type: integer
+          description: Number of replies to this Post.
+          format: int64
+        repost_count:
+          type: integer
+          description: Number of times this Post has been reposted.
+          format: int64
+    PostScopes:
+      type: object
+      description: The scopes for this Post.
+      required:
+      - followers
+      properties:
+        followers:
+          type: boolean
+          description: Indicates whether visibility of this Post is limited to the author's followers.
+    Place:
+      type: object
+      properties:
+        contained_within:
+          $ref: '#/components/schemas/PlaceContainedWithin'
+        country:
+          type: string
+        country_code:
+          type: string
+        full_name:
+          type: string
+        geo:
+          $ref: '#/components/schemas/PlaceGeo'
+        id:
+          type: string
+        name:
+          type: string
+        place_type:
+          type: string
     AddChatGroupMembersRequest:
       type: object
       required:
@@ -2214,28 +1884,98 @@ components:
           description: List of user IDs to add to the group conversation.
           items:
             type: string
-    AddChatGroupMembersConversationParticipantKeys:
+    PlaceGeo:
+      type: object
+      description: The geographic location of this place, expressed as a GeoJSON Feature.
+      required:
+      - type
+      - bbox
+      - properties
+      properties:
+        bbox:
+          type: array
+          description: The bounding box as [southwest_longitude, southwest_latitude, northeast_longitude, northeast_latitude].
+          minItems: 4
+          maxItems: 4
+          items:
+            type: number
+            format: double
+        properties:
+          type: object
+          description: Additional GeoJSON feature properties.
+        type:
+          description: The GeoJSON feature type.
+          oneOf:
+          - type: string
+            enum:
+            - Feature
+    GetChatConversationResponse:
       type: object
       properties:
-        encrypted_conversation_key:
+        data:
+          $ref: '#/components/schemas/ChatConversation'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        includes:
+          $ref: '#/components/schemas/Expansions'
+    SendChatMessageRequest:
+      type: object
+      required:
+      - message_id
+      - encoded_message_create_event
+      properties:
+        conversation_token:
           type: string
-          description: Conversation key encrypted with this participant's public key.
-        public_key_version:
+          description: Optional conversation token.
+        encoded_message_create_event:
           type: string
-          description: Version of the participant's public key used for encryption.
-        user_id:
+          description: Base64-encoded Thrift MessageCreateEvent containing encrypted message contents.
+        encoded_message_event_signature:
           type: string
-          description: Participant user ID.
-    DisallowedResourceProblem:
+          description: Base64-encoded Thrift MessageEventSignature for message verification.
+        message_id:
+          type: string
+          description: Unique identifier for this message.
+    Expansions:
+      type: object
+      properties:
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        places:
+          type: array
+          items:
+            $ref: '#/components/schemas/Place'
+        polls:
+          type: array
+          items:
+            $ref: '#/components/schemas/Poll'
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        topics:
+          type: array
+          items:
+            $ref: '#/components/schemas/Topic'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    FieldHydrationFailureProblem:
       type: object
       required:
       - type
       - title
       - detail
+      - field
       properties:
         detail:
           type: string
-        resource_id:
+        field:
           type: string
         resource_type:
           type: string
@@ -2248,52 +1988,49 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    MediaPublicMetrics:
-      type: object
-      description: Public engagement metrics for the media at the time of the request.
-      required:
-      - view_count
-      properties:
-        view_count:
-          type: integer
-          description: The number of times this video has been viewed.
-          format: int64
-    PostMediaMetadata:
-      type: array
-      description: Metadata for media attached to this Post.
-      items:
-        type: object
-        description: Metadata for one media item attached to this Post.
-        properties:
-          alt_text:
-            type:
-            - string
-            - 'null'
-            description: Alternative text describing the media for accessibility.
-          description:
-            type:
-            - string
-            - 'null'
-            description: Description of the media.
-          media_key:
-            type:
-            - string
-            - 'null'
-            description: The unique identifier of the media.
-          title:
-            type:
-            - string
-            - 'null'
-            description: Title of the media.
-    SendChatMessageResponseData:
+          - https://api.x.com/2/problems/field-hydration-failure
+    DeleteChatMessagesActionSignaturesMessageEventSignature:
       type: object
       required:
-      - encoded_message_event
+      - signature
+      - public_key_version
+      - signature_version
       properties:
-        encoded_message_event:
+        message_signing_key_info_list:
+          type: array
+          description: List of signing key information for message verification.
+          items:
+            $ref: '#/components/schemas/DeleteChatMessagesActionSignaturesMessageEventSignatureMessageSigningKeyInfoList'
+        public_key_version:
           type: string
-          description: Base64-encoded Thrift message event for the sent message.
+          description: The version of the public key used for signing.
+          pattern: ^[0-9]+$
+        signature:
+          type: string
+          description: The signature of the message event.
+          minLength: 1
+          pattern: ^[A-Za-z0-9+/=_-]+$
+        signature_version:
+          type: string
+          description: The version of the signature algorithm.
+          pattern: ^[0-9]+$
+        signing_public_key:
+          type: string
+          description: The public key used for signing.
+    PostSuggestedSourceLinks:
+      type: array
+      description: URLs suggested as sources for this Post.
+      items:
+        type: string
+    AddChatGroupMembersResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Post'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     DeleteChatMessagesRequest:
       type: object
       required:
@@ -2323,55 +2060,140 @@ components:
           minItems: 1
           items:
             type: string
-    UserAffiliation:
+    CreateChatConversationActionSignaturesMessageEventSignatureMessageSigningKeyInfoList:
       type: object
-      description: Metadata about a user's affiliation.
       properties:
-        badge_url:
-          type:
-          - string
-          - 'null'
-          description: URL of the affiliation badge image shown on the User's profile.
-        description:
-          type:
-          - string
-          - 'null'
-          description: Description of the affiliation.
-        url:
-          type:
-          - string
-          - 'null'
-          description: URL associated with the affiliation.
-        user_id:
+        member_id:
+          type: string
+          description: The member ID associated with this signing key.
+        public_key_version:
+          type: string
+          description: The version of the public key.
+        signing_public_key:
+          type: string
+          description: The signing public key.
+    AddUserPublicKeyPublicKey:
+      type: object
+      properties:
+        identity_public_key_signature:
+          type: string
+          description: Signature over the identity public key.
+        public_key:
+          type: string
+          description: Identity public key (base64 encoded).
+        public_key_fingerprint:
+          type: string
+          description: Fingerprint of the identity public key.
+        registration_method:
+          type: string
+          description: Registration method for the public key.
+        signing_public_key:
+          type: string
+          description: Signing public key (base64 encoded).
+        signing_public_key_signature:
+          type: string
+          description: Signature over the signing public key.
+    UserWithheld:
+      type: object
+      description: Withholding details for withheld content.
+      properties:
+        country_codes:
           type:
           - array
           - 'null'
-          description: A list of unique identifiers of the accounts this User is affiliated with.
+          description: A list of countries (as ISO 3166-1 alpha-2 codes) where this content is withheld.
           items:
             type: string
-    MediaVariants:
-      type: array
-      description: Each media object may have multiple display or playback variants, with different resolutions or formats.
-      items:
-        type: object
-        description: A single playback or display variant of a media object.
-        properties:
-          bit_rate:
-            type:
-            - integer
-            - 'null'
-            description: The bit rate of this variant, in bits per second. Absent for playlist variants.
-            format: int64
-          content_type:
-            type:
-            - string
-            - 'null'
-            description: The MIME type of this variant, for example "video/mp4" or "application/x-mpegURL".
-          url:
-            type:
-            - string
-            - 'null'
-            description: The URL to this media variant.
+        scope:
+          type:
+          - string
+          - 'null'
+          description: The scope of the withholding. Only present, with the value "user", when the entire User is withheld.
+          enum:
+          - user
+    ChatMediaUploadInitializeResponseData:
+      type: object
+      required:
+      - session_id
+      - media_hash_key
+      - conversation_id
+      properties:
+        conversation_id:
+          type: string
+          description: Canonical ID of the conversation.
+        media_hash_key:
+          type: string
+          description: Hash key addressing the uploaded media.
+        session_id:
+          type: string
+          description: Upload session ID.
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+    AddConversationKeysActionSignaturesMessageEventSignatureMessageSigningKeyInfoList:
+      type: object
+      properties:
+        member_id:
+          type: string
+          description: The member ID associated with this signing key.
+        public_key_version:
+          type: string
+          description: The version of the public key.
+        signing_public_key:
+          type: string
+          description: The signing public key.
+    DeleteChatMessagesActionSignaturesMessageEventSignatureMessageSigningKeyInfoList:
+      type: object
+      properties:
+        member_id:
+          type: string
+          description: The member ID associated with this signing key.
+        public_key_version:
+          type: string
+          description: The version of the public key.
+        signing_public_key:
+          type: string
+          description: The signing public key.
+    AddUserPublicKeyRequest:
+      type: object
+      required:
+      - public_key
+      - version
+      properties:
+        generate_version:
+          type: boolean
+          description: When true, the server generates a new version.
+        public_key:
+          description: Public key registration payload.
+          $ref: '#/components/schemas/AddUserPublicKeyPublicKey'
+        version:
+          type: string
+          description: Public key version.
     CreateChatConversationRequest:
       type: object
       required:
@@ -2421,28 +2243,46 @@ components:
         ttl_msec:
           type: string
           description: Message time-to-live in milliseconds. Messages expire after this duration.
-    SendChatMessageResponse:
+    DeleteChatMessagesResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/SendChatMessageResponseData'
+          $ref: '#/components/schemas/DeleteChatMessagesResponseData'
         errors:
           type: array
           items:
             $ref: '#/components/schemas/Problem'
-    AddConversationKeysActionSignaturesMessageEventSignatureMessageSigningKeyInfoList:
+    NotAuthorizedForFieldProblem:
       type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
       properties:
-        member_id:
+        detail:
           type: string
-          description: The member ID associated with this signing key.
-        public_key_version:
+        field:
           type: string
-          description: The version of the public key.
-        signing_public_key:
+        parameter:
           type: string
-          description: The signing public key.
-    DeleteChatMessagesActionSignatures:
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
+          type: string
+    AddChatGroupMembersActionSignatures:
       type: object
       required:
       - message_id
@@ -2456,7 +2296,7 @@ components:
           pattern: ^[A-Za-z0-9+/=_-]+$
         message_event_signature:
           description: Message event signature supplied with an action signature.
-          $ref: '#/components/schemas/DeleteChatMessagesActionSignaturesMessageEventSignature'
+          $ref: '#/components/schemas/AddChatGroupMembersActionSignaturesMessageEventSignature'
         message_id:
           type: string
           description: Client-generated ID of the message being signed.
@@ -2464,63 +2304,37 @@ components:
         signature_payload:
           type: string
           description: Payload string the client signed; used only in server-side failure logs.
-    PostGeo:
+    AddConversationKeysResponseData:
       type: object
-      description: The location tagged on the Post, if the user provided one.
       properties:
-        coordinates:
-          type:
-          - object
-          - 'null'
-          description: A GeoJSON Point geometry.
-          required:
-          - type
-          - coordinates
-          properties:
-            coordinates:
-              type: array
-              description: '[longitude, latitude].'
-              minItems: 2
-              maxItems: 2
-              items:
-                type: number
-                format: double
-            type:
-              type: string
-              description: The GeoJSON geometry type.
-              enum:
-              - Point
-        place_id:
-          type:
-          - string
-          - 'null'
-          description: The unique identifier of the tagged place.
-    DeleteChatMessagesResponseData:
+        conversation_id:
+          type: string
+          description: Canonical ID of the conversation.
+        sequence_id:
+          type: string
+          description: Sequence ID of the key change.
+    AddConversationKeysRequest:
       type: object
       required:
-      - deleted
+      - conversation_key_version
+      - conversation_participant_keys
       properties:
-        deleted:
-          type: boolean
-          description: Whether the messages were deleted.
-    AddChatGroupMembersResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Post'
-        errors:
+        action_signatures:
           type: array
+          description: Cryptographic signatures for the action.
           items:
-            $ref: '#/components/schemas/Problem'
-    ChatMediaUploadFinalizeResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ChatMediaUploadFinalizeResponseData'
-        errors:
+            $ref: '#/components/schemas/AddConversationKeysActionSignatures'
+        base64_encoded_key_rotation:
+          type: string
+          description: Base64-encoded key rotation payload for ratchet tree key management.
+        conversation_key_version:
+          type: string
+          description: Version of the conversation encryption key (typically a timestamp in milliseconds).
+        conversation_participant_keys:
           type: array
+          description: Encrypted conversation keys for each participant.
           items:
-            $ref: '#/components/schemas/Problem'
+            $ref: '#/components/schemas/AddConversationKeysConversationParticipantKeys'
     GetChatConversationEventsResponse:
       type: object
       properties:
@@ -2548,6 +2362,412 @@ components:
               type: integer
               description: Number of items in the data array.
               format: int32
+    MediaNonPublicMetrics:
+      type: object
+      description: Nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+    CreateChatConversationConversationParticipantKeys:
+      type: object
+      properties:
+        encrypted_conversation_key:
+          type: string
+          description: Conversation key encrypted with this participant's public key.
+        public_key_version:
+          type: string
+          description: Version of the participant's public key used for encryption.
+        user_id:
+          type: string
+          description: Participant user ID.
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    AddChatGroupMembersActionSignaturesMessageEventSignature:
+      type: object
+      required:
+      - signature
+      - public_key_version
+      - signature_version
+      properties:
+        message_signing_key_info_list:
+          type: array
+          description: List of signing key information for message verification.
+          items:
+            $ref: '#/components/schemas/AddChatGroupMembersActionSignaturesMessageEventSignatureMessageSigningKeyInfoList'
+        public_key_version:
+          type: string
+          description: The version of the public key used for signing.
+          pattern: ^[0-9]+$
+        signature:
+          type: string
+          description: The signature of the message event.
+          minLength: 1
+          pattern: ^[A-Za-z0-9+/=_-]+$
+        signature_version:
+          type: string
+          description: The version of the signature algorithm.
+          pattern: ^[0-9]+$
+        signing_public_key:
+          type: string
+          description: The public key used for signing.
+    PostMatchedMediaNotes:
+      type: array
+      description: Community-Notes media matches for this Post.
+      items:
+        type: object
+        description: A Community-Notes media match for this Post.
+        properties:
+          match_status:
+            type:
+            - string
+            - 'null'
+            description: The status of the media note match.
+          note_id:
+            type:
+            - string
+            - 'null'
+            description: The matched note's unique identifier.
+    Topic:
+      type: object
+      properties:
+        description:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+    MarkChatConversationReadRequest:
+      type: object
+      required:
+      - seen_until_sequence_id
+      properties:
+        seen_until_sequence_id:
+          type: string
+          description: The sequence ID of the last message to mark as read up to.
+    SendChatMessageResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SendChatMessageResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    UserAffiliation:
+      type: object
+      description: Metadata about a user's affiliation.
+      properties:
+        badge_url:
+          type:
+          - string
+          - 'null'
+          description: URL of the affiliation badge image shown on the User's profile.
+        description:
+          type:
+          - string
+          - 'null'
+          description: Description of the affiliation.
+        url:
+          type:
+          - string
+          - 'null'
+          description: URL associated with the affiliation.
+        user_id:
+          type:
+          - array
+          - 'null'
+          description: A list of unique identifiers of the accounts this User is affiliated with.
+          items:
+            type: string
+    UserSubscription:
+      type: object
+      description: The subscription relationship between this User and you.
+      required:
+      - subscribes_to_you
+      properties:
+        subscribes_to_you:
+          type: boolean
+          description: Indicates if this User subscribes to you.
+    ResourceNotFoundProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    PostDisplayTextRange:
+      type: array
+      description: The inclusive start and exclusive end indices of the displayable content of the Post.
+      minItems: 2
+      maxItems: 2
+      items:
+        type: integer
+        format: int64
+    SendChatMessageResponseData:
+      type: object
+      required:
+      - encoded_message_event
+      properties:
+        encoded_message_event:
+          type: string
+          description: Base64-encoded Thrift message event for the sent message.
+    ChatMediaUploadFinalizeRequest:
+      type: object
+      required:
+      - conversation_id
+      - media_hash_key
+      - num_parts
+      properties:
+        conversation_id:
+          type: string
+          description: The XChat conversation the upload belongs to.
+        media_hash_key:
+          type: string
+          description: The media hash key returned by the initialize step.
+        message_id:
+          type: string
+          description: Optional message identifier associated with the upload.
+        num_parts:
+          type: string
+          description: Total number of uploaded parts, as a numeric string.
+        ttl_msec:
+          type: string
+          description: Optional TTL for the media in milliseconds, as a numeric string.
+      additionalProperties: false
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    PostNoteRequestSuggestions:
+      type: array
+      description: Community-Notes request suggestions for this Post.
+      items:
+        type: object
+        description: A Community-Notes request suggestion for this Post.
+        properties:
+          source_link:
+            type:
+            - string
+            - 'null'
+            description: A suggested source link supporting the note request.
+          suggestion:
+            type:
+            - string
+            - 'null'
+            description: The text of the note request suggestion.
+          suggestion_id:
+            type:
+            - string
+            - 'null'
+            description: The unique identifier of the note request suggestion.
+    PostSuggestedSourceLinksWithCounts:
+      type: array
+      description: Suggested source URLs for this Post, each with the number of times it was suggested.
+      items:
+        type: object
+        description: A suggested source URL for this Post with the number of times it was suggested.
+        properties:
+          count:
+            type:
+            - integer
+            - 'null'
+            description: Number of times this source link was suggested.
+            format: int64
+          url:
+            type:
+            - string
+            - 'null'
+            description: The suggested source URL.
+    AddChatGroupMembersActionSignaturesMessageEventSignatureMessageSigningKeyInfoList:
+      type: object
+      properties:
+        member_id:
+          type: string
+          description: The member ID associated with this signing key.
+        public_key_version:
+          type: string
+          description: The version of the public key.
+        signing_public_key:
+          type: string
+          description: The signing public key.
+    MarkChatConversationReadResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/MarkChatConversationReadResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    PostContextAnnotations:
+      type: array
+      description: Annotations inferred about the Post (domain and entity context).
+      items:
+        type: object
+        description: A single inferred annotation about the Post (domain and entity context).
+        required:
+        - domain
+        - entity
+        properties:
+          domain:
+            description: The domain (broad category) this annotation belongs to.
+            oneOf:
+            - type: object
+              description: A domain or entity referenced by a context annotation.
+              properties:
+                description:
+                  type:
+                  - string
+                  - 'null'
+                id:
+                  type:
+                  - string
+                  - 'null'
+                name:
+                  type:
+                  - string
+                  - 'null'
+          entity:
+            description: The specific entity recognized within the domain.
+            oneOf:
+            - type: object
+              description: A domain or entity referenced by a context annotation.
+              properties:
+                description:
+                  type:
+                  - string
+                  - 'null'
+                id:
+                  type:
+                  - string
+                  - 'null'
+                name:
+                  type:
+                  - string
+                  - 'null'
+    SendChatTypingIndicatorResponseData:
+      type: object
+      required:
+      - success
+      properties:
+        success:
+          type: boolean
+          description: Whether the typing indicator was sent.
+    MediaPromotedMetrics:
+      type: object
+      description: Promoted nonpublic engagement metrics for the media at the time of the request.
+      properties:
+        playback_0_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who started playback (0% quartile) of this video.
+          format: int64
+        playback_100_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who completed playback (100% quartile) of this video.
+          format: int64
+        playback_25_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 25% of this video.
+          format: int64
+        playback_50_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 50% of this video.
+          format: int64
+        playback_75_count:
+          type:
+          - integer
+          - 'null'
+          description: Number of users who watched at least 75% of this video.
+          format: int64
+        view_count:
+          type:
+          - integer
+          - 'null'
+          description: The number of promoted views of this video. Null when the backend returns quartile data without a view count.
+          format: int64
     PollOptions:
       type: array
       description: The list of options (choices) available in this poll.
@@ -2570,6 +2790,204 @@ components:
             type: integer
             description: The number of votes this option has received.
             format: int64
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    ChatMessageEvent:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        conversation_token:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        encoded_event:
+          type: string
+        id:
+          type: string
+        is_trusted:
+          type: boolean
+        message_event_signature:
+          type: object
+        previous_id:
+          type: string
+        sender_id:
+          type: string
+    CreateChatConversationResponseData:
+      type: object
+      required:
+      - conversation_id
+      properties:
+        conversation_id:
+          type: string
+          description: Canonical ID of the created conversation.
+        conversation_key_change_sequence_id:
+          type: string
+          description: Sequence ID of the conversation key change.
+    DeleteChatMessagesResponseData:
+      type: object
+      required:
+      - deleted
+      properties:
+        deleted:
+          type: boolean
+          description: Whether the messages were deleted.
+    Post:
+      type: object
+      properties:
+        article:
+          type: object
+        article_title:
+          type: object
+          description: Metadata about the long-form Article attached to this Post, if any.
+        attachments:
+          $ref: '#/components/schemas/PostAttachments'
+        author_id:
+          type: string
+          description: Unique identifier of the author of this Post.
+        card_uri:
+          type: string
+        community_id:
+          type: string
+          description: The unique identifier of the Community this Post belongs to, if any.
+        context_annotations:
+          $ref: '#/components/schemas/PostContextAnnotations'
+        conversation_id:
+          type: string
+          description: The ID of the conversation this Post belongs to (matches the root Post's ID).
+        created_at:
+          type: string
+          description: Creation time of the Post.
+          format: date-time
+        display_text_range:
+          $ref: '#/components/schemas/PostDisplayTextRange'
+        edit_controls:
+          $ref: '#/components/schemas/PostEditControls'
+        edit_history_post_ids:
+          type: array
+          description: A list of Post IDs in this Post's edit history chain.
+          items:
+            type: string
+        entities:
+          $ref: '#/components/schemas/PostEntities'
+        geo:
+          $ref: '#/components/schemas/PostGeo'
+        id:
+          type: string
+          description: Unique identifier of this Post.
+        in_reply_to_user_id:
+          type: string
+          description: Unique identifier of the User this Post is replying to.
+        lang:
+          type: string
+          description: Language of the Post, if detected by X. Returned as a BCP47 language tag.
+        matched_media_notes:
+          $ref: '#/components/schemas/PostMatchedMediaNotes'
+        media_metadata:
+          $ref: '#/components/schemas/PostMediaMetadata'
+        non_public_metrics:
+          type: object
+          description: Nonpublic engagement metrics for the Post at the time of the request.
+        note_post:
+          $ref: '#/components/schemas/PostNotePost'
+        note_request_suggestions:
+          $ref: '#/components/schemas/PostNoteRequestSuggestions'
+        organic_metrics:
+          type: object
+          description: Organic nonpublic engagement metrics for the Post at the time of the request.
+        paid_partnership:
+          type: boolean
+          description: Indicates if this Post is a paid partnership, i.e. it has been disclosed by the author as containing paid promotion.
+        possibly_sensitive:
+          type: boolean
+          description: Indicates if this Post contains URLs marked as sensitive, for example content suitable for mature audiences.
+        promoted_metrics:
+          type: object
+          description: Promoted nonpublic engagement metrics for the Post at the time of the request.
+        public_metrics:
+          $ref: '#/components/schemas/PostPublicMetrics'
+        referenced_posts:
+          $ref: '#/components/schemas/PostReferencedPosts'
+        reply_settings:
+          type: string
+          description: Shows who can reply to this Post.
+        scopes:
+          $ref: '#/components/schemas/PostScopes'
+        source:
+          type: string
+          description: The name of the app the user posted from. This is deprecated.
+        suggested_source_links:
+          $ref: '#/components/schemas/PostSuggestedSourceLinks'
+        suggested_source_links_with_counts:
+          $ref: '#/components/schemas/PostSuggestedSourceLinksWithCounts'
+        text:
+          type: string
+          description: The content of the Post.
+        username:
+          type: string
+        withheld:
+          $ref: '#/components/schemas/PostWithheld'
+    ChatConversation:
+      type: object
+      properties:
+        admin_ids:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+        group_avatar_url:
+          type: string
+        group_name:
+          type: string
+        id:
+          type: string
+        is_muted:
+          type: boolean
+        member_ids:
+          type: array
+          items:
+            type: string
+        message_ttl_ms:
+          type: integer
+        participant_ids:
+          type: array
+          items:
+            type: string
+        screen_capture_blocking_enabled:
+          type: boolean
+        screen_capture_detection_enabled:
+          type: boolean
+        type:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+    InitializeChatGroupResponseData:
+      type: object
+      required:
+      - conversation_id
+      properties:
+        conversation_id:
+          type: string
+          description: Unique ID for the new group conversation.
     User:
       type: object
       properties:
@@ -2651,576 +3069,158 @@ components:
           description: 'The X Blue verified type of the user, e.g.: blue, government, business or none.'
         withheld:
           $ref: '#/components/schemas/UserWithheld'
-    AddConversationKeysResponseData:
+    PostEntities:
       type: object
+      description: A list of metadata entities (hashtags, mentions, URLs) found in the Post text.
       properties:
-        conversation_id:
-          type: string
-          description: Canonical ID of the conversation.
-        sequence_id:
-          type: string
-          description: Sequence ID of the key change.
-    MarkChatConversationReadResponseData:
-      type: object
-      required:
-      - success
-      properties:
-        success:
-          type: boolean
-          description: Whether the conversation was marked read.
-    MediaOrganicMetrics:
-      type: object
-      description: Organic nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-        playback_100_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-        playback_25_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-        playback_50_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-        playback_75_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-        view_count:
-          type:
-          - integer
-          - 'null'
-          description: The number of organic views of this video. Null when the backend returns quartile data without a view count.
-          format: int64
-    FieldUnauthorizedProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-unauthorized
-    PostAttachments:
-      type: object
-      description: Specifies the type of attachments (if any) present in this Post.
-      properties:
-        media_keys:
+        cashtags:
           type:
           - array
           - 'null'
-          description: Media keys of media attached to this Post.
           items:
-            type: string
-        media_source_tweet_id:
+            type: object
+            description: A hashtag or cashtag entity.
+            required:
+            - start
+            - end
+            - tag
+            properties:
+              end:
+                type: integer
+                description: End index in the text (exclusive).
+                format: int64
+              start:
+                type: integer
+                description: Start index in the text (inclusive).
+                format: int64
+              tag:
+                type: string
+        hashtags:
           type:
           - array
           - 'null'
-          description: IDs of the source Posts the attached media originated from.
           items:
-            type: string
-        poll_ids:
+            type: object
+            description: A hashtag or cashtag entity.
+            required:
+            - start
+            - end
+            - tag
+            properties:
+              end:
+                type: integer
+                description: End index in the text (exclusive).
+                format: int64
+              start:
+                type: integer
+                description: Start index in the text (inclusive).
+                format: int64
+              tag:
+                type: string
+        mentions:
           type:
           - array
           - 'null'
-          description: IDs of polls attached to this Post.
           items:
-            type: string
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    PostPublicMetrics:
-      type: object
-      description: Engagement metrics for the Post at the time of the request.
-      required:
-      - repost_count
-      - reply_count
-      - like_count
-      - quote_count
-      - bookmark_count
-      - impression_count
-      properties:
-        bookmark_count:
-          type: integer
-          description: Number of times this Post has been bookmarked.
-          format: int64
-        impression_count:
-          type: integer
-          description: Number of times this Post has been viewed.
-          format: int64
-        like_count:
-          type: integer
-          description: Number of likes on this Post.
-          format: int64
-        quote_count:
-          type: integer
-          description: Number of quote Posts of this Post.
-          format: int64
-        reply_count:
-          type: integer
-          description: Number of replies to this Post.
-          format: int64
-        repost_count:
-          type: integer
-          description: Number of times this Post has been reposted.
-          format: int64
-    ChatMediaUploadFinalizeRequest:
-      type: object
-      required:
-      - conversation_id
-      - media_hash_key
-      - num_parts
-      properties:
-        conversation_id:
-          type: string
-          description: The XChat conversation the upload belongs to.
-        media_hash_key:
-          type: string
-          description: The media hash key returned by the initialize step.
-        message_id:
-          type: string
-          description: Optional message identifier associated with the upload.
-        num_parts:
-          type: string
-          description: Total number of uploaded parts, as a numeric string.
-        ttl_msec:
-          type: string
-          description: Optional TTL for the media in milliseconds, as a numeric string.
-      additionalProperties: false
-    PlaceGeo:
-      type: object
-      description: The geographic location of this place, expressed as a GeoJSON Feature.
-      required:
-      - type
-      - bbox
-      - properties
-      properties:
-        bbox:
-          type: array
-          description: The bounding box as [southwest_longitude, southwest_latitude, northeast_longitude, northeast_latitude].
-          minItems: 4
-          maxItems: 4
-          items:
-            type: number
-            format: double
-        properties:
-          type: object
-          description: Additional GeoJSON feature properties.
-        type:
-          description: The GeoJSON feature type.
-          oneOf:
-          - type: string
-            enum:
-            - Feature
-    Expansions:
-      type: object
-      properties:
-        media:
-          type: array
-          items:
-            $ref: '#/components/schemas/Media'
-        places:
-          type: array
-          items:
-            $ref: '#/components/schemas/Place'
-        polls:
-          type: array
-          items:
-            $ref: '#/components/schemas/Poll'
-        posts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Post'
-        topics:
-          type: array
-          items:
-            $ref: '#/components/schemas/Topic'
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
-    ChatMediaUploadAppendResponseData:
-      type: object
-      properties:
-        expires_at:
-          type: integer
-          description: Epoch seconds when the upload session expires.
-    CreateChatConversationResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateChatConversationResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    UserPublicMetrics:
-      type: object
-      description: A list of metrics for this User.
-      required:
-      - followers_count
-      - following_count
-      - post_count
-      - listed_count
-      properties:
-        followers_count:
-          type: integer
-          description: Number of Users who follow this User.
-          format: int64
-        following_count:
-          type: integer
-          description: Number of Users this User follows.
-          format: int64
-        like_count:
+            type: object
+            description: A user mention entity.
+            required:
+            - start
+            - end
+            properties:
+              end:
+                type: integer
+                format: int64
+              id:
+                type:
+                - string
+                - 'null'
+              start:
+                type: integer
+                format: int64
+              username:
+                type:
+                - string
+                - 'null'
+        urls:
           type:
-          - integer
+          - array
           - 'null'
-          description: Number of Posts this User has liked.
-          format: int64
-        listed_count:
-          type: integer
-          description: Number of Lists that include this User.
-          format: int64
-        media_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of media items posted by this User.
-          format: int64
-        post_count:
-          type: integer
-          description: Number of Posts (including Reposts) created by this User.
-          format: int64
-    MediaNonPublicMetrics:
-      type: object
-      description: Nonpublic engagement metrics for the media at the time of the request.
-      properties:
-        playback_0_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who started playback (0% quartile) of this video.
-          format: int64
-        playback_100_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who completed playback (100% quartile) of this video.
-          format: int64
-        playback_25_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 25% of this video.
-          format: int64
-        playback_50_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 50% of this video.
-          format: int64
-        playback_75_count:
-          type:
-          - integer
-          - 'null'
-          description: Number of users who watched at least 75% of this video.
-          format: int64
-    ChatMessageEvent:
-      type: object
-      properties:
-        conversation_id:
-          type: string
-        conversation_token:
-          type: string
-        created_at:
-          type: string
-          format: date-time
-        encoded_event:
-          type: string
-        id:
-          type: string
-        is_trusted:
-          type: boolean
-        message_event_signature:
-          type: object
-        previous_id:
-          type: string
-        sender_id:
-          type: string
-    AddConversationKeysActionSignaturesMessageEventSignature:
-      type: object
-      required:
-      - signature
-      - public_key_version
-      - signature_version
-      properties:
-        message_signing_key_info_list:
-          type: array
-          description: List of signing key information for message verification.
           items:
-            $ref: '#/components/schemas/AddConversationKeysActionSignaturesMessageEventSignatureMessageSigningKeyInfoList'
-        public_key_version:
-          type: string
-          description: The version of the public key used for signing.
-          pattern: ^[0-9]+$
-        signature:
-          type: string
-          description: The signature of the message event.
-          minLength: 1
-          pattern: ^[A-Za-z0-9+/=_-]+$
-        signature_version:
-          type: string
-          description: The version of the signature algorithm.
-          pattern: ^[0-9]+$
-        signing_public_key:
-          type: string
-          description: The public key used for signing.
-    ChatMediaUploadAppendResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ChatMediaUploadAppendResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    AddChatGroupMembersActionSignatures:
-      type: object
-      required:
-      - message_id
-      - encoded_message_event_detail
-      - message_event_signature
-      properties:
-        encoded_message_event_detail:
-          type: string
-          description: Base64-encoded message event detail.
-          minLength: 1
-          pattern: ^[A-Za-z0-9+/=_-]+$
-        message_event_signature:
-          description: Message event signature supplied with an action signature.
-          $ref: '#/components/schemas/AddChatGroupMembersActionSignaturesMessageEventSignature'
-        message_id:
-          type: string
-          description: Client-generated ID of the message being signed.
-          minLength: 1
-        signature_payload:
-          type: string
-          description: Payload string the client signed; used only in server-side failure logs.
-    AddConversationKeysResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/AddConversationKeysResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    CreateChatConversationActionSignaturesMessageEventSignatureMessageSigningKeyInfoList:
-      type: object
-      properties:
-        member_id:
-          type: string
-          description: The member ID associated with this signing key.
-        public_key_version:
-          type: string
-          description: The version of the public key.
-        signing_public_key:
-          type: string
-          description: The signing public key.
-    AddConversationKeysRequest:
-      type: object
-      required:
-      - conversation_key_version
-      - conversation_participant_keys
-      properties:
-        action_signatures:
-          type: array
-          description: Cryptographic signatures for the action.
-          items:
-            $ref: '#/components/schemas/AddConversationKeysActionSignatures'
-        base64_encoded_key_rotation:
-          type: string
-          description: Base64-encoded key rotation payload for ratchet tree key management.
-        conversation_key_version:
-          type: string
-          description: Version of the conversation encryption key (typically a timestamp in milliseconds).
-        conversation_participant_keys:
-          type: array
-          description: Encrypted conversation keys for each participant.
-          items:
-            $ref: '#/components/schemas/AddConversationKeysConversationParticipantKeys'
-    Poll:
-      type: object
-      properties:
-        duration_minutes:
-          type: integer
-        end_datetime:
-          type: string
-        id:
-          type: string
-        options:
-          $ref: '#/components/schemas/PollOptions'
-        voting_status:
-          type: string
-    ChatConversation:
-      type: object
-      properties:
-        admin_ids:
-          type: array
-          items:
-            type: string
-        created_at:
-          type: string
-          format: date-time
-        group_avatar_url:
-          type: string
-        group_name:
-          type: string
-        id:
-          type: string
-        is_muted:
-          type: boolean
-        member_ids:
-          type: array
-          items:
-            type: string
-        message_ttl_ms:
-          type: integer
-        participant_ids:
-          type: array
-          items:
-            type: string
-        screen_capture_blocking_enabled:
-          type: boolean
-        screen_capture_detection_enabled:
-          type: boolean
-        type:
-          type: string
-        updated_at:
-          type: string
-          format: date-time
-    UserSubscription:
-      type: object
-      description: The subscription relationship between this User and you.
-      required:
-      - subscribes_to_you
-      properties:
-        subscribes_to_you:
-          type: boolean
-          description: Indicates if this User subscribes to you.
-    Media:
-      type: object
-      properties:
-        alt_text:
-          type: string
-        duration_ms:
-          type: integer
-        height:
-          type: integer
-        media_key:
-          type: string
-        non_public_metrics:
-          $ref: '#/components/schemas/MediaNonPublicMetrics'
-        organic_metrics:
-          $ref: '#/components/schemas/MediaOrganicMetrics'
-        preview_image_url:
-          type: string
-        promoted_metrics:
-          $ref: '#/components/schemas/MediaPromotedMetrics'
-        public_metrics:
-          $ref: '#/components/schemas/MediaPublicMetrics'
-        type:
-          type: string
-        url:
-          type: string
-        variants:
-          $ref: '#/components/schemas/MediaVariants'
-        width:
-          type: integer
-    SendChatTypingIndicatorResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/SendChatTypingIndicatorResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    ChatMediaUploadInitializeRequest:
-      type: object
-      required:
-      - conversation_id
-      - total_bytes
-      properties:
-        conversation_id:
-          type: string
-          description: The XChat conversation the upload belongs to.
-        total_bytes:
-          type: integer
-          description: Total size of the media upload in bytes.
-          minimum: 0
-      additionalProperties: false
+            type: object
+            description: A URL entity found in the Post text, enriched with link metadata.
+            required:
+            - start
+            - end
+            properties:
+              description:
+                type:
+                - string
+                - 'null'
+                description: Description of the linked page, when available.
+              display_url:
+                type:
+                - string
+                - 'null'
+                description: The URL as displayed in the Post text.
+              end:
+                type: integer
+                format: int64
+              expanded_url:
+                type:
+                - string
+                - 'null'
+                description: The fully resolved URL.
+              images:
+                type:
+                - array
+                - 'null'
+                items:
+                  type: object
+                  description: A preview image for a linked page.
+                  properties:
+                    height:
+                      type:
+                      - integer
+                      - 'null'
+                      format: int64
+                    url:
+                      type:
+                      - string
+                      - 'null'
+                    width:
+                      type:
+                      - integer
+                      - 'null'
+                      format: int64
+              media_key:
+                type:
+                - string
+                - 'null'
+              start:
+                type: integer
+                format: int64
+              status:
+                type:
+                - integer
+                - 'null'
+                description: HTTP status from resolving the URL.
+                format: int64
+              title:
+                type:
+                - string
+                - 'null'
+                description: Title of the linked page, when available.
+              unwound_url:
+                type:
+                - string
+                - 'null'
+                description: The final destination after following redirects.
+              url:
+                type:
+                - string
+                - 'null'
+                description: The t.co shortened URL.
   parameters:
     UserFieldsParameter:
       name: user.fields
@@ -3260,23 +3260,6 @@ components:
           - verified_followers_count
           - verified_type
           - withheld
-      explode: false
-      style: form
-    ChatConversationExpansionsParameter:
-      name: expansions
-      in: query
-      description: A comma separated list of fields to expand.
-      required: false
-      schema:
-        type: array
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - admin_ids
-          - member_ids
-          - participant_ids
       explode: false
       style: form
     ChatConversationFieldsParameter:
@@ -3326,6 +3309,23 @@ components:
           - message_event_signature
           - previous_id
           - sender_id
+      explode: false
+      style: form
+    ChatConversationExpansionsParameter:
+      name: expansions
+      in: query
+      description: A comma separated list of fields to expand.
+      required: false
+      schema:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - admin_ids
+          - member_ids
+          - participant_ids
       explode: false
       style: form
   securitySchemes:

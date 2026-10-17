@@ -84,23 +84,32 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    InternalErrorProblem:
+    Usage:
+      type: object
+      properties:
+        cap_reset_day:
+          type: integer
+        daily_client_app_usage:
+          $ref: '#/components/schemas/UsageDailyClientAppUsage'
+        daily_project_usage:
+          $ref: '#/components/schemas/UsageDailyProjectUsage'
+        project_cap:
+          type: string
+        project_id:
+          type: string
+        project_usage:
+          type: string
+    Error:
       type: object
       required:
-      - type
-      - title
-      - detail
+      - code
+      - message
       properties:
-        detail:
-          type: string
-        status:
+        code:
           type: integer
-        title:
+          format: int32
+        message:
           type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
     InvalidRequestProblem:
       type: object
       required:
@@ -122,6 +131,87 @@ components:
           - https://api.x.com/2/problems/invalid-request
         value:
           type: string
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    ResourceNotFoundProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    GetUsageResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Usage'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     FieldUnauthorizedProblem:
       type: object
       required:
@@ -146,19 +236,48 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
-    ResourceUnavailableProblem:
+    UsageDailyProjectUsage:
+      type: object
+      description: Project-level daily Post usage for the caller's project.
+      properties:
+        project_id:
+          type:
+          - string
+          - 'null'
+          description: Unique identifier of the project.
+        usage:
+          type:
+          - array
+          - 'null'
+          description: Daily usage entries for the project.
+          items:
+            type: object
+            description: A single day's usage entry.
+            required:
+            - date
+            properties:
+              date:
+                type: string
+                description: The day of the usage entry, as an ISO 8601 date-time.
+              usage:
+                type:
+                - string
+                - 'null'
+                description: Number of Posts used on this day.
+    DisallowedResourceProblem:
       type: object
       required:
       - type
       - title
       - detail
-      - resource_type
       properties:
         detail:
           type: string
         resource_id:
           type: string
         resource_type:
+          type: string
+        section:
           type: string
         status:
           type: integer
@@ -167,16 +286,7 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    GetUsageResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Usage'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
+          - https://api.x.com/2/problems/disallowed-resource
     UsageDailyClientAppUsage:
       type: array
       description: Per-client-app daily Post usage for the caller's project.
@@ -235,31 +345,7 @@ components:
           https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
           https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
           https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    DisallowedResourceProblem:
+    InternalErrorProblem:
       type: object
       required:
       - type
@@ -268,12 +354,6 @@ components:
       properties:
         detail:
           type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
         status:
           type: integer
         title:
@@ -281,8 +361,8 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    ResourceNotFoundProblem:
+          - https://api.x.com/2/problems/internal-error
+    NotAuthorizedForResourceProblem:
       type: object
       required:
       - type
@@ -298,6 +378,8 @@ components:
           type: string
         resource_type:
           type: string
+        section:
+          type: string
         status:
           type: integer
         title:
@@ -305,9 +387,30 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/resource-not-found
+          - https://api.x.com/2/problems/not-authorized-for-resource
         value:
           type: string
+    GetUsageCreditsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GetUsageCreditsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetUsageCreditsResponseDataFreeGrants:
+      type: object
+      required:
+      - amount
+      properties:
+        amount:
+          type: number
+          description: USD remaining in this free grant.
+        expires_at:
+          type: string
+          description: When this grant expires (RFC 3339). Omitted if the grant never expires or the expiry is unknown.
+      additionalProperties: false
     NotAuthorizedForFieldProblem:
       type: object
       required:
@@ -338,32 +441,6 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
           type: string
-    Usage:
-      type: object
-      properties:
-        cap_reset_day:
-          type: integer
-        daily_client_app_usage:
-          $ref: '#/components/schemas/UsageDailyClientAppUsage'
-        daily_project_usage:
-          $ref: '#/components/schemas/UsageDailyProjectUsage'
-        project_cap:
-          type: string
-        project_id:
-          type: string
-        project_usage:
-          type: string
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
     GetUsageCreditsResponseData:
       type: object
       required:
@@ -386,83 +463,6 @@ components:
         total_balance:
           type: number
           description: 'Spendable USD remaining, clamped at 0.00: total_balance = max(0, prepaid_balance + free_balance).'
-    GetUsageCreditsResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GetUsageCreditsResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    NotAuthorizedForResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
-          type: string
-    UsageDailyProjectUsage:
-      type: object
-      description: Project-level daily Post usage for the caller's project.
-      properties:
-        project_id:
-          type:
-          - string
-          - 'null'
-          description: Unique identifier of the project.
-        usage:
-          type:
-          - array
-          - 'null'
-          description: Daily usage entries for the project.
-          items:
-            type: object
-            description: A single day's usage entry.
-            required:
-            - date
-            properties:
-              date:
-                type: string
-                description: The day of the usage entry, as an ISO 8601 date-time.
-              usage:
-                type:
-                - string
-                - 'null'
-                description: Number of Posts used on this day.
-    GetUsageCreditsResponseDataFreeGrants:
-      type: object
-      required:
-      - amount
-      properties:
-        amount:
-          type: number
-          description: USD remaining in this free grant.
-        expires_at:
-          type: string
-          description: When this grant expires (RFC 3339). Omitted if the grant never expires or the expiry is unknown.
-      additionalProperties: false
   parameters:
     UsageFieldsParameter:
       name: usage.fields

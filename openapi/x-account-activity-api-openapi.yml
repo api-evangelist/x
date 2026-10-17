@@ -197,26 +197,34 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    CreateAccountActivitySubscriptionRequest:
+    GetAccountActivitySubscriptionsResponse:
       type: object
-      properties: {}
-    InternalErrorProblem:
+      properties:
+        data:
+          $ref: '#/components/schemas/GetAccountActivitySubscriptionsResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    CreateAccountActivitySubscriptionResponseData:
       type: object
       required:
-      - type
-      - title
-      - detail
+      - subscribed
       properties:
-        detail:
-          type: string
-        status:
+        subscribed:
+          type: boolean
+          description: Whether the subscription is active.
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
           type: integer
-        title:
+          format: int32
+        message:
           type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/internal-error
     InvalidRequestProblem:
       type: object
       required:
@@ -238,55 +246,6 @@ components:
           - https://api.x.com/2/problems/invalid-request
         value:
           type: string
-    FieldUnauthorizedProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-unauthorized
-    CreateAccountActivitySubscriptionResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateAccountActivitySubscriptionResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    GetAccountActivitySubscriptionsResponseDataSubscriptions:
-      type: object
-      properties:
-        user_id:
-          type: string
-          description: Subscribed user.
-      additionalProperties: false
-    ValidateAccountActivitySubscriptionResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/ValidateAccountActivitySubscriptionResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
     ResourceUnavailableProblem:
       type: object
       required:
@@ -309,112 +268,13 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/resource-unavailable
+    CreateAccountActivitySubscriptionRequest:
+      type: object
+      properties: {}
     WebhookConfigId:
       type: string
       description: Unique identifier of a WebhookConfig
       pattern: ^[0-9]{1,19}$
-    DeleteAccountActivitySubscriptionResponseData:
-      type: object
-      required:
-      - subscribed
-      properties:
-        subscribed:
-          type: boolean
-          description: Whether the user has an active subscription.
-    GetAccountActivitySubscriptionCountResponseData:
-      type: object
-      properties:
-        account_name:
-          type: string
-          description: Name of the subscribing account.
-        provisioned_count:
-          type: string
-          description: Number of subscriptions provisioned for the app.
-        subscriptions_count_all:
-          type: string
-          description: Number of active subscriptions across all event types.
-        subscriptions_count_direct_messages:
-          type: string
-          description: Number of active Direct Message subscriptions.
-    Problem:
-      oneOf:
-      - $ref: '#/components/schemas/ResourceNotFoundProblem'
-      - $ref: '#/components/schemas/InvalidRequestProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
-      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
-      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
-      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
-      - $ref: '#/components/schemas/ResourceUnavailableProblem'
-      - $ref: '#/components/schemas/DisallowedResourceProblem'
-      - $ref: '#/components/schemas/InternalErrorProblem'
-      discriminator:
-        propertyName: type
-        mapping:
-          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
-          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
-          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
-          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
-          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
-          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
-          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
-          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
-          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
-    GetAccountActivitySubscriptionCountResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GetAccountActivitySubscriptionCountResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
     ResourceNotFoundProblem:
       type: object
       required:
@@ -441,6 +301,211 @@ components:
           - https://api.x.com/2/problems/resource-not-found
         value:
           type: string
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    GetAccountActivitySubscriptionCountResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/GetAccountActivitySubscriptionCountResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    FieldUnauthorizedProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-unauthorized
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    DeleteAccountActivitySubscriptionResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DeleteAccountActivitySubscriptionResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetAccountActivitySubscriptionsResponseDataSubscriptions:
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: Subscribed user.
+      additionalProperties: false
+    DeleteAccountActivitySubscriptionResponseData:
+      type: object
+      required:
+      - subscribed
+      properties:
+        subscribed:
+          type: boolean
+          description: Whether the user has an active subscription.
+    Problem:
+      oneOf:
+      - $ref: '#/components/schemas/ResourceNotFoundProblem'
+      - $ref: '#/components/schemas/InvalidRequestProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForResourceProblem'
+      - $ref: '#/components/schemas/NotAuthorizedForFieldProblem'
+      - $ref: '#/components/schemas/FieldUnauthorizedProblem'
+      - $ref: '#/components/schemas/FieldHydrationFailureProblem'
+      - $ref: '#/components/schemas/ResourceUnavailableProblem'
+      - $ref: '#/components/schemas/DisallowedResourceProblem'
+      - $ref: '#/components/schemas/InternalErrorProblem'
+      discriminator:
+        propertyName: type
+        mapping:
+          https://api.x.com/2/problems/disallowed-resource: '#/components/schemas/DisallowedResourceProblem'
+          https://api.x.com/2/problems/field-hydration-failure: '#/components/schemas/FieldHydrationFailureProblem'
+          https://api.x.com/2/problems/field-unauthorized: '#/components/schemas/FieldUnauthorizedProblem'
+          https://api.x.com/2/problems/internal-error: '#/components/schemas/InternalErrorProblem'
+          https://api.x.com/2/problems/invalid-request: '#/components/schemas/InvalidRequestProblem'
+          https://api.x.com/2/problems/not-authorized-for-field: '#/components/schemas/NotAuthorizedForFieldProblem'
+          https://api.x.com/2/problems/not-authorized-for-resource: '#/components/schemas/NotAuthorizedForResourceProblem'
+          https://api.x.com/2/problems/resource-not-found: '#/components/schemas/ResourceNotFoundProblem'
+          https://api.x.com/2/problems/resource-unavailable: '#/components/schemas/ResourceUnavailableProblem'
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
+    ValidateAccountActivitySubscriptionResponseData:
+      type: object
+      required:
+      - subscribed
+      properties:
+        subscribed:
+          type: boolean
+          description: Whether the user has an active subscription.
+    NotAuthorizedForResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-resource
+        value:
+          type: string
+    GetAccountActivitySubscriptionsResponseData:
+      type: object
+      properties:
+        application_id:
+          type: string
+          description: App the subscriptions belong to.
+        subscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetAccountActivitySubscriptionsResponseDataSubscriptions'
+        webhook_id:
+          type: string
+          description: Webhook receiving the subscription events.
+        webhook_url:
+          type: string
+          description: URL the webhook delivers events to.
+    ValidateAccountActivitySubscriptionResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ValidateAccountActivitySubscriptionResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     NotAuthorizedForFieldProblem:
       type: object
       required:
@@ -471,100 +536,35 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-field
         value:
           type: string
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    CreateAccountActivitySubscriptionResponseData:
-      type: object
-      required:
-      - subscribed
-      properties:
-        subscribed:
-          type: boolean
-          description: Whether the subscription is active.
-    GetAccountActivitySubscriptionsResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/GetAccountActivitySubscriptionsResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    GetAccountActivitySubscriptionsResponseData:
-      type: object
-      properties:
-        application_id:
-          type: string
-          description: App the subscriptions belong to.
-        subscriptions:
-          type: array
-          items:
-            $ref: '#/components/schemas/GetAccountActivitySubscriptionsResponseDataSubscriptions'
-        webhook_id:
-          type: string
-          description: Webhook receiving the subscription events.
-        webhook_url:
-          type: string
-          description: URL the webhook delivers events to.
-    DeleteAccountActivitySubscriptionResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/DeleteAccountActivitySubscriptionResponseData'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    NotAuthorizedForResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-resource
-        value:
-          type: string
-    ValidateAccountActivitySubscriptionResponseData:
-      type: object
-      required:
-      - subscribed
-      properties:
-        subscribed:
-          type: boolean
-          description: Whether the user has an active subscription.
     UserId:
       type: string
       description: Unique identifier of a User
       pattern: ^[0-9]{1,19}$
       example: '2244994945'
+    CreateAccountActivitySubscriptionResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateAccountActivitySubscriptionResponseData'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    GetAccountActivitySubscriptionCountResponseData:
+      type: object
+      properties:
+        account_name:
+          type: string
+          description: Name of the subscribing account.
+        provisioned_count:
+          type: string
+          description: Number of subscriptions provisioned for the app.
+        subscriptions_count_all:
+          type: string
+          description: Number of active subscriptions across all event types.
+        subscriptions_count_direct_messages:
+          type: string
+          description: Number of active Direct Message subscriptions.
   securitySchemes:
     BearerToken:
       type: http

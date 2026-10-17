@@ -120,14 +120,41 @@ paths:
                 $ref: '#/components/schemas/Problem'
 components:
   schemas:
-    InternalErrorProblem:
+    GetNewsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/News'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    NewsClusterPostsResults:
+      type: array
+      items:
+        type: object
+        description: A Post belonging to this news story's cluster.
+        required:
+        - post_id
+        properties:
+          post_id:
+            type: string
+            description: Unique identifier of the Post.
+    ResourceNotFoundProblem:
       type: object
       required:
       - type
       - title
       - detail
+      - resource_type
       properties:
         detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
           type: string
         status:
           type: integer
@@ -136,7 +163,115 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/internal-error
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    News:
+      type: object
+      properties:
+        category:
+          type: string
+        cluster_posts_results:
+          $ref: '#/components/schemas/NewsClusterPostsResults'
+        contexts:
+          type: object
+        disclaimer:
+          type: string
+        hook:
+          type: string
+        id:
+          type: string
+        keywords:
+          type: object
+        name:
+          type: string
+        summary:
+          type: string
+        updated_at:
+          type: string
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    NotAuthorizedForFieldProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
+          type: string
+    SearchNewsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/News'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+        meta:
+          type: object
+          properties:
+            result_count:
+              type: integer
+              description: Number of items in the data array.
+              format: int32
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
     InvalidRequestProblem:
       type: object
       required:
@@ -158,24 +293,6 @@ components:
           - https://api.x.com/2/problems/invalid-request
         value:
           type: string
-    SearchNewsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/News'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-        meta:
-          type: object
-          properties:
-            result_count:
-              type: integer
-              description: Number of items in the data array.
-              format: int32
     Problem:
       oneOf:
       - $ref: '#/components/schemas/ResourceNotFoundProblem'
@@ -223,6 +340,68 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
     NotAuthorizedForResourceProblem:
       type: object
       required:
@@ -250,185 +429,6 @@ components:
           enum:
           - https://api.x.com/2/problems/not-authorized-for-resource
         value:
-          type: string
-    GetNewsResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/News'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    NewsClusterPostsResults:
-      type: array
-      items:
-        type: object
-        description: A Post belonging to this news story's cluster.
-        required:
-        - post_id
-        properties:
-          post_id:
-            type: string
-            description: Unique identifier of the Post.
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    NotAuthorizedForFieldProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-field
-        value:
-          type: string
-    News:
-      type: object
-      properties:
-        category:
-          type: string
-        cluster_posts_results:
-          $ref: '#/components/schemas/NewsClusterPostsResults'
-        contexts:
-          type: object
-        disclaimer:
-          type: string
-        hook:
-          type: string
-        id:
-          type: string
-        keywords:
-          type: object
-        name:
-          type: string
-        summary:
-          type: string
-        updated_at:
-          type: string
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
           type: string
   parameters:
     NewsFieldsParameter:

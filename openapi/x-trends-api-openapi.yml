@@ -117,15 +117,81 @@ paths:
     - url: https://api.x.com/2
       description: X API v2 production server
 components:
+  parameters:
+    TrendFieldsParameter:
+      name: trend.fields
+      in: query
+      description: A comma separated list of Trend fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a Trend object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - trend_name
+          - tweet_count
+      explode: false
+      style: form
+    PersonalizedTrendFieldsParameter:
+      name: personalized_trend.fields
+      in: query
+      description: A comma separated list of PersonalizedTrend fields to display.
+      required: false
+      schema:
+        type: array
+        description: The fields available for a PersonalizedTrend object.
+        minItems: 1
+        uniqueItems: true
+        items:
+          type: string
+          enum:
+          - category
+          - post_count
+          - trend_name
+          - trending_since
+      explode: false
+      style: form
   schemas:
-    InternalErrorProblem:
+    PersonalizedTrend:
+      type: object
+      properties:
+        category:
+          type: string
+        post_count:
+          type: string
+        trend_name:
+          type: string
+        trending_since:
+          type: string
+    GetTrendsPersonalizedTrendsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonalizedTrend'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
+    ResourceNotFoundProblem:
       type: object
       required:
       - type
       - title
       - detail
+      - resource_type
       properties:
         detail:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
           type: string
         status:
           type: integer
@@ -134,7 +200,74 @@ components:
         type:
           type: string
           enum:
-          - https://api.x.com/2/problems/internal-error
+          - https://api.x.com/2/problems/resource-not-found
+        value:
+          type: string
+    Error:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    FieldHydrationFailureProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/field-hydration-failure
+    NotAuthorizedForFieldProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - field
+      properties:
+        detail:
+          type: string
+        field:
+          type: string
+        parameter:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/not-authorized-for-field
+        value:
+          type: string
     InvalidRequestProblem:
       type: object
       required:
@@ -203,6 +336,62 @@ components:
           type: string
           enum:
           - https://api.x.com/2/problems/field-unauthorized
+    DisallowedResourceProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        section:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/disallowed-resource
+    ResourceUnavailableProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      - resource_type
+      properties:
+        detail:
+          type: string
+        resource_id:
+          type: string
+        resource_type:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/resource-unavailable
+    GetTrendsByWoeidResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trend'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Problem'
     Trend:
       type: object
       properties:
@@ -210,6 +399,23 @@ components:
           type: string
         tweet_count:
           type: integer
+    InternalErrorProblem:
+      type: object
+      required:
+      - type
+      - title
+      - detail
+      properties:
+        detail:
+          type: string
+        status:
+          type: integer
+        title:
+          type: string
+        type:
+          type: string
+          enum:
+          - https://api.x.com/2/problems/internal-error
     NotAuthorizedForResourceProblem:
       type: object
       required:
@@ -238,212 +444,6 @@ components:
           - https://api.x.com/2/problems/not-authorized-for-resource
         value:
           type: string
-    FieldHydrationFailureProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/field-hydration-failure
-    DisallowedResourceProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/disallowed-resource
-    ResourceNotFoundProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-not-found
-        value:
-          type: string
-    GetTrendsPersonalizedTrendsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/PersonalizedTrend'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-    ResourceUnavailableProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - resource_type
-      properties:
-        detail:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/resource-unavailable
-    NotAuthorizedForFieldProblem:
-      type: object
-      required:
-      - type
-      - title
-      - detail
-      - field
-      properties:
-        detail:
-          type: string
-        field:
-          type: string
-        parameter:
-          type: string
-        resource_id:
-          type: string
-        resource_type:
-          type: string
-        section:
-          type: string
-        status:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          enum:
-          - https://api.x.com/2/problems/not-authorized-for-field
-        value:
-          type: string
-    Error:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-        message:
-          type: string
-    PersonalizedTrend:
-      type: object
-      properties:
-        category:
-          type: string
-        post_count:
-          type: string
-        trend_name:
-          type: string
-        trending_since:
-          type: string
-    GetTrendsByWoeidResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Trend'
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/Problem'
-  parameters:
-    PersonalizedTrendFieldsParameter:
-      name: personalized_trend.fields
-      in: query
-      description: A comma separated list of PersonalizedTrend fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a PersonalizedTrend object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - category
-          - post_count
-          - trend_name
-          - trending_since
-      explode: false
-      style: form
-    TrendFieldsParameter:
-      name: trend.fields
-      in: query
-      description: A comma separated list of Trend fields to display.
-      required: false
-      schema:
-        type: array
-        description: The fields available for a Trend object.
-        minItems: 1
-        uniqueItems: true
-        items:
-          type: string
-          enum:
-          - trend_name
-          - tweet_count
-      explode: false
-      style: form
   securitySchemes:
     BearerToken:
       type: http
