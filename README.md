@@ -1,4 +1,4 @@
-# X (x)
+# X
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,40 +64,200 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Get immediate access to the X API and unlock the potential of X data.
+X (formerly Twitter) operates the X Developer Platform, the programmable interface to the public conversation on X. The X API v2 is a 190-operation REST surface covering Posts, Users, Direct Messages, the encrypted Chat API, Lists, Spaces, Media, Communities, Community Notes, Broadcasts, News, Trends, Articles and Bots, plus a substantial real-time layer — filtered stream, firehose and sample volume streams, compliance streams, Account Activity webhooks and the X Activity API. X publishes a machine-readable OpenAPI at api.x.com/2/openapi.json, an llms.txt family, an AGENTS.md, an agentskills.io skill, an A2A agent card and two hosted MCP servers. Access is sold pay-per-usage in prepaid credits rather than by subscription tier, with an Enterprise agreement for volume above the published cap.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/x/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/x/refs/heads/main/apis.yml)
+**Areas:** Spaces · Conversations · X · Social · Social Media · Posts · User · Direct Messages · Streaming · Webhook · Real-Time · Trends
 
-## Scope
+## X on APIs.io
 
-- **Type:** Index
-- **Position:** Consumer
-- **Access:** 3rd-Party
+Everything profiled for X is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/x/](https://apis.io/providers/x/)** — or go straight to one of the APIs or properties below.
 
-## Timestamps
+### APIs (24)
 
-- **Created:** 2025-08-14
-- **Modified:** 2026-03-16
+- [X Account Activity API](https://apis.io/apis/x/x-account-activity-api/) — Endpoints relating to retrieving, managing Account Activity subscriptions — 5 operation(s) in the X-published contract.
+- [X Account API](https://apis.io/apis/x/x-account-api/) — Endpoints for managing the authenticated user's X Developer Platform account — 2 operation(s) in the X-published contract.
+- [X Activity API](https://apis.io/apis/x/x-activity-api/) — Endpoints relating to retrieving, managing activity subscriptions — 5 operation(s) in the X-published contract.
+- [X Articles API](https://apis.io/apis/x/x-articles-api/) — Endpoints related to retrieving, creating & modifying Articles — 2 operation(s) in the X-published contract.
+- [X Bots API](https://apis.io/apis/x/x-bots-api/) — The Bots surface of the X API v2. — 6 operation(s) in the X-published contract.
+- [X Broadcasts API](https://apis.io/apis/x/x-broadcasts-api/) — Endpoints related to live broadcasts and their chat — 13 operation(s) in the X-published contract.
+- [X Chat API](https://apis.io/apis/x/x-chat-api/) — Endpoints related to Chat encrypted messaging — 16 operation(s) in the X-published contract.
+- [X Communities API](https://apis.io/apis/x/x-communities-api/) — Endpoints related to retrieving and managing Communities — 2 operation(s) in the X-published contract.
+- [X Community Notes API](https://apis.io/apis/x/x-community-notes-api/) — Endpoints related to retrieving, searching, and modifying Community Notes — 5 operation(s) in the X-published contract.
+- [X Compliance API](https://apis.io/apis/x/x-compliance-api/) — Endpoints related to keeping X data in your systems compliant — 6 operation(s) in the X-published contract.
+- [X Connections API](https://apis.io/apis/x/x-connections-api/) — Endpoints related to streaming connections — 4 operation(s) in the X-published contract.
+- [X Direct Messages API](https://apis.io/apis/x/x-direct-messages-api/) — Endpoints related to retrieving, managing Direct Messages — 9 operation(s) in the X-published contract.
+- [X General API](https://apis.io/apis/x/x-general-api/) — Miscellaneous endpoints for general API functionality — 1 operation(s) in the X-published contract.
+- [X Lists API](https://apis.io/apis/x/x-lists-api/) — Endpoints related to retrieving, managing Lists — 9 operation(s) in the X-published contract.
+- [X Media API](https://apis.io/apis/x/x-media-api/) — Endpoints related to retrieving and uploading Media — 11 operation(s) in the X-published contract.
+- [X News API](https://apis.io/apis/x/x-news-api/) — Endpoint for retrieving news stories — 2 operation(s) in the X-published contract.
+- [X Posts API](https://apis.io/apis/x/x-posts-api/) — Endpoints related to retrieving, searching, and modifying Posts — 14 operation(s) in the X-published contract.
+- [X Spaces API](https://apis.io/apis/x/x-spaces-api/) — Endpoints related to retrieving, managing Spaces — 6 operation(s) in the X-published contract.
+- [X Stream API](https://apis.io/apis/x/x-stream-api/) — Endpoints related to streaming — 18 operation(s) in the X-published contract.
+- [X Trends API](https://apis.io/apis/x/x-trends-api/) — Endpoint for retrieving trends — 2 operation(s) in the X-published contract.
+- [X Usage API](https://apis.io/apis/x/x-usage-api/) — Endpoints related to retrieving usage — 2 operation(s) in the X-published contract.
+- [X Users API](https://apis.io/apis/x/x-users-api/) — Endpoints related to retrieving, managing relationships of Users — 42 operation(s) in the X-published contract.
+- [X Webhooks API](https://apis.io/apis/x/x-webhooks-api/) — Endpoints relating to retrieving, managing webhooks and webhook configs — 8 operation(s) in the X-published contract.
+- [X Ads API](https://apis.io/apis/x/x-ads-api/) — The X Ads API enables programmatic management of advertising campaigns on the X platform including campaign creation and scheduling, custom audience…
 
-## APIs
+### Published properties
 
-### X
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-Get immediate access to the X API and unlock the potential of X data.
+#### AsyncAPI (1)
 
-- **Human URL:** [ https://developer.x.com/en]( https://developer.x.com/en)
+Event-driven and webhook contracts.
 
-#### Properties
+- [X Webhooks](https://apis.io/asyncapis/x/x-webhooks/)
 
-- [Documentation]( https://developer.x.com/en)
-- [Postman Collection](collections/x.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/x.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+#### MCP servers (1)
 
-## Common Properties
+Model Context Protocol servers that expose the API to agents.
 
-- [GitHub Organization](https://github.com/twitter)
+- [x-mcp.yml](https://apis.io/servers/x/x-mcp-yml/)
 
-## Maintainers
+#### Agentic access (1)
 
-**FN:** Kin Lane
-**Email:** kin@apievangelist.com
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [X Agentic Access](https://apis.io/agentic-access/x/x-agentic-access/)
+
+#### Collections (4)
+
+Postman and Open Collection request collections.
+
+- [X API v2](https://apis.io/collections/x/open-x/)
+- [X API v2 Posts API](https://apis.io/collections/x/open-x-posts-api/)
+- [X API v2 Posts Trends API](https://apis.io/collections/x/open-x-trends-api/)
+- [X API v2 Posts Users API](https://apis.io/collections/x/open-x-users-api/)
+
+#### Overlays (24)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [X Account Activity Api Phrasing Overlay](https://apis.io/overlays/x/x-account-activity-api-phrasing-overlay/)
+- [X Account Api Phrasing Overlay](https://apis.io/overlays/x/x-account-api-phrasing-overlay/)
+- [X Activity Api Phrasing Overlay](https://apis.io/overlays/x/x-activity-api-phrasing-overlay/)
+- [X Api V2 Overlay](https://apis.io/overlays/x/x-api-v2-overlay/)
+- [X Articles Api Phrasing Overlay](https://apis.io/overlays/x/x-articles-api-phrasing-overlay/)
+- [X Bots Api Phrasing Overlay](https://apis.io/overlays/x/x-bots-api-phrasing-overlay/)
+- [X Broadcasts Api Phrasing Overlay](https://apis.io/overlays/x/x-broadcasts-api-phrasing-overlay/)
+- [X Chat Api Phrasing Overlay](https://apis.io/overlays/x/x-chat-api-phrasing-overlay/)
+- [X Communities Api Phrasing Overlay](https://apis.io/overlays/x/x-communities-api-phrasing-overlay/)
+- [X Community Notes Api Phrasing Overlay](https://apis.io/overlays/x/x-community-notes-api-phrasing-overlay/)
+- [X Compliance Api Phrasing Overlay](https://apis.io/overlays/x/x-compliance-api-phrasing-overlay/)
+- [X Connections Api Phrasing Overlay](https://apis.io/overlays/x/x-connections-api-phrasing-overlay/)
+- [X Direct Messages Api Phrasing Overlay](https://apis.io/overlays/x/x-direct-messages-api-phrasing-overlay/)
+- [X General Api Phrasing Overlay](https://apis.io/overlays/x/x-general-api-phrasing-overlay/)
+- [X Lists Api Phrasing Overlay](https://apis.io/overlays/x/x-lists-api-phrasing-overlay/)
+- [X Media Api Phrasing Overlay](https://apis.io/overlays/x/x-media-api-phrasing-overlay/)
+- [X News Api Phrasing Overlay](https://apis.io/overlays/x/x-news-api-phrasing-overlay/)
+- [X Posts Api Phrasing Overlay](https://apis.io/overlays/x/x-posts-api-phrasing-overlay/)
+- [X Spaces Api Phrasing Overlay](https://apis.io/overlays/x/x-spaces-api-phrasing-overlay/)
+- [X Stream Api Phrasing Overlay](https://apis.io/overlays/x/x-stream-api-phrasing-overlay/)
+- [X Trends Api Phrasing Overlay](https://apis.io/overlays/x/x-trends-api-phrasing-overlay/)
+- [X Usage Api Phrasing Overlay](https://apis.io/overlays/x/x-usage-api-phrasing-overlay/)
+- [X Users Api Phrasing Overlay](https://apis.io/overlays/x/x-users-api-phrasing-overlay/)
+- [X Webhooks Api Phrasing Overlay](https://apis.io/overlays/x/x-webhooks-api-phrasing-overlay/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [X Authentication](https://apis.io/security/x/x-authentication/)
+- [X Domain Security](https://apis.io/security/x/x-domain-security/)
+- [X Vulnerability Disclosure](https://apis.io/security/x/x-vulnerability-disclosure/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [X Scopes](https://apis.io/scopes/x/x-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [X Plans Pricing](https://apis.io/plans/x/x-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [X Rate Limits](https://apis.io/rate-limits/x/x-rate-limits/)
+
+#### FinOps (1)
+
+What the API costs to run, by operation.
+
+- [X Finops](https://apis.io/finops/x/x-finops/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://x.com/)
+- [Documentation](https://docs.x.com/)
+- [Getting started](https://docs.x.com/x-api/getting-started/make-your-first-request)
+- [API reference](https://docs.x.com/x-api/introduction)
+- [Pricing](https://docs.x.com/x-api/getting-started/pricing)
+- [Sign up](https://console.x.com)
+- [Support](https://devcommunity.x.com/)
+- [Terms of service](https://developer.x.com/en/developer-terms/agreement-and-policy)
+- [Privacy policy](https://x.com/en/privacy)
+- [GitHub](https://github.com/xdevplatform)
+- [Status](https://developer.x.com/status)
+
+## API Evangelist rating
+
+**Kin Score 69.4** — exemplar · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 75.0 |
+| Contract quality | 57.6 |
+| Contract governance | 18.2 |
+| Operational transparency | 76.3 |
+| Developer ergonomics | 76.2 |
+| Access clarity | 65.8 |
+
+**Agent readiness 61.2** — agent-native
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | documented (partial credit) |
+| MCP Server | verified |
+| Auth Clarity | served (partial credit) |
+| Idempotency | documented (partial credit) |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | yes |
+| Well Known Catalog | yes |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | yes |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | verified |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | partial |
+| Operation Distinctiveness | mostly (partial credit) |
+
+**Regulatory alignment 40.2** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/x/](https://apis.io/providers/x/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for X: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/x/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
