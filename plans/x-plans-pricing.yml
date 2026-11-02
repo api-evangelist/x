@@ -1,0 +1,127 @@
+# Pricing transcribed from the provider's own page — see provenance. Numbers are quoted, not derived.
+generated: '2026-10-28'
+method: searched
+source: https://docs.x.com/x-api/getting-started/pricing
+sources:
+- https://docs.x.com/x-api/getting-started/pricing
+provenance:
+  tool: engine/economics/harvest_pricing.py
+  run: 20261028T120612
+  grounding: every price_text was found verbatim in the fetched page text
+audience: developer-api
+pricing_basis: per-call
+delivery:
+  delivery: managed
+  method: page
+  read: '2026-10-28'
+published: true
+note: Credit-based pay-per-use API pricing with per-endpoint read/write/webhook rates, 24-hour deduplication,
+  and up to 20% back in free xAI credits based on cumulative spend tiers.
+plan_count: 7
+currency: USD
+plans:
+- name: 'Posts: Read'
+  price_text: $0.005 per resource
+  price: 0.005
+  currency: USD
+  period: per-use
+  unit: resource
+- name: 'User: Read'
+  price_text: $0.010 per resource
+  price: 0.01
+  currency: USD
+  period: per-use
+  unit: resource
+- name: 'Like: Read'
+  price_text: $0.001 per resource
+  price: 0.001
+  currency: USD
+  period: per-use
+  unit: resource
+- name: 'Post: Create'
+  price_text: $0.015 per request
+  price: 0.015
+  currency: USD
+  period: per-use
+  unit: request
+- name: 'Post: Create (with URL)'
+  price_text: $0.200 per request
+  price: 0.2
+  currency: USD
+  period: per-use
+  unit: request
+- name: Owned Reads
+  price_text: $0.001 per resource
+  price: 0.001
+  currency: USD
+  period: per-use
+  unit: resource
+- name: Enterprise
+  price_text: upgrade to an Enterprise plan
+  period: none
+rate_limit_statements:
+- Pay-per-usage plans are capped at 3 million Post reads per monthly billing cycle
+x-canonical:
+  generated: '2026-11-01'
+  vocabulary: engine/economics/plans-canonical.yml
+  models:
+  - hybrid
+  units:
+  - object
+  - request
+  plans:
+  - name: 'Posts: Read'
+    access: other
+    model: hybrid
+    model_how: derived
+    units:
+    - object
+    periods:
+    - other
+  - name: 'User: Read'
+    access: other
+    model: hybrid
+    model_how: derived
+    units:
+    - object
+    periods:
+    - other
+  - name: 'Like: Read'
+    access: other
+    model: hybrid
+    model_how: derived
+    units:
+    - object
+    periods:
+    - other
+  - name: 'Post: Create'
+    access: other
+    model: hybrid
+    model_how: derived
+    units:
+    - request
+    periods:
+    - other
+  - name: 'Post: Create (with URL)'
+    access: other
+    model: hybrid
+    model_how: derived
+    units:
+    - request
+    periods:
+    - other
+  - name: Owned Reads
+    access: other
+    model: hybrid
+    model_how: derived
+    units:
+    - object
+    periods:
+    - other
+  - name: Enterprise
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods:
+    - none
